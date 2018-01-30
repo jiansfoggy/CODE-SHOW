@@ -25,11 +25,13 @@ https://devmarketer.io/learn/do-not-install-mysql-macos-sierra-how-to-fix/
 
 ###### 我的Root密码  
 <br>
+
 ![](https://raw.githubusercontent.com/jiansfoggy/CODE-SHOW/master/MySQL/mysqlpw.png)  
 <br>
 <br>
 <br>
 <br>
+
 # Q2 If You Forget Your Password for MySQL Roothost Account on You Macbook  
 
 步骤：  
