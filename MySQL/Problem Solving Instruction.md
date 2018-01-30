@@ -25,7 +25,7 @@ https://devmarketer.io/learn/do-not-install-mysql-macos-sierra-how-to-fix/
 
 ###### 我的Root密码  
 
-![Click Here](CODE-SHOW/MySQL/mysqlpw.png)
+![Click Here](https://raw.githubusercontent.com/jiansfoggy/CODE-SHOW/master/MySQL/mysqlpw.png)
 <br>
 
 
