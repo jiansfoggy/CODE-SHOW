@@ -4,7 +4,7 @@
 
 MySQL 5.7.20是没有这个问题，可以从5.7.20的DMG包里单独安装Preference pane。  
 
-步骤:  
+> 步骤:  
 删除原来的MySQL Preference pane,下载MySQL5.7.20 DMG包。  
 下载地址：https://downloads.mysql.com/archives/community/  
 安装MySQL5.7.20时，在Installation Type 单独选中Preference Pane安装。
@@ -19,13 +19,13 @@ MySQL 5.7.20是没有这个问题，可以从5.7.20的DMG包里单独安装Prefe
 **方法三，Another Method**  
 If you prefer to reading English, please try this:  
 https://devmarketer.io/learn/do-not-install-mysql-macos-sierra-how-to-fix/  
-  
-  
-  
-# Q2 If You Forget Your Roothost's Password for MySQL on You Macbook  
 
-1：苹果->系统偏好设置->最下边点mysql 在弹出页面中 关闭mysql服务  
-2：进入终端  
+
+
+# Q2 If You Forget Your Password for MySQL Roothost Account on You Macbook  
+
+> 苹果->系统偏好设置->最下边点mysql 在弹出页面中 关闭mysql服务  
+> 进入终端  
 
 输入：  
 ``cd /usr/local/mysql/bin/``  
