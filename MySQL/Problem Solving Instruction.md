@@ -1,22 +1,25 @@
 # Q1 If macOS Sierra cannot load MySQL Preference Pane
 
-### 从MySQL 5.7.20 DMG包单独安装Preference Pane
+**从MySQL 5.7.20 DMG包单独安装Preference Pane**
 
-5.7.20是没有这个问题，可以从5.7.20的DMG 包里单独安装Preference pane。
+5.7.20是没有这个问题，可以从5.7.20的DMG包里单独安装Preference pane。
 
-步骤：
-删除原来的MySQL Preference pane
-下载MySQL5.7.20 DMG包。下载地址：https://downloads.mysql.com/archives/community/
-安装MySQL5.7.20时，在Installation Type 单独选中Preference Pane安装
+步骤:
+删除原来的MySQL Preference pane,下载MySQL5.7.20 DMG包。
 
-### 命令行启动MySQL
+下载地址：https://downloads.mysql.com/archives/community/
+
+安装MySQL5.7.20时，在Installation Type 单独选中Preference Pane安装。
+
+**命令行启动MySQL**
 如果不想按第一个方案重新安装MySQL Preference Pane，在bug的讨论里他们有提到使用命令行启动/关闭MySQL服务器。
 启动MySQL
 sudo launchctl load -F /Library/LaunchDaemons/com.oracle.oss.mysql.mysqld.plist
 关闭MySQL
 sudo launchctl unload -F /Library/LaunchDaemons/com.oracle.oss.mysql.mysqld.plist
 
-### Another Method
+**Another Method**
+If you prefer to reading English, please try this:
 https://devmarketer.io/learn/do-not-install-mysql-macos-sierra-how-to-fix/
 
 
