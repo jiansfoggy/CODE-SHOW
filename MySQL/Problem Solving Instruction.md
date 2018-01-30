@@ -46,7 +46,8 @@ https://devmarketer.io/learn/do-not-install-mysql-macos-sierra-how-to-fix/
 
 以下是部分说明：  
 用户权限表中  
-Limit Connectivity to Hosts Matching 表示登录地址限制，就是登录时候的ip地址 ，‘%'代表任意Adminstrative Roles是权限，如果发现你的root没有管理员权限了，就点这个选项卡全部勾选。  
+Limit Connectivity to Hosts Matching 表示登录地址限制，就是登录时候的ip地址，
+‘%'代表任意Adminstrative Roles是权限，如果发现你的root没有管理员权限了，就点这个选项卡全部勾选。  
 
 以下是其他命令:  
 ``/mysqladmin -u root -p password 123 //更改root用户密码``  
