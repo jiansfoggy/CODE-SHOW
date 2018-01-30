@@ -31,15 +31,15 @@ https://devmarketer.io/learn/do-not-install-mysql-macos-sierra-how-to-fix/
 
 输入：
 
-cd /usr/local/mysql/bin/
+``cd /usr/local/mysql/bin/``
 
 回车后 登录管理员权限
 
-sudo su
+``sudo su``
 
 回车后输入以下命令来禁止mysql验证功能
 
-./mysqld_safe --skip-grant-tables &
+``./mysqld_safe --skip-grant-tables &``
 
 回车后mysql会自动重启，重启好了之后进入mysql workbench 随便创建一个连接，然后用户名填root （注意这里不会验证密码，所以填只要存在的账户就可以）。
 
@@ -59,8 +59,8 @@ Adminstrative Roles是权限，如果发现你的root没有管理员权限了，
 
 以下是其他命令
 
-1 /mysqladmin -u root -p password 123 //更改root用户密码
-2 /mysql -uroot -p //root用户登录mysql
+``/mysqladmin -u root -p password 123 //更改root用户密码
+  /mysql -uroot -p //root用户登录mysql``
 
 
 
