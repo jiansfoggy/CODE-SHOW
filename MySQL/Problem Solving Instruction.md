@@ -23,8 +23,12 @@ MySQL 5.7.20是没有这个问题，可以从5.7.20的DMG包里单独安装Prefe
 If you prefer to reading English, please try this:  
 https://devmarketer.io/learn/do-not-install-mysql-macos-sierra-how-to-fix/  
 
+###### 我的Root密码  
 
+![Click Here][CODE-SHOW/MySQL/mysqlpw.png]
+<br>
 
+<br/>
 # Q2 If You Forget Your Password for MySQL Roothost Account on You Macbook  
 
 步骤：  
