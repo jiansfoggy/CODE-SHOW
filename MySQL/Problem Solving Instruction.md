@@ -10,13 +10,15 @@ MySQL 5.7.20是没有这个问题，可以从5.7.20的DMG包里单独安装Prefe
 安装MySQL5.7.20时，在Installation Type 单独选中Preference Pane安装。
 
 **方法二，命令行启动MySQL**  
-如果不想按第一个方案重新安装MySQL Preference Pane，在bug的讨论里他们有提到使用命令行启动/关闭MySQL服务器。  
+
+>如果不想按第一个方案重新安装MySQL Preference Pane，在bug的讨论里他们有提到使用命令行启动/关闭MySQL服务器。  
 启动MySQL  
 ``sudo launchctl load -F /Library/LaunchDaemons/com.oracle.oss.mysql.mysqld.plist``  
 关闭MySQL  
 ``sudo launchctl unload -F /Library/LaunchDaemons/com.oracle.oss.mysql.mysqld.plist``
 
-**方法三，Another Method**  
+**方法三，Crack it from Terminal**  
+
 If you prefer to reading English, please try this:  
 https://devmarketer.io/learn/do-not-install-mysql-macos-sierra-how-to-fix/  
 
@@ -24,15 +26,18 @@ https://devmarketer.io/learn/do-not-install-mysql-macos-sierra-how-to-fix/
 
 # Q2 If You Forget Your Password for MySQL Roothost Account on You Macbook  
 
-> 苹果->系统偏好设置->最下边点mysql 在弹出页面中 关闭mysql服务  
-> 进入终端  
+步骤：  
+> 苹果->系统偏好设置->最下边点mysql->在弹出页面中关闭mysql服务,  
 
-输入：  
+> 进入终端输入：  
 ``cd /usr/local/mysql/bin/``  
-回车后 登录管理员权限  
+
+回车后，登录管理员权限  
 ``sudo su``  
+
 回车后输入以下命令来禁止mysql验证功能  
 ``./mysqld_safe --skip-grant-tables &``  
+
 回车后mysql会自动重启，重启好了之后进入mysql workbench 随便创建一个连接，然后用户名填root(注意这里不会验证密码，所以填只要存在的账户就可以)。  
 再创建一个server administration，选择刚创建的连接。  
 双击server administration，  
