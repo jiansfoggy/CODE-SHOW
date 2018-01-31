@@ -3,12 +3,12 @@ library(readxl)
 library(sqldf)
 padding <- read_excel("//dcna_cifs.peacecorps.gov/users/jsun/My Documents/Data/Project2.xlsx", 
                        sheet = "Sheet3")
-padding <- read_excel("//dcna_cifs.peacecorps.gov/users/jsun/My Documents/Data/st2.xlsx", 
-                       sheet = "Sheet1")
+#padding <- read_excel("//dcna_cifs.peacecorps.gov/users/jsun/My Documents/Data/st2.xlsx", 
+#                       sheet = "Sheet1")
 test2 <- read_excel("//dcna_cifs.peacecorps.gov/users/jsun/My Documents/Data/test2.xlsx")
 Tique=sqldf("select * from padding natural join test2")
 Tique=sqldf("select * from Tique order by SubRegion")
-select * from ... join ... where .AA=.AA
+#select * from ... join ... where .AA=.AA
 
 ###factor needed data
 #get variable
@@ -135,39 +135,3 @@ word2=append(word2,"* InvAcc")
 shuchu=list(word1,word2)
 
 EOD=1.377463-0.653510*Fre+0.626382*InvAcc
-
-InvAcc=-2.199078+1.043309*Fre+1.59647*EOD
--1.377463/0.626382
-0.653510/0.626382
-1/0.626382
-
-InvAcc=-2.879088+2.958668*Fre+0.878826*Inv
-Inv=3.276061-3.366614*Fre+1.137882*InvAcc
-2.879088/0.878826
--2.958668/0.878826
-1/0.878826
-
-Row=c()
-
-
-
-TRAIN=Padd[-1,]
-TEST=Padd[1,]
-
-Kfold=rep(1:6, length.out=nrow(Padd))
-Kfolds=sample(Kfold)
-
-TRAINX=Padd[Kfolds!=2,]
-TESTX =Padd[Kfolds==2,]
-GetPad=lm(EOD~Fre+InvAcc,data=TRAINX, weights = Weight[Kfolds!=2])
-MX=predict(GetPad,newdata = TESTX[,-3])
-MSE=(sum((TESTX[,3]-MX)^2))/nrow(TESTX)
-
-TRAINX=Padd[Kfolds!=1,]
-TESTX =Padd[Kfolds==1,]
-GetPad=lm(EOD~Fre+InvAcc,data=TRAINX, weights = Weight[Kfolds!=1])
-MX=predict(GetPad,newdata = TESTX[,-3])
-MSE=(sum((TESTX[,3]-MX)^2))/nrow(TESTX)
-summary(MX)
-
-
