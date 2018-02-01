@@ -21,8 +21,6 @@ EOD=Tique$`Enter on Duty`
 Pad=data.frame(SubRegion,Fre,AA,Inv,Inv_deadline, EOD)
 
 
-
-
 ### run The function to get equation
 wlr=function(Fre,SubRegion,AA,Inv,Inv_deadline,EOD){
   #form data frame
@@ -122,41 +120,3 @@ wlr=function(Fre,SubRegion,AA,Inv,Inv_deadline,EOD){
 wlr(Fre,SubRegion,AA,Inv,Inv_deadline,EOD)
 
 #####the following is draft#################
-SS=summary(GetPad)
-word1="The fitted equation is :"
-word2=c("EOD = ")
-word2=append(word2,GetPad$coefficients[1])
-word2=append(word2,"+")
-word2=append(word2,GetPad$coefficients[2])
-word2=append(word2,"* Fre +")
-word2=append(word2,GetPad$coefficients[3])
-word2=append(word2,"* InvAcc")
-shuchu=list(word1,word2)
-
-EOD=1.377463-0.653510*Fre+0.626382*InvAcc
-
-InvAcc=-2.199078+1.043309*Fre+1.59647*EOD
--1.377463/0.626382
-0.653510/0.626382
-1/0.626382
-
-InvAcc=-2.879088+2.958668*Fre+0.878826*Inv
-Inv=3.276061-3.366614*Fre+1.137882*InvAcc
-2.879088/0.878826
--2.958668/0.878826
-1/0.878826
-
-EOD=2.41235-0.89953*Fre+0.67761*Inv_deadline
-0.67761*Inv_deadline=EOD-2.41235+0.89953*Fre
-Inv_deadline=(1/0.67761)*EOD-(2.41235/0.67761)+(0.89953/0.67761)*Fre
-
-Inv_deadline=1.475775*EOD-3.560086+1.327504*Fre
-
-AA=c(-1.01367,-0.71908,-0.84172,-1.41764,-0.43854,0.10600,-1.29071,-1.71339,
-     -1.69400,-2.39128,-2.36943,-1.27065,0.27358,-1.09293,0.61949,-1.15050,
-     -1.19473,-3.01246,-1.03949,-1.11064,-0.34086,-1.60182,-1.97752)
-AA/(-0.67761)
-AAc=c(1.4959490,1.0612004,1.2421895,2.0921179,0.6471864,-0.1564322,1.9047977,
-      2.5285784,2.4999631,3.5289916,3.4967459,1.8751937,-0.4037426,1.6129189,
-      -0.9142279,1.6978793,1.7631528,4.4457136,1.5340535,1.6390549,0.5030327,
-      2.3639262,2.9183749)
