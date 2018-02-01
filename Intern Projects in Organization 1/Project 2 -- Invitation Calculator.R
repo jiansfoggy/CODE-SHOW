@@ -24,8 +24,6 @@ EOD=Tique$EOD
 Pad=data.frame(SubRegion,Fre,AA,Inv,InvAcc, EOD)
 Padd=data.frame(Fre, InvAcc, EOD)
 
-
-
 ### run The function to get equation
 wlr=function(Fre,SubRegion,AA,Inv,InvAcc,EOD){
   #form data frame
