@@ -1,0 +1,37 @@
+body{
+  background-color:White;
+}, 
+#selector, 
+ 
+.act {
+    background-color: #191970 !important;
+} 
+
+sidebarPanel(
+                          selectInput("region", "Post:", choices=nameit[,2]),
+                          selectInput("AAVR", "Area Assignment for First Row:", choices=xsvr[,1]),
+                          numericInput("VR","Volunteer Request:" ,min=0, max=1000, value=60),
+                          selectInput("AAINV", "Area Assignment for Second Row:", choices=xsinv[,1]),
+                          numericInput("InvAcc", "Invitation Accepted:",min=0, max=1000, value=70),
+                          numericInput("EOD", "Actual EOD Number:",min=0, max=1000, value=1),
+                          numericInput("BF", "BackFill:",min=-100, max=100, value=0),
+                          numericInput("attrition", "PC Attrition:",min=0, max=100, value=0),
+                          #'Jump to Second Tab'
+                          br(),
+                          actionButton('goButton', img(src="pclogo.png", height = 50, width = 95)),
+                          p("Click the button to update the value displayed in the main panel.")
+                        ),
+                        mainPanel(
+                          strong("The number need to accept invitation:"),
+                          verbatimTextOutput("acc"),
+                          strong("The number need to invite:"),
+                          verbatimTextOutput("inv"),
+                          strong("The Percentage InvAcc/Invited:"),
+                          verbatimTextOutput("per"),
+                          strong("The Retrospective Padding Number:"),
+                          verbatimTextOutput("padnum"),
+                          strong("The Retrospective Padding Rate:"),
+                          verbatimTextOutput("padrate")
+                          #textOutput("accc")
+                        )
+                      )
