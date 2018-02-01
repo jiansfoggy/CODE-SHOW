@@ -30,7 +30,7 @@ wlr=function(Fre,SubRegion,AA,Inv,InvAcc,EOD){
   Padd=data.frame(SubRegion,Fre,AA,InvAcc,Inv,EOD)
   
     
-    #get row number for different region
+    #get row number for different region 
     Row=c()
     
     Row1=nrow(Padd[SubRegion=="Africa",])
