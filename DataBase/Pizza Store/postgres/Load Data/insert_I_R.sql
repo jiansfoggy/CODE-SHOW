@@ -1,0 +1,28 @@
+-- insert I_R
+
+INSERT INTO I_R ( Recipes_Name,Ingredient_Name, R_Quantity ) VALUES
+('Egibhiibaaii', 'Marinara',6),
+('Hfifbbigdbad', 'Basil',8),
+('Ghdehbhibcdi', 'Peppers',5),
+('Beeigedcbhhc', 'Italian Sausage',6),
+('Edacigbgecea', 'Pesto',8),
+('Ihiaacbhhfed', 'Sausage',2),
+('Degdagedhhfh', 'Garlic',6),
+('Ffhceabaebfe', 'Black Olives',9),
+('Difefdfiidbb', 'Mozzarella',8),
+('Gifiaicafhah', 'Pesto',7),
+('Cdicgbbaddab', 'Pepperoni',6),
+('Eeedegehaiac', 'Lamb',4),
+('Iigegicffcbh', 'Mushrooms',2),
+('Ibgighebgfbh', 'Mushrooms',4),
+('Fbibbaeffadi', 'Marinara',6),
+('Affghbihheac', 'Buffalo sauce',1),
+('Ibagcifiaddd', 'Onions',9),
+('Ihbbeadghfea', 'Garlic',6),
+('Aifbabaigbdi', 'Pineapple',5),
+('Ggghadaecbaa', 'Pesto',5),
+('Eahffbbcfdch', 'Onions',2),
+('Iidefddibcbg', 'Italian Sausage',1),
+('Bgdfegcciecc', 'Canadian Bacon',8),
+('Caiffeaaedgc', 'Buffalo sauce',3),
+('Ccdghbbhdgid', 'Sausage',8);

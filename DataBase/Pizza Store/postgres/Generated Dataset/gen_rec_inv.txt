@@ -1,0 +1,124 @@
+/**
+generate Recipe dataset
+**/
+
+/**
+Recipes_Name
+**/
+
+=CONCATENATE(CHAR(INT(RAND()*9+65)),CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),
+	CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),
+	CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)), 
+	CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)))
+
+/**
+Description
+**/
+
+=CONCATENATE(CHAR(INT(RAND()*9+65)),CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),
+	CHAR(INT(RAND()*9+97)), " ",CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),
+	CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)), " ",
+	CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),
+	CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)), " ",
+	CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),
+	CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)), " ")
+
+/**
+Cooking_Instructions
+**/
+
+=CONCATENATE(CHAR(INT(RAND()*9+65)),CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),
+	CHAR(INT(RAND()*9+97)), " ",CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),
+	CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)), " ",
+	CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),
+	CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)), " ",
+	CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),
+	CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)), " ")
+
+/**
+I_R
+**/
+
+/**
+Recipes_Name
+**/
+
+=CONCATENATE(CHAR(INT(RAND()*9+65)),CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),
+	CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),
+	CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)), 
+	CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)))
+
+Refer to Recipes dataset
+
+/**
+Ingredient_Name
+**/
+
+Mozzarella
+Marinara
+Pesto
+Buffalo sauce
+Pepperoni
+Sausage
+Bacon
+Canadian Bacon
+Italian Sausage
+Garlic
+Peppers
+Pineapple
+Mushrooms
+Basil
+Onions
+Black Olives
+Lamb
+
+/**
+Quantity
+**/
+
+=RANDBETWEEN(1,9)
+
+
+/**
+Inventory
+**/
+
+/**
+Ingredient_Name
+**/
+
+Mozzarella
+Marinara
+Pesto
+Buffalo sauce
+Pepperoni
+Sausage
+Bacon
+Canadian Bacon
+Italian Sausage
+Garlic
+Peppers
+Pineapple
+Mushrooms
+Basil
+Onions
+Black Olives
+Lamb
+
+/**
+Description
+**/
+
+=CONCATENATE(CHAR(INT(RAND()*9+65)),CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),
+	CHAR(INT(RAND()*9+97)), " ",CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),
+	CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)), " ",
+	CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),
+	CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)), " ",
+	CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),
+	CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)),CHAR(INT(RAND()*9+97)), " ")
+
+/**
+Quantity
+**/
+
+=RANDBETWEEN(1000,99999)

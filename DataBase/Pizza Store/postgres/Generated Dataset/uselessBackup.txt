@@ -1,0 +1,23 @@
+
+/**
+Orders
+**/
+
+/**
+Username
+**/
+
+=INDEX(U!$B$2:$B$1001,RANDBETWEEN(1,COUNTA(U!$B$2:$B$1001)),1)
+
+/**
+Create_Time
+**/
+
+=TEXT(RAND()*("2019-01-01 12:00:00"-"2015-01-01 9:00")+"2015-01-01 9:00:00","yyyy-mm-dd h:m:s")
+
+/**
+Recipes_Name
+**/
+
+=INDEX('R'!$A$2:$A$26,RANDBETWEEN(1,COUNTA('R'!$A$2:$A$26)),1)
+

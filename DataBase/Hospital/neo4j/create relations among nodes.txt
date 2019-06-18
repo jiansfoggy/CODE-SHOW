@@ -1,0 +1,15 @@
+MATCH (D:Doctors), (P:Patients)
+WHERE D.Name in P.Doc
+CREATE (D)-[h:heal]->(P);
+
+MATCH (P:Patients), (I:Illness)
+WHERE I.Name in P.Ill
+CREATE (P)-[ca:catched]->(I);
+
+MATCH (P:Patients), (I:Illness)
+WHERE I.Name in P.Ill
+CREATE (P)<-[ct:catch]-(I);
+
+MATCH (T:Treatments), (P:Patients)
+WHERE P.Name in T.Pat
+CREATE (T)-[t:treat]->(P);

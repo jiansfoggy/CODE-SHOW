@@ -1,0 +1,37 @@
+
+
+The PostgreSQL and Neo4j share the same dataset for doctors, which is generated in EXCEL. But the other datasets are randomly generated in Python, therefore the query results and extraCredit results are different for these 2 parts.
+
+PostgreSQL
+
+Pros
+1. Strictly defined schemas;
+2. Widely accepted query language. Easy to operate.
+3. Can Join table. Join is a very good function in relational database, which makes it easier for us to query table and track orders in this project.
+4. The datasets are loaded quickly.
+
+Cons
+1. Don't have user interface like Neo4J
+2. Cannot save the query result. If we want to review the former results, we have to query again.
+3. Cannot savean array of value in one field. We have to build a lookup table to save illness and treated doctors and related treatments for each patient in one field, because there isn't subdocument in all relational tables. 
+4. Don't have as vivid results as Neo4J. PostgreSQL only outputs tables, which is hard to directly view the relationships between patients, doctors, illnesses and treatments.
+5.Difficult to load local files. Although there is \COPY code helping to load local file into the psql container in docker, I failed many times. And it usually feedback many unreasonable error. What's worse, the error explanation is obscure, it's hard to know which part is wrong.
+
+Neo4J
+We already generate doctors who have illness. So we directly select them as sick doctors in Neo4J part.
+
+Pros
+1. Very great user experience.
+2. Great user interface makes users operate Neo4J easily.
+3. Fast Query. Neo4J returns query result very quickly.
+4. Object-oriented thinking. Very clear, explicit semantics for each query you write. No hidden assumption, such as that relational SQL where you have to know the tables in the FROM clause will implicitly form cartesian products.
+5. Do group by aggregate queries that is unimaginable in relational database. Due to the tabular model restriction, aggregate queries on relational database are greatly constrained by how data is grouped together. In contrast, graph model are more flexible on grouping and aggregating relevant data.
+6. The output graph is very vivid, which directly reflects the relationships between nodes.
+
+Cons
+1. Slow to build relationship when dealing with large scale dataset.
+2. Less number of qualified developers in the job market than the SQL developers. However, it’s picking up. For each graph expert, they can unleash the data value that can hardly be cooked, if feasible, by a traditional SQL expert.
+3. If you have zero connection of your data, Graph may not be that useful for you. By zero connection I mean that your data has no natural connections, including creating connections between your data and attributes/properties to classify your data. And you don’t have runtime connection either based on your query.
+4. Non-standardization of graph database query language and many marketing hype and incomplete offerings on the market have led to subpar performance and subpar usability impression on beginners, which actually slows down the graph model adoption in the needed enterprises.
+
+Generally speaking, PostgerSQL is easy to code, but I prefer to using Neo4J, because it is beautiful.

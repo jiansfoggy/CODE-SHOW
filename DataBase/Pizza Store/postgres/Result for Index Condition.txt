@@ -1,0 +1,224 @@
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Egibhiibaaii';
+                                 QUERY PLAN                                 
+----------------------------------------------------------------------------
+ Bitmap Heap Scan on orders  (cost=83.47..412.42 rows=1996 width=28)
+   Recheck Cond: (recipes_name = 'Egibhiibaaii'::text)
+   ->  Bitmap Index Scan on index_rec  (cost=0.00..82.97 rows=1996 width=0)
+         Index Cond: (recipes_name = 'Egibhiibaaii'::text)
+(4 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Hfifbbigdbad';
+                                 QUERY PLAN                                 
+----------------------------------------------------------------------------
+ Bitmap Heap Scan on orders  (cost=83.26..411.87 rows=1969 width=28)
+   Recheck Cond: (recipes_name = 'Hfifbbigdbad'::text)
+   ->  Bitmap Index Scan on index_rec  (cost=0.00..82.77 rows=1969 width=0)
+         Index Cond: (recipes_name = 'Hfifbbigdbad'::text)
+(4 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Ghdehbhibcdi';
+                                 QUERY PLAN                                 
+----------------------------------------------------------------------------
+ Bitmap Heap Scan on orders  (cost=83.20..411.71 rows=1961 width=28)
+   Recheck Cond: (recipes_name = 'Ghdehbhibcdi'::text)
+   ->  Bitmap Index Scan on index_rec  (cost=0.00..82.71 rows=1961 width=0)
+         Index Cond: (recipes_name = 'Ghdehbhibcdi'::text)
+(4 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Beeigedcbhhc';
+                                 QUERY PLAN                                 
+----------------------------------------------------------------------------
+ Bitmap Heap Scan on orders  (cost=83.60..412.76 rows=2013 width=28)
+   Recheck Cond: (recipes_name = 'Beeigedcbhhc'::text)
+   ->  Bitmap Index Scan on index_rec  (cost=0.00..83.10 rows=2013 width=0)
+         Index Cond: (recipes_name = 'Beeigedcbhhc'::text)
+(4 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Edacigbgecea';
+                                 QUERY PLAN                                 
+----------------------------------------------------------------------------
+ Bitmap Heap Scan on orders  (cost=87.86..417.43 rows=2046 width=28)
+   Recheck Cond: (recipes_name = 'Edacigbgecea'::text)
+   ->  Bitmap Index Scan on index_rec  (cost=0.00..87.34 rows=2046 width=0)
+         Index Cond: (recipes_name = 'Edacigbgecea'::text)
+(4 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Ihiaacbhhfed';
+                                QUERY PLAN                                 
+---------------------------------------------------------------------------
+ Bitmap Heap Scan on orders  (cost=14.60..336.79 rows=336 width=28)
+   Recheck Cond: (recipes_name = 'Ihiaacbhhfed'::text)
+   ->  Bitmap Index Scan on index_rec  (cost=0.00..14.52 rows=336 width=0)
+         Index Cond: (recipes_name = 'Ihiaacbhhfed'::text)
+(4 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Degdagedhhfh';
+                                 QUERY PLAN                                 
+----------------------------------------------------------------------------
+ Bitmap Heap Scan on orders  (cost=87.95..417.67 rows=2058 width=28)
+   Recheck Cond: (recipes_name = 'Degdagedhhfh'::text)
+   ->  Bitmap Index Scan on index_rec  (cost=0.00..87.44 rows=2058 width=0)
+         Index Cond: (recipes_name = 'Degdagedhhfh'::text)
+(4 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Ffhceabaebfe';
+                                 QUERY PLAN                                 
+----------------------------------------------------------------------------
+ Bitmap Heap Scan on orders  (cost=83.30..411.97 rows=1974 width=28)
+   Recheck Cond: (recipes_name = 'Ffhceabaebfe'::text)
+   ->  Bitmap Index Scan on index_rec  (cost=0.00..82.81 rows=1974 width=0)
+         Index Cond: (recipes_name = 'Ffhceabaebfe'::text)
+(4 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Difefdfiidbb';
+                                 QUERY PLAN                                 
+----------------------------------------------------------------------------
+ Bitmap Heap Scan on orders  (cost=83.52..412.54 rows=2002 width=28)
+   Recheck Cond: (recipes_name = 'Difefdfiidbb'::text)
+   ->  Bitmap Index Scan on index_rec  (cost=0.00..83.02 rows=2002 width=0)
+         Index Cond: (recipes_name = 'Difefdfiidbb'::text)
+(4 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Gifiaicafhah';
+                                 QUERY PLAN                                 
+----------------------------------------------------------------------------
+ Bitmap Heap Scan on orders  (cost=78.79..406.64 rows=1908 width=28)
+   Recheck Cond: (recipes_name = 'Gifiaicafhah'::text)
+   ->  Bitmap Index Scan on index_rec  (cost=0.00..78.31 rows=1908 width=0)
+         Index Cond: (recipes_name = 'Gifiaicafhah'::text)
+(4 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Cdicgbbaddab';
+                                 QUERY PLAN                                 
+----------------------------------------------------------------------------
+ Bitmap Heap Scan on orders  (cost=83.68..412.97 rows=2023 width=28)
+   Recheck Cond: (recipes_name = 'Cdicgbbaddab'::text)
+   ->  Bitmap Index Scan on index_rec  (cost=0.00..83.17 rows=2023 width=0)
+         Index Cond: (recipes_name = 'Cdicgbbaddab'::text)
+(4 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Eeedegehaiac';
+                                QUERY PLAN                                 
+---------------------------------------------------------------------------
+ Bitmap Heap Scan on orders  (cost=14.36..332.84 rows=305 width=28)
+   Recheck Cond: (recipes_name = 'Eeedegehaiac'::text)
+   ->  Bitmap Index Scan on index_rec  (cost=0.00..14.29 rows=305 width=0)
+         Index Cond: (recipes_name = 'Eeedegehaiac'::text)
+(4 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Iigegicffcbh';
+                                 QUERY PLAN                                 
+----------------------------------------------------------------------------
+ Bitmap Heap Scan on orders  (cost=83.24..411.83 rows=1967 width=28)
+   Recheck Cond: (recipes_name = 'Iigegicffcbh'::text)
+   ->  Bitmap Index Scan on index_rec  (cost=0.00..82.75 rows=1967 width=0)
+         Index Cond: (recipes_name = 'Iigegicffcbh'::text)
+(4 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Ibgighebgfbh';
+                                 QUERY PLAN                                 
+----------------------------------------------------------------------------
+ Bitmap Heap Scan on orders  (cost=83.28..411.93 rows=1972 width=28)
+   Recheck Cond: (recipes_name = 'Ibgighebgfbh'::text)
+   ->  Bitmap Index Scan on index_rec  (cost=0.00..82.79 rows=1972 width=0)
+         Index Cond: (recipes_name = 'Ibgighebgfbh'::text)
+(4 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Fbibbaeffadi';
+                                 QUERY PLAN                                 
+----------------------------------------------------------------------------
+ Bitmap Heap Scan on orders  (cost=87.95..417.67 rows=2058 width=28)
+   Recheck Cond: (recipes_name = 'Fbibbaeffadi'::text)
+   ->  Bitmap Index Scan on index_rec  (cost=0.00..87.44 rows=2058 width=0)
+         Index Cond: (recipes_name = 'Fbibbaeffadi'::text)
+(4 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Affghbihheac';
+                                 QUERY PLAN                                 
+----------------------------------------------------------------------------
+ Bitmap Heap Scan on orders  (cost=88.17..418.26 rows=2087 width=28)
+   Recheck Cond: (recipes_name = 'Affghbihheac'::text)
+   ->  Bitmap Index Scan on index_rec  (cost=0.00..87.65 rows=2087 width=0)
+         Index Cond: (recipes_name = 'Affghbihheac'::text)
+(4 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Ibagcifiaddd';
+                                QUERY PLAN                                
+--------------------------------------------------------------------------
+ Bitmap Heap Scan on orders  (cost=9.60..299.35 rows=206 width=28)
+   Recheck Cond: (recipes_name = 'Ibagcifiaddd'::text)
+   ->  Bitmap Index Scan on index_rec  (cost=0.00..9.54 rows=206 width=0)
+         Index Cond: (recipes_name = 'Ibagcifiaddd'::text)
+(4 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Ihbbeadghfea';
+                                 QUERY PLAN                                 
+----------------------------------------------------------------------------
+ Bitmap Heap Scan on orders  (cost=87.97..417.74 rows=2061 width=28)
+   Recheck Cond: (recipes_name = 'Ihbbeadghfea'::text)
+   ->  Bitmap Index Scan on index_rec  (cost=0.00..87.46 rows=2061 width=0)
+         Index Cond: (recipes_name = 'Ihbbeadghfea'::text)
+(4 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Aifbabaigbdi';
+                                 QUERY PLAN                                 
+----------------------------------------------------------------------------
+ Bitmap Heap Scan on orders  (cost=78.73..406.50 rows=1901 width=28)
+   Recheck Cond: (recipes_name = 'Aifbabaigbdi'::text)
+   ->  Bitmap Index Scan on index_rec  (cost=0.00..78.26 rows=1901 width=0)
+         Index Cond: (recipes_name = 'Aifbabaigbdi'::text)
+(4 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Ggghadaecbaa';
+                                 QUERY PLAN                                 
+----------------------------------------------------------------------------
+ Bitmap Heap Scan on orders  (cost=83.69..413.01 rows=2025 width=28)
+   Recheck Cond: (recipes_name = 'Ggghadaecbaa'::text)
+   ->  Bitmap Index Scan on index_rec  (cost=0.00..83.19 rows=2025 width=0)
+         Index Cond: (recipes_name = 'Ggghadaecbaa'::text)
+(4 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Eahffbbcfdch';
+                                QUERY PLAN                                
+--------------------------------------------------------------------------
+ Bitmap Heap Scan on orders  (cost=9.68..304.17 rows=217 width=28)
+   Recheck Cond: (recipes_name = 'Eahffbbcfdch'::text)
+   ->  Bitmap Index Scan on index_rec  (cost=0.00..9.63 rows=217 width=0)
+         Index Cond: (recipes_name = 'Eahffbbcfdch'::text)
+(4 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Iidefddibcbg';
+                                 QUERY PLAN                                 
+----------------------------------------------------------------------------
+ Bitmap Heap Scan on orders  (cost=78.82..406.72 rows=1912 width=28)
+   Recheck Cond: (recipes_name = 'Iidefddibcbg'::text)
+   ->  Bitmap Index Scan on index_rec  (cost=0.00..78.34 rows=1912 width=0)
+         Index Cond: (recipes_name = 'Iidefddibcbg'::text)
+(4 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Bgdfegcciecc';
+                                 QUERY PLAN                                 
+----------------------------------------------------------------------------
+ Bitmap Heap Scan on orders  (cost=83.38..412.18 rows=1984 width=28)
+   Recheck Cond: (recipes_name = 'Bgdfegcciecc'::text)
+   ->  Bitmap Index Scan on index_rec  (cost=0.00..82.88 rows=1984 width=0)
+         Index Cond: (recipes_name = 'Bgdfegcciecc'::text)
+(4 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Caiffeaaedgc';
+                                 QUERY PLAN                                 
+----------------------------------------------------------------------------
+ Bitmap Heap Scan on orders  (cost=83.26..411.87 rows=1969 width=28)
+   Recheck Cond: (recipes_name = 'Caiffeaaedgc'::text)
+   ->  Bitmap Index Scan on index_rec  (cost=0.00..82.77 rows=1969 width=0)
+         Index Cond: (recipes_name = 'Caiffeaaedgc'::text)
+(4 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Ccdghbbhdgid';
+                                QUERY PLAN                                 
+---------------------------------------------------------------------------
+ Bitmap Heap Scan on orders  (cost=14.50..335.18 rows=323 width=28)
+   Recheck Cond: (recipes_name = 'Ccdghbbhdgid'::text)
+   ->  Bitmap Index Scan on index_rec  (cost=0.00..14.42 rows=323 width=0)
+         Index Cond: (recipes_name = 'Ccdghbbhdgid'::text)
+(4 rows)

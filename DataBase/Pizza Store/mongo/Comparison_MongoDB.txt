@@ -1,0 +1,15 @@
+For MongoDB, I also insert 1000 users, 25 recipes, 50000 orders into different collections. For both nonindexed and indexed situation, I query 25 times for each recipe.
+
+Before adding an index on recipe ID, it takes around 23-54 ms to process. The average execution time is 48.36 ms.
+
+Next, I add index by 
+
+> db.Order.ensureIndex(
+{ Recipes_Name : 1 },
+{ unique : true, dropDups : true }
+)
+
+As we can see, the index in mongodb significantly shrinks the processing time. The processing time is reduced to 46-57 ms after adding index. The average execution time is 49.32 ms.
+
+It is very weird, since that the execution time should be greatly shrink after adding index. However, it does not show like I thought.
+But this result is much better than PostgreSQL.

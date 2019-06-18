@@ -1,0 +1,46 @@
+In this project, we separately use PostgreSQL and MongoDB to manage the BoB's Pizza's database and finished 50000 orders. Here PostgreSQL shows both advantages and disadvantages. So does MongoDB. The following part are detailed discussion.
+
+
+PostgreSQL
+
+Advantages
+
+1.Simple database structure. PostgreSQL is much easier to design than MongoDB. Every schema is well designed before inserting data.
+
+2.Neat query language. Compared with Mongoose in MongoDB, the query code is simple in PostgreSQL.
+
+3.Can Join table. Join is a very good function in relational database, which makes it easier for us to query table and track orders in this project.
+
+Disadvantages
+
+1.Cannot save an array of value in one field. We have to build a lookup table to save ingredients and related quantity for each recipe, because there isn't subdocument in all relational tables. 
+
+2.Difficult to implement a server-side function. The function format is weird and hard to construct.
+
+3.Difficult to load local files. Although there is \COPY code helping to load local file into the psql container in docker, I failed many times. And it usually feedback many unreasonable error. What's worse, the error explanation is obscure, it's hard to know which part is wrong.
+
+MongoDB
+
+Advantages
+
+1.Subdocument makes the database much easier to understand. Subdocument is a very great feature for mongodb, since we can save an array of value in each document. For example, we can save first name and last name under the name field, save ingredient list and related quantity under ingredient field. Thus, we don't need to code a lookup table.
+
+2.Fast Processing. According to our result, MongoDB takes less time to process the database than PostgreSQL no matther before or after adding index. For example, MongoDB spends 2-9 ms on processing database, in a meanwhile, PostgreSQL costs 0.0-87.65.
+
+3.Choose Javascript, a popular programming language, as primary language.
+
+4. A very flexible structure. We can add different fields for each document.
+
+Disadvantages
+
+1.Complex Structure. The collection designing is so complex in mongoose.
+
+2.Don't have Join function. It's good that MongoDB can do reference other collection as PostgreSQL does, however, it cannot do Join, which pushes us to do thousands of times query by ourselves.
+
+3.Cannot do transaction. With transactions, updates could be made along the way and rolled back if any part of the transaction fails.
+Without transaction, the performance of updating collection in MongoDB gets harmed by requiring that you confirm a 'transaction' could be completed before the 'transaction' begins.
+
+
+In general, I prefer PostgreSQL to MongoDB, because I feel easy to operate relational database. And it can do Join, it is easy to query, it has neat code. About MongoDB, its query result looks very beautiful, but Mongoose is not friendly to me, it is hard to install and operate. On the other side, I have to admit that MongoDB fits better for big data.
+
+Additionally, I finally installed the Mongoose at May 22 with the help from our Dear Professor Dan (Really Appreciate!!!), and I only one day to tune my mongoose code, because the due day is May 23. Albeit I am still tuning my mongoose code for tracking order function, I can successfully and smoothly load and insert data into the database pizza. Maybe after two more days, my codes will be perfect. However, I still feel the power of Mongoose, it runs so fast on the server, much faster than MongoDB.

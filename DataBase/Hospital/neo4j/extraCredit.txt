@@ -1,0 +1,74 @@
+##########################################
+# How many doctors are treating doctors? #
+##########################################
+
+MATCH (D)-[h]->(P)
+WHERE D.Name in P.Doc AND 
+P.Name =~ 'D.*'
+RETURN COUNT(DISTINCT D.Name);
+
+Here is the query result. There are totally 70 doctors treating doctors.
++------------------------+
+| COUNT(DISTINCT D.Name) |
++------------------------+
+| 70                     |
++------------------------+
+
+####################################################################
+# What's the count of how many patients have each kind of illness? #
+####################################################################
+
+MATCH (P)-[ca:catched]->(I)
+WHERE I.Name in P.Ill
+RETURN I.Name, COUNT(DISTINCT P.Name);
+
+#############################################
+# What's the doctor with the most patients? #
+#############################################
+
+MATCH (D)-[h]->(P)
+WHERE D.Name in P.Doc
+RETURN D.Name, COUNT(DISTINCT P.Name) AS CNTP
+ORDER BY CNTP DESC
+LIMIT 1;
+
+Here is the query result. D92 are treating with most patients, which is 259.
++---------------+
+| D.Name | CNTP |
++---------------+
+| "D92"  | 259  |
++---------------+
+
+####################################################################
+# Which doctor is treating the largest number of unique illnesses? #
+####################################################################
+
+MATCH (D)-[h]->(P)-[ca]->(I)
+WHERE D.Name in P.Doc and I.Name in P.Ill
+RETURN D.Name, COUNT(DISTINCT I.Name) AS CNTI
+ORDER BY CNTI DESC
+LIMIT 1;
+
+Here is the query result. D92 is treating the largest number of unique illnesses, which is 407.
++---------------+
+| D.Name | CNTI |
++---------------+
+| "D92"  | 407  |
++---------------+
+
+###############################################################################
+# What illness is being treated with the largest number of unique treatments? #
+###############################################################################
+
+MATCH (I)-[ct]->(P)<-[t]-(T)
+WHERE I.Name in P.Ill and P.Name in T.Pat
+RETURN I.Name, COUNT(DISTINCT T.Name) AS CNTT
+ORDER BY CNTT DESC
+LIMIT 1;
+
+Here is the query result. I349 is being treated with the largest number of unique treatments, which is 338.
++---------------+
+| I.Name | CNTT |
++---------------+
+| "I349" | 338  |
++---------------+

@@ -1,0 +1,16 @@
+For PostgreSQL, I insert 1000 Users, 25 Recipes and 50000 Orders.
+
+And we are required to query by recipe Id in non-indexed and indexed situation. 
+There are 25 different pizza recipes, so the order table is queried 25 times for different recipes each time.
+
+In Nonindexed one, we can see the cost, rows and width for each query.
+
+And for each query, the start cost is 0.0, the total cost is 820.79.
+
+In Indexed one, we can see the cost, rows and width for each query.
+
+And for Heap Scan on orders in each query, the start cost is from 9.68 to 88.17, the total cost is from 299.35 to 418.26.
+
+For Index Scan on index_rec, the start cost is 0.0, the maximum total cost is 87.65, which is much lower than that from Nonindexed one, which is 820.79.
+
+Therefore, indexing Recipes_Name will significantly reduce the cost and improve the database's performance.

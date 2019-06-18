@@ -1,0 +1,10 @@
+####################
+# Generate Doctors #
+####################
+
+Name:
+=CONCAT(E$2,F2)
+
+If_pat
+=IF(RAND()<=0.35,"Yes","No")
+

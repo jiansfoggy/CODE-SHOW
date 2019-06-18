@@ -1,0 +1,76 @@
+It is possible for both PostgreSQL and Neo4J to return all of this information in one query.
+
+Meanwhile, the PostgreSQL and Neo4j share the same dataset for doctors, which is generated in EXCEL. But the other datasets are randomly generated in Python, therefore the query results are different for these 2 parts.
+
+As we can see, both of them clearly show the query result.
+
+#######################################################
+# Here is the query language and result for PostgreSQL#
+#######################################################
+
+SELECT JH.DName, JH.IName, PTT.TName
+FROM P_T_T PTT
+LEFT JOIN 
+(SELECT P.PName , P.DName, DTI.IName
+FROM P_T_I DTI 
+LEFT JOIN Patients P
+ON P.PName = DTI.PName) JH
+ON PTT.PName = JH.PName
+WHERE JH.PName = 'P88'
+GROUP BY JH.DName, JH.IName, PTT.TName
+ORDER BY JH.DName, JH.IName, PTT.TName;
+
+Query result
+
+ dname | iname | tname 
+-------+-------+-------
+ D90   | I105  | T130
+ D90   | I105  | T152
+ D90   | I105  | T175
+ D90   | I105  | T185
+ D90   | I105  | T19
+ D90   | I105  | T261
+ D90   | I105  | T320
+ D90   | I105  | T38
+ D90   | I105  | T4
+ D90   | I105  | T410
+ D90   | I105  | T413
+ D90   | I105  | T462
+ D90   | I105  | T519
+ D90   | I105  | T643
+ D90   | I105  | T679
+ D90   | I105  | T70
+ D90   | I682  | T130
+ D90   | I682  | T152
+ D90   | I682  | T175
+ D90   | I682  | T185
+ D90   | I682  | T19
+ D90   | I682  | T261
+ D90   | I682  | T320
+ D90   | I682  | T38
+ D90   | I682  | T4
+ D90   | I682  | T410
+ D90   | I682  | T413
+ D90   | I682  | T462
+ D90   | I682  | T519
+ D90   | I682  | T643
+ D90   | I682  | T679
+ D90   | I682  | T70
+
+
+##################################################
+# Here is the query language and result for Neo4j#
+##################################################
+
+MATCH (T)-[t]->(P: Patients {Name:"P88"})<-[ct]-(I)
+WHERE I.Name in P.Ill and P.Name in T.Pat
+RETURN P.Doc AS DOCTOR, P.Ill AS ILLNESS, collect(DISTINCT T.Name) AS TREATMENT;
+
+
++-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| DOCTOR               | ILLNESS                 | TREATMENT                                                                                                                  |
++-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ["D81", "D5", "D52"] | ["I35", "I332", "I914"] | ["T318", "T120", "T315", "T127", "T640", "T662", "T644", "T481", "T666", "T736", "T32", "T681", "T13", "T3", "T39", "T85"] |
++-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+1 row available after 41 ms, consumed after another 0 ms

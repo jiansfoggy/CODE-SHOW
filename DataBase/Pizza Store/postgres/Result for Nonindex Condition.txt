@@ -1,0 +1,174 @@
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Egibhiibaaii';
+                         QUERY PLAN                         
+------------------------------------------------------------
+ Seq Scan on orders  (cost=0.00..820.79 rows=2000 width=28)
+   Filter: (recipes_name = 'Egibhiibaaii'::text)
+(2 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Hfifbbigdbad';
+                         QUERY PLAN                         
+------------------------------------------------------------
+ Seq Scan on orders  (cost=0.00..820.79 rows=1972 width=28)
+   Filter: (recipes_name = 'Hfifbbigdbad'::text)
+(2 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Ghdehbhibcdi';
+                         QUERY PLAN                         
+------------------------------------------------------------
+ Seq Scan on orders  (cost=0.00..820.79 rows=1964 width=28)
+   Filter: (recipes_name = 'Ghdehbhibcdi'::text)
+(2 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Beeigedcbhhc';
+                         QUERY PLAN                         
+------------------------------------------------------------
+ Seq Scan on orders  (cost=0.00..820.79 rows=2016 width=28)
+   Filter: (recipes_name = 'Beeigedcbhhc'::text)
+(2 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Edacigbgecea';
+                         QUERY PLAN                         
+------------------------------------------------------------
+ Seq Scan on orders  (cost=0.00..820.79 rows=2049 width=28)
+   Filter: (recipes_name = 'Edacigbgecea'::text)
+(2 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Ihiaacbhhfed';
+                        QUERY PLAN                         
+-----------------------------------------------------------
+ Seq Scan on orders  (cost=0.00..820.79 rows=336 width=28)
+   Filter: (recipes_name = 'Ihiaacbhhfed'::text)
+(2 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Degdagedhhfh';
+                         QUERY PLAN                         
+------------------------------------------------------------
+ Seq Scan on orders  (cost=0.00..820.79 rows=2062 width=28)
+   Filter: (recipes_name = 'Degdagedhhfh'::text)
+(2 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Ffhceabaebfe';
+                         QUERY PLAN                         
+------------------------------------------------------------
+ Seq Scan on orders  (cost=0.00..820.79 rows=1978 width=28)
+   Filter: (recipes_name = 'Ffhceabaebfe'::text)
+(2 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Difefdfiidbb';
+                         QUERY PLAN                         
+------------------------------------------------------------
+ Seq Scan on orders  (cost=0.00..820.79 rows=2005 width=28)
+   Filter: (recipes_name = 'Difefdfiidbb'::text)
+(2 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Gifiaicafhah';
+                         QUERY PLAN                         
+------------------------------------------------------------
+ Seq Scan on orders  (cost=0.00..820.79 rows=1911 width=28)
+   Filter: (recipes_name = 'Gifiaicafhah'::text)
+(2 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Cdicgbbaddab';
+                         QUERY PLAN                         
+------------------------------------------------------------
+ Seq Scan on orders  (cost=0.00..820.79 rows=2026 width=28)
+   Filter: (recipes_name = 'Cdicgbbaddab'::text)
+(2 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Eeedegehaiac';
+                        QUERY PLAN                         
+-----------------------------------------------------------
+ Seq Scan on orders  (cost=0.00..820.79 rows=306 width=28)
+   Filter: (recipes_name = 'Eeedegehaiac'::text)
+(2 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Iigegicffcbh';
+                         QUERY PLAN                         
+------------------------------------------------------------
+ Seq Scan on orders  (cost=0.00..820.79 rows=1971 width=28)
+   Filter: (recipes_name = 'Iigegicffcbh'::text)
+(2 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Ibgighebgfbh';
+                         QUERY PLAN                         
+------------------------------------------------------------
+ Seq Scan on orders  (cost=0.00..820.79 rows=1975 width=28)
+   Filter: (recipes_name = 'Ibgighebgfbh'::text)
+(2 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Fbibbaeffadi';
+                         QUERY PLAN                         
+------------------------------------------------------------
+ Seq Scan on orders  (cost=0.00..820.79 rows=2062 width=28)
+   Filter: (recipes_name = 'Fbibbaeffadi'::text)
+(2 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Affghbihheac';
+                         QUERY PLAN                         
+------------------------------------------------------------
+ Seq Scan on orders  (cost=0.00..820.79 rows=2091 width=28)
+   Filter: (recipes_name = 'Affghbihheac'::text)
+(2 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Ibagcifiaddd';
+                        QUERY PLAN                         
+-----------------------------------------------------------
+ Seq Scan on orders  (cost=0.00..820.79 rows=207 width=28)
+   Filter: (recipes_name = 'Ibagcifiaddd'::text)
+(2 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Ihbbeadghfea';
+                         QUERY PLAN                         
+------------------------------------------------------------
+ Seq Scan on orders  (cost=0.00..820.79 rows=2064 width=28)
+   Filter: (recipes_name = 'Ihbbeadghfea'::text)
+(2 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Aifbabaigbdi';
+                         QUERY PLAN                         
+------------------------------------------------------------
+ Seq Scan on orders  (cost=0.00..820.79 rows=1905 width=28)
+   Filter: (recipes_name = 'Aifbabaigbdi'::text)
+(2 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Ggghadaecbaa';
+                         QUERY PLAN                         
+------------------------------------------------------------
+ Seq Scan on orders  (cost=0.00..820.79 rows=2029 width=28)
+   Filter: (recipes_name = 'Ggghadaecbaa'::text)
+(2 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Eahffbbcfdch';
+                        QUERY PLAN                         
+-----------------------------------------------------------
+ Seq Scan on orders  (cost=0.00..820.79 rows=218 width=28)
+   Filter: (recipes_name = 'Eahffbbcfdch'::text)
+(2 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Iidefddibcbg';
+                         QUERY PLAN                         
+------------------------------------------------------------
+ Seq Scan on orders  (cost=0.00..820.79 rows=1916 width=28)
+   Filter: (recipes_name = 'Iidefddibcbg'::text)
+(2 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Bgdfegcciecc';
+                         QUERY PLAN                         
+------------------------------------------------------------
+ Seq Scan on orders  (cost=0.00..820.79 rows=1987 width=28)
+   Filter: (recipes_name = 'Bgdfegcciecc'::text)
+(2 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Caiffeaaedgc';
+                         QUERY PLAN                         
+------------------------------------------------------------
+ Seq Scan on orders  (cost=0.00..820.79 rows=1972 width=28)
+   Filter: (recipes_name = 'Caiffeaaedgc'::text)
+(2 rows)
+
+7dbs=# EXPLAIN SELECT * FROM Orders WHERE Recipes_Name = 'Ccdghbbhdgid';
+                        QUERY PLAN                         
+-----------------------------------------------------------
+ Seq Scan on orders  (cost=0.00..820.79 rows=324 width=28)
+   Filter: (recipes_name = 'Ccdghbbhdgid'::text)
+(2 rows)

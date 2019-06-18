@@ -1,0 +1,699 @@
+db.Orders.find({Recipes_Name: 'R1'}).explain("executionStats").executionStats;
+{
+	"executionSuccess" : true,
+	"nReturned" : 1916,
+	"executionTimeMillis" : 47,
+	"totalKeysExamined" : 0,
+	"totalDocsExamined" : 100606,
+	"executionStages" : {
+		"stage" : "COLLSCAN",
+		"filter" : {
+			"Recipes_Name" : {
+				"$eq" : "R1"
+			}
+		},
+		"nReturned" : 1916,
+		"executionTimeMillisEstimate" : 30,
+		"works" : 100608,
+		"advanced" : 1916,
+		"needTime" : 98691,
+		"needYield" : 0,
+		"saveState" : 786,
+		"restoreState" : 786,
+		"isEOF" : 1,
+		"invalidates" : 0,
+		"direction" : "forward",
+		"docsExamined" : 100606
+	}
+}
+db.Orders.find({Recipes_Name: 'R2'}).explain("executionStats").executionStats;{
+	"executionSuccess" : true,
+	"nReturned" : 1963,
+	"executionTimeMillis" : 52,
+	"totalKeysExamined" : 0,
+	"totalDocsExamined" : 100606,
+	"executionStages" : {
+		"stage" : "COLLSCAN",
+		"filter" : {
+			"Recipes_Name" : {
+				"$eq" : "R2"
+			}
+		},
+		"nReturned" : 1963,
+		"executionTimeMillisEstimate" : 50,
+		"works" : 100608,
+		"advanced" : 1963,
+		"needTime" : 98644,
+		"needYield" : 0,
+		"saveState" : 786,
+		"restoreState" : 786,
+		"isEOF" : 1,
+		"invalidates" : 0,
+		"direction" : "forward",
+		"docsExamined" : 100606
+	}
+}
+> db.Orders.find({Recipes_Name: 'R3'}).explain("executionStats").executionStats;
+{
+	"executionSuccess" : true,
+	"nReturned" : 2042,
+	"executionTimeMillis" : 51,
+	"totalKeysExamined" : 0,
+	"totalDocsExamined" : 100606,
+	"executionStages" : {
+		"stage" : "COLLSCAN",
+		"filter" : {
+			"Recipes_Name" : {
+				"$eq" : "R3"
+			}
+		},
+		"nReturned" : 2042,
+		"executionTimeMillisEstimate" : 51,
+		"works" : 100608,
+		"advanced" : 2042,
+		"needTime" : 98565,
+		"needYield" : 0,
+		"saveState" : 786,
+		"restoreState" : 786,
+		"isEOF" : 1,
+		"invalidates" : 0,
+		"direction" : "forward",
+		"docsExamined" : 100606
+	}
+}
+> db.Orders.find({Recipes_Name: 'R4'}).explain("executionStats").executionStats;
+{
+	"executionSuccess" : true,
+	"nReturned" : 2089,
+	"executionTimeMillis" : 50,
+	"totalKeysExamined" : 0,
+	"totalDocsExamined" : 100606,
+	"executionStages" : {
+		"stage" : "COLLSCAN",
+		"filter" : {
+			"Recipes_Name" : {
+				"$eq" : "R4"
+			}
+		},
+		"nReturned" : 2089,
+		"executionTimeMillisEstimate" : 40,
+		"works" : 100608,
+		"advanced" : 2089,
+		"needTime" : 98518,
+		"needYield" : 0,
+		"saveState" : 786,
+		"restoreState" : 786,
+		"isEOF" : 1,
+		"invalidates" : 0,
+		"direction" : "forward",
+		"docsExamined" : 100606
+	}
+}
+> db.Orders.find({Recipes_Name: 'R5'}).explain("executionStats").executionStats;
+{
+	"executionSuccess" : true,
+	"nReturned" : 2040,
+	"executionTimeMillis" : 48,
+	"totalKeysExamined" : 0,
+	"totalDocsExamined" : 100606,
+	"executionStages" : {
+		"stage" : "COLLSCAN",
+		"filter" : {
+			"Recipes_Name" : {
+				"$eq" : "R5"
+			}
+		},
+		"nReturned" : 2040,
+		"executionTimeMillisEstimate" : 50,
+		"works" : 100608,
+		"advanced" : 2040,
+		"needTime" : 98567,
+		"needYield" : 0,
+		"saveState" : 786,
+		"restoreState" : 786,
+		"isEOF" : 1,
+		"invalidates" : 0,
+		"direction" : "forward",
+		"docsExamined" : 100606
+	}
+}
+> db.Orders.find({Recipes_Name: 'R6'}).explain("executionStats").executionStats;
+{
+	"executionSuccess" : true,
+	"nReturned" : 2005,
+	"executionTimeMillis" : 48,
+	"totalKeysExamined" : 0,
+	"totalDocsExamined" : 100606,
+	"executionStages" : {
+		"stage" : "COLLSCAN",
+		"filter" : {
+			"Recipes_Name" : {
+				"$eq" : "R6"
+			}
+		},
+		"nReturned" : 2005,
+		"executionTimeMillisEstimate" : 41,
+		"works" : 100608,
+		"advanced" : 2005,
+		"needTime" : 98602,
+		"needYield" : 0,
+		"saveState" : 786,
+		"restoreState" : 786,
+		"isEOF" : 1,
+		"invalidates" : 0,
+		"direction" : "forward",
+		"docsExamined" : 100606
+	}
+}
+> db.Orders.find({Recipes_Name: 'R7'}).explain("executionStats").executionStats;
+{
+	"executionSuccess" : true,
+	"nReturned" : 2027,
+	"executionTimeMillis" : 46,
+	"totalKeysExamined" : 0,
+	"totalDocsExamined" : 100606,
+	"executionStages" : {
+		"stage" : "COLLSCAN",
+		"filter" : {
+			"Recipes_Name" : {
+				"$eq" : "R7"
+			}
+		},
+		"nReturned" : 2027,
+		"executionTimeMillisEstimate" : 43,
+		"works" : 100608,
+		"advanced" : 2027,
+		"needTime" : 98580,
+		"needYield" : 0,
+		"saveState" : 787,
+		"restoreState" : 787,
+		"isEOF" : 1,
+		"invalidates" : 0,
+		"direction" : "forward",
+		"docsExamined" : 100606
+	}
+}
+> db.Orders.find({Recipes_Name: 'R8'}).explain("executionStats").executionStats;
+{
+	"executionSuccess" : true,
+	"nReturned" : 2041,
+	"executionTimeMillis" : 46,
+	"totalKeysExamined" : 0,
+	"totalDocsExamined" : 100606,
+	"executionStages" : {
+		"stage" : "COLLSCAN",
+		"filter" : {
+			"Recipes_Name" : {
+				"$eq" : "R8"
+			}
+		},
+		"nReturned" : 2041,
+		"executionTimeMillisEstimate" : 32,
+		"works" : 100608,
+		"advanced" : 2041,
+		"needTime" : 98566,
+		"needYield" : 0,
+		"saveState" : 786,
+		"restoreState" : 786,
+		"isEOF" : 1,
+		"invalidates" : 0,
+		"direction" : "forward",
+		"docsExamined" : 100606
+	}
+}
+> db.Orders.find({Recipes_Name: 'R9'}).explain("executionStats").executionStats;
+{
+	"executionSuccess" : true,
+	"nReturned" : 2090,
+	"executionTimeMillis" : 47,
+	"totalKeysExamined" : 0,
+	"totalDocsExamined" : 100606,
+	"executionStages" : {
+		"stage" : "COLLSCAN",
+		"filter" : {
+			"Recipes_Name" : {
+				"$eq" : "R9"
+			}
+		},
+		"nReturned" : 2090,
+		"executionTimeMillisEstimate" : 31,
+		"works" : 100608,
+		"advanced" : 2090,
+		"needTime" : 98517,
+		"needYield" : 0,
+		"saveState" : 786,
+		"restoreState" : 786,
+		"isEOF" : 1,
+		"invalidates" : 0,
+		"direction" : "forward",
+		"docsExamined" : 100606
+	}
+}
+> db.Orders.find({Recipes_Name: 'R10'}).explain("executionStats").executionStats;
+{
+	"executionSuccess" : true,
+	"nReturned" : 1920,
+	"executionTimeMillis" : 46,
+	"totalKeysExamined" : 0,
+	"totalDocsExamined" : 100606,
+	"executionStages" : {
+		"stage" : "COLLSCAN",
+		"filter" : {
+			"Recipes_Name" : {
+				"$eq" : "R10"
+			}
+		},
+		"nReturned" : 1920,
+		"executionTimeMillisEstimate" : 50,
+		"works" : 100608,
+		"advanced" : 1920,
+		"needTime" : 98687,
+		"needYield" : 0,
+		"saveState" : 786,
+		"restoreState" : 786,
+		"isEOF" : 1,
+		"invalidates" : 0,
+		"direction" : "forward",
+		"docsExamined" : 100606
+	}
+}
+> db.Orders.find({Recipes_Name: 'R11'}).explain("executionStats").executionStats;
+{
+	"executionSuccess" : true,
+	"nReturned" : 1935,
+	"executionTimeMillis" : 48,
+	"totalKeysExamined" : 0,
+	"totalDocsExamined" : 100606,
+	"executionStages" : {
+		"stage" : "COLLSCAN",
+		"filter" : {
+			"Recipes_Name" : {
+				"$eq" : "R11"
+			}
+		},
+		"nReturned" : 1935,
+		"executionTimeMillisEstimate" : 40,
+		"works" : 100608,
+		"advanced" : 1935,
+		"needTime" : 98672,
+		"needYield" : 0,
+		"saveState" : 786,
+		"restoreState" : 786,
+		"isEOF" : 1,
+		"invalidates" : 0,
+		"direction" : "forward",
+		"docsExamined" : 100606
+	}
+}
+> db.Orders.find({Recipes_Name: 'R12'}).explain("executionStats").executionStats;
+{
+	"executionSuccess" : true,
+	"nReturned" : 1989,
+	"executionTimeMillis" : 47,
+	"totalKeysExamined" : 0,
+	"totalDocsExamined" : 100606,
+	"executionStages" : {
+		"stage" : "COLLSCAN",
+		"filter" : {
+			"Recipes_Name" : {
+				"$eq" : "R12"
+			}
+		},
+		"nReturned" : 1989,
+		"executionTimeMillisEstimate" : 30,
+		"works" : 100608,
+		"advanced" : 1989,
+		"needTime" : 98618,
+		"needYield" : 0,
+		"saveState" : 786,
+		"restoreState" : 786,
+		"isEOF" : 1,
+		"invalidates" : 0,
+		"direction" : "forward",
+		"docsExamined" : 100606
+	}
+}
+> db.Orders.find({Recipes_Name: 'R13'}).explain("executionStats").executionStats;
+{
+	"executionSuccess" : true,
+	"nReturned" : 1932,
+	"executionTimeMillis" : 52,
+	"totalKeysExamined" : 0,
+	"totalDocsExamined" : 100606,
+	"executionStages" : {
+		"stage" : "COLLSCAN",
+		"filter" : {
+			"Recipes_Name" : {
+				"$eq" : "R13"
+			}
+		},
+		"nReturned" : 1932,
+		"executionTimeMillisEstimate" : 50,
+		"works" : 100608,
+		"advanced" : 1932,
+		"needTime" : 98675,
+		"needYield" : 0,
+		"saveState" : 786,
+		"restoreState" : 786,
+		"isEOF" : 1,
+		"invalidates" : 0,
+		"direction" : "forward",
+		"docsExamined" : 100606
+	}
+}
+> db.Orders.find({Recipes_Name: 'R14'}).explain("executionStats").executionStats;
+{
+	"executionSuccess" : true,
+	"nReturned" : 2000,
+	"executionTimeMillis" : 48,
+	"totalKeysExamined" : 0,
+	"totalDocsExamined" : 100606,
+	"executionStages" : {
+		"stage" : "COLLSCAN",
+		"filter" : {
+			"Recipes_Name" : {
+				"$eq" : "R14"
+			}
+		},
+		"nReturned" : 2000,
+		"executionTimeMillisEstimate" : 50,
+		"works" : 100608,
+		"advanced" : 2000,
+		"needTime" : 98607,
+		"needYield" : 0,
+		"saveState" : 786,
+		"restoreState" : 786,
+		"isEOF" : 1,
+		"invalidates" : 0,
+		"direction" : "forward",
+		"docsExamined" : 100606
+	}
+}
+> db.Orders.find({Recipes_Name: 'R15'}).explain("executionStats").executionStats;
+{
+	"executionSuccess" : true,
+	"nReturned" : 2006,
+	"executionTimeMillis" : 47,
+	"totalKeysExamined" : 0,
+	"totalDocsExamined" : 100606,
+	"executionStages" : {
+		"stage" : "COLLSCAN",
+		"filter" : {
+			"Recipes_Name" : {
+				"$eq" : "R15"
+			}
+		},
+		"nReturned" : 2006,
+		"executionTimeMillisEstimate" : 40,
+		"works" : 100608,
+		"advanced" : 2006,
+		"needTime" : 98601,
+		"needYield" : 0,
+		"saveState" : 786,
+		"restoreState" : 786,
+		"isEOF" : 1,
+		"invalidates" : 0,
+		"direction" : "forward",
+		"docsExamined" : 100606
+	}
+}
+> db.Orders.find({Recipes_Name: 'R16'}).explain("executionStats").executionStats;
+{
+	"executionSuccess" : true,
+	"nReturned" : 1991,
+	"executionTimeMillis" : 52,
+	"totalKeysExamined" : 0,
+	"totalDocsExamined" : 100606,
+	"executionStages" : {
+		"stage" : "COLLSCAN",
+		"filter" : {
+			"Recipes_Name" : {
+				"$eq" : "R16"
+			}
+		},
+		"nReturned" : 1991,
+		"executionTimeMillisEstimate" : 40,
+		"works" : 100608,
+		"advanced" : 1991,
+		"needTime" : 98616,
+		"needYield" : 0,
+		"saveState" : 786,
+		"restoreState" : 786,
+		"isEOF" : 1,
+		"invalidates" : 0,
+		"direction" : "forward",
+		"docsExamined" : 100606
+	}
+}
+> db.Orders.find({Recipes_Name: 'R17'}).explain("executionStats").executionStats;
+{
+	"executionSuccess" : true,
+	"nReturned" : 2024,
+	"executionTimeMillis" : 47,
+	"totalKeysExamined" : 0,
+	"totalDocsExamined" : 100606,
+	"executionStages" : {
+		"stage" : "COLLSCAN",
+		"filter" : {
+			"Recipes_Name" : {
+				"$eq" : "R17"
+			}
+		},
+		"nReturned" : 2024,
+		"executionTimeMillisEstimate" : 20,
+		"works" : 100608,
+		"advanced" : 2024,
+		"needTime" : 98583,
+		"needYield" : 0,
+		"saveState" : 786,
+		"restoreState" : 786,
+		"isEOF" : 1,
+		"invalidates" : 0,
+		"direction" : "forward",
+		"docsExamined" : 100606
+	}
+}
+> db.Orders.find({Recipes_Name: 'R18'}).explain("executionStats").executionStats;
+{
+	"executionSuccess" : true,
+	"nReturned" : 1980,
+	"executionTimeMillis" : 48,
+	"totalKeysExamined" : 0,
+	"totalDocsExamined" : 100606,
+	"executionStages" : {
+		"stage" : "COLLSCAN",
+		"filter" : {
+			"Recipes_Name" : {
+				"$eq" : "R18"
+			}
+		},
+		"nReturned" : 1980,
+		"executionTimeMillisEstimate" : 30,
+		"works" : 100608,
+		"advanced" : 1980,
+		"needTime" : 98627,
+		"needYield" : 0,
+		"saveState" : 786,
+		"restoreState" : 786,
+		"isEOF" : 1,
+		"invalidates" : 0,
+		"direction" : "forward",
+		"docsExamined" : 100606
+	}
+}
+> db.Orders.find({Recipes_Name: 'R19'}).explain("executionStats").executionStats;
+{
+	"executionSuccess" : true,
+	"nReturned" : 2006,
+	"executionTimeMillis" : 51,
+	"totalKeysExamined" : 0,
+	"totalDocsExamined" : 100606,
+	"executionStages" : {
+		"stage" : "COLLSCAN",
+		"filter" : {
+			"Recipes_Name" : {
+				"$eq" : "R19"
+			}
+		},
+		"nReturned" : 2006,
+		"executionTimeMillisEstimate" : 40,
+		"works" : 100608,
+		"advanced" : 2006,
+		"needTime" : 98601,
+		"needYield" : 0,
+		"saveState" : 786,
+		"restoreState" : 786,
+		"isEOF" : 1,
+		"invalidates" : 0,
+		"direction" : "forward",
+		"docsExamined" : 100606
+	}
+}
+> db.Orders.find({Recipes_Name: 'R20'}).explain("executionStats").executionStats;
+{
+	"executionSuccess" : true,
+	"nReturned" : 1930,
+	"executionTimeMillis" : 47,
+	"totalKeysExamined" : 0,
+	"totalDocsExamined" : 100606,
+	"executionStages" : {
+		"stage" : "COLLSCAN",
+		"filter" : {
+			"Recipes_Name" : {
+				"$eq" : "R20"
+			}
+		},
+		"nReturned" : 1930,
+		"executionTimeMillisEstimate" : 30,
+		"works" : 100608,
+		"advanced" : 1930,
+		"needTime" : 98677,
+		"needYield" : 0,
+		"saveState" : 786,
+		"restoreState" : 786,
+		"isEOF" : 1,
+		"invalidates" : 0,
+		"direction" : "forward",
+		"docsExamined" : 100606
+	}
+}
+> db.Orders.find({Recipes_Name: 'R21'}).explain("executionStats").executionStats;
+{
+	"executionSuccess" : true,
+	"nReturned" : 2012,
+	"executionTimeMillis" : 48,
+	"totalKeysExamined" : 0,
+	"totalDocsExamined" : 100606,
+	"executionStages" : {
+		"stage" : "COLLSCAN",
+		"filter" : {
+			"Recipes_Name" : {
+				"$eq" : "R21"
+			}
+		},
+		"nReturned" : 2012,
+		"executionTimeMillisEstimate" : 51,
+		"works" : 100608,
+		"advanced" : 2012,
+		"needTime" : 98595,
+		"needYield" : 0,
+		"saveState" : 786,
+		"restoreState" : 786,
+		"isEOF" : 1,
+		"invalidates" : 0,
+		"direction" : "forward",
+		"docsExamined" : 100606
+	}
+}
+> db.Orders.find({Recipes_Name: 'R22'}).explain("executionStats").executionStats;
+{
+	"executionSuccess" : true,
+	"nReturned" : 2047,
+	"executionTimeMillis" : 57,
+	"totalKeysExamined" : 0,
+	"totalDocsExamined" : 100606,
+	"executionStages" : {
+		"stage" : "COLLSCAN",
+		"filter" : {
+			"Recipes_Name" : {
+				"$eq" : "R22"
+			}
+		},
+		"nReturned" : 2047,
+		"executionTimeMillisEstimate" : 60,
+		"works" : 100608,
+		"advanced" : 2047,
+		"needTime" : 98560,
+		"needYield" : 0,
+		"saveState" : 786,
+		"restoreState" : 786,
+		"isEOF" : 1,
+		"invalidates" : 0,
+		"direction" : "forward",
+		"docsExamined" : 100606
+	}
+}
+> db.Orders.find({Recipes_Name: 'R23'}).explain("executionStats").executionStats;
+{
+	"executionSuccess" : true,
+	"nReturned" : 2020,
+	"executionTimeMillis" : 49,
+	"totalKeysExamined" : 0,
+	"totalDocsExamined" : 100606,
+	"executionStages" : {
+		"stage" : "COLLSCAN",
+		"filter" : {
+			"Recipes_Name" : {
+				"$eq" : "R23"
+			}
+		},
+		"nReturned" : 2020,
+		"executionTimeMillisEstimate" : 30,
+		"works" : 100608,
+		"advanced" : 2020,
+		"needTime" : 98587,
+		"needYield" : 0,
+		"saveState" : 786,
+		"restoreState" : 786,
+		"isEOF" : 1,
+		"invalidates" : 0,
+		"direction" : "forward",
+		"docsExamined" : 100606
+	}
+}
+> db.Orders.find({Recipes_Name: 'R24'}).explain("executionStats").executionStats;
+{
+	"executionSuccess" : true,
+	"nReturned" : 2043,
+	"executionTimeMillis" : 54,
+	"totalKeysExamined" : 0,
+	"totalDocsExamined" : 100606,
+	"executionStages" : {
+		"stage" : "COLLSCAN",
+		"filter" : {
+			"Recipes_Name" : {
+				"$eq" : "R24"
+			}
+		},
+		"nReturned" : 2043,
+		"executionTimeMillisEstimate" : 50,
+		"works" : 100608,
+		"advanced" : 2043,
+		"needTime" : 98564,
+		"needYield" : 0,
+		"saveState" : 786,
+		"restoreState" : 786,
+		"isEOF" : 1,
+		"invalidates" : 0,
+		"direction" : "forward",
+		"docsExamined" : 100606
+	}
+}
+> db.Orders.find({Recipes_Name: 'R25'}).explain("executionStats").executionStats;
+{
+	"executionSuccess" : true,
+	"nReturned" : 1952,
+	"executionTimeMillis" : 57,
+	"totalKeysExamined" : 0,
+	"totalDocsExamined" : 100606,
+	"executionStages" : {
+		"stage" : "COLLSCAN",
+		"filter" : {
+			"Recipes_Name" : {
+				"$eq" : "R25"
+			}
+		},
+		"nReturned" : 1952,
+		"executionTimeMillisEstimate" : 43,
+		"works" : 100608,
+		"advanced" : 1952,
+		"needTime" : 98655,
+		"needYield" : 0,
+		"saveState" : 787,
+		"restoreState" : 787,
+		"isEOF" : 1,
+		"invalidates" : 0,
+		"direction" : "forward",
+		"docsExamined" : 100606
+	}
+}
