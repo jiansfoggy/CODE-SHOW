@@ -6,11 +6,11 @@ Target: get the following values
 
 ## Step 1 Download COCO-Text dataset
 Click the following link to download COCO-Text annotations 2017 v1.4  
-*https://vision.cornell.edu/se3/coco-text-2/*
+*https://vision.cornell.edu/se3/coco-text-2/*  
 Then, unzip it to your target directory
 
 Click the following link to download COCO train2014 dataset  
-*https://cocodataset.org/#download*
+*https://cocodataset.org/#download*  
 Then, unzip it to your target directory.  
 > Note: the size of this file is 13GB, it may need more space.
 
