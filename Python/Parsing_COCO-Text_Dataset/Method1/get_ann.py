@@ -31,7 +31,7 @@ for i in imgCls:
         # remember to extract width, height
         #img_info["width"]=img['width']
         #img_info["height"]=img['height']
-        
+         
         for k in anns:
             ann = ct.loadAnns(k)[0]
             if (ann["image_id"]==iId):
