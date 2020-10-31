@@ -16,15 +16,24 @@ Then, unzip it to your target directory.
 
 ## Step 2 Select one method to parse it
 
-**[Method 1]**  
-
-1st, extract images' bounding boxes, transcriptions and filenames firstly, then split the image set into three folders, train, valid and test.
-2nd, finish above task at the same time with only one file.
-
+**[Method 1](https://github.com/jiansfoggy/CODE-SHOW/tree/master/Python/Parsing_COCO-Text_Dataset/Method1)**  
+This method returns 2 parts separately.  
+Get values in Part A via get_ann.py;  
+Get values in Part B via assign_img.py.
 
 **[Method 2]**
+This method returns 2 parts at the same time 
 
-# Step 3 Sample to run our code.
+## Step 3 Run Code  
+Method 1:  
+(''')
+CUDA_VISIBLE_DEVICES=2,3 python3 get_ann.py
 
+CUDA_VISIBLE_DEVICES=2,3 python3 assign_img.py --ann_path /media/data3/jian/Text_Detection/COCO-Text/train_anns --img_path /media/data3/jian/Text_Detection/COCO-Text/train2014/ --folder2save /media/data3/jian/Text_Detection/COCO-Text/coco_train/
+
+CUDA_VISIBLE_DEVICES=2,3 python3 assign_img.py --ann_path /media/data3/jian/Text_Detection/COCO-Text/test_anns --img_path /media/data3/jian/Text_Detection/COCO-Text/train2014/ --folder2save /media/data3/jian/Text_Detection/COCO-Text/coco_test/
+
+CUDA_VISIBLE_DEVICES=2,3 python3 assign_img.py --ann_path /media/data3/jian/Text_Detection/COCO-Text/val_anns --img_path /media/data3/jian/Text_Detection/COCO-Text/train2014/ --folder2save /media/data3/jian/Text_Detection/COCO-Text/coco_valid/  
+(''')
 
 # Step 4 Now you get it
