@@ -21,8 +21,8 @@ This method returns 2 parts separately.
 Get values in Part A via get_ann.py;  
 Get values in Part B via assign_img.py.
 
-**[Method 2]**
-This method returns 2 parts at the same time 
+**[Method 2](https://github.com/jiansfoggy/CODE-SHOW/tree/master/Python/Parsing_COCO-Text_Dataset/Method2)**  
+This method returns 2 parts at the same time.
 
 ## Step 3 Run Code  
 Method 1:  
@@ -31,14 +31,15 @@ Method 1:
 CUDA_VISIBLE_DEVICES=2,3 python3 get_ann.py
 
 #Part B
-CUDA_VISIBLE_DEVICES=2,3 python3 assign_img.py --ann_path /media/data3/jian/Text_Detection/COCO-Text/train_anns --img_path /media/data3/jian/Text_Detection/COCO-Text/train2014/ --folder2save /media/data3/jian/Text_Detection/COCO-Text/coco_train/
+# CUDA_VISIBLE_DEVICES=2,3 python3 assign_img.py --ann_path ./train_anns --img_path ./train2014/ --folder2save ./coco_train/
 
-CUDA_VISIBLE_DEVICES=2,3 python3 assign_img.py --ann_path /media/data3/jian/Text_Detection/COCO-Text/test_anns --img_path /media/data3/jian/Text_Detection/COCO-Text/train2014/ --folder2save /media/data3/jian/Text_Detection/COCO-Text/coco_test/
+# CUDA_VISIBLE_DEVICES=2,3 python3 assign_img.py --ann_path ./test_anns --img_path ./train2014/ --folder2save ./coco_test/
 
-CUDA_VISIBLE_DEVICES=2,3 python3 assign_img.py --ann_path /media/data3/jian/Text_Detection/COCO-Text/val_anns --img_path /media/data3/jian/Text_Detection/COCO-Text/train2014/ --folder2save /media/data3/jian/Text_Detection/COCO-Text/coco_valid/  
+# CUDA_VISIBLE_DEVICES=2,3 python3 assign_img.py --ann_path ./val_anns --img_path ./train2014/ --folder2save ./coco_valid/
 ```
 
 Method 2:
+`# CUDA_VISIBLE_DEVICES=2,3 python3 assign_img.py --COCO_path ./COCO_Text.json --img_path ./train2014/`
 
 ## Step 4 Output  
 Now, there should be six files. Three for new splitted annotations, three for new splitted image sets
