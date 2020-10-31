@@ -40,8 +40,8 @@ if __name__ == '__main__':
 
     assign_img(opt)
 
-# CUDA_VISIBLE_DEVICES=2,3 python3 assign_img.py --ann_path /media/data3/jian/Text_Detection/COCO-Text/train_anns --img_path /media/data3/jian/Text_Detection/COCO-Text/train2014/ --folder2save /media/data3/jian/Text_Detection/COCO-Text/coco_train/
+# CUDA_VISIBLE_DEVICES=2,3 python3 assign_img.py --ann_path ./train_anns --img_path ./train2014/ --folder2save ./coco_train/
 
-# CUDA_VISIBLE_DEVICES=2,3 python3 assign_img.py --ann_path /media/data3/jian/Text_Detection/COCO-Text/test_anns --img_path /media/data3/jian/Text_Detection/COCO-Text/train2014/ --folder2save /media/data3/jian/Text_Detection/COCO-Text/coco_test/
+# CUDA_VISIBLE_DEVICES=2,3 python3 assign_img.py --ann_path ./test_anns --img_path ./train2014/ --folder2save ./coco_test/
 
-# CUDA_VISIBLE_DEVICES=2,3 python3 assign_img.py --ann_path /media/data3/jian/Text_Detection/COCO-Text/val_anns --img_path /media/data3/jian/Text_Detection/COCO-Text/train2014/ --folder2save /media/data3/jian/Text_Detection/COCO-Text/coco_valid/
+# CUDA_VISIBLE_DEVICES=2,3 python3 assign_img.py --ann_path ./val_anns --img_path ./train2014/ --folder2save ./coco_valid/
