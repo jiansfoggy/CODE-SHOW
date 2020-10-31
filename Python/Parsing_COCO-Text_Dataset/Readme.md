@@ -1,10 +1,20 @@
-# Code for parsing COCO-Text dataset and extract variable that we need.
+# Parsing COCO-Text Dataset
+
+Target: get the following values  
+> img_id, file_name, width, height bbox and transcription  
+> trainset, validset, testset
 
 # Step 1 Download COCO-Text dataset
-Use this link,
+Click the following link to download COCO-Text annotations 2017 v1.4  
 https://vision.cornell.edu/se3/coco-text-2/
-then, download COCO-Text annotations 2017 v1.4
-then, unzip it.
+Then, unzip it to your target directory
+
+Click the following link to download COCO train2014 dataset  
+https://cocodataset.org/#download
+Then, unzip it to your target directory.  
+>> Note
+
+
 
 # Step 2 Select one method to parse it
 
