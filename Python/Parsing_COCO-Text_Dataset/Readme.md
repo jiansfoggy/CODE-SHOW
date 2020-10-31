@@ -26,7 +26,7 @@ This method returns 2 parts at the same time
 
 ## Step 3 Run Code  
 Method 1:  
-(''')
+(```)  
 CUDA_VISIBLE_DEVICES=2,3 python3 get_ann.py
 
 CUDA_VISIBLE_DEVICES=2,3 python3 assign_img.py --ann_path /media/data3/jian/Text_Detection/COCO-Text/train_anns --img_path /media/data3/jian/Text_Detection/COCO-Text/train2014/ --folder2save /media/data3/jian/Text_Detection/COCO-Text/coco_train/
@@ -34,6 +34,6 @@ CUDA_VISIBLE_DEVICES=2,3 python3 assign_img.py --ann_path /media/data3/jian/Text
 CUDA_VISIBLE_DEVICES=2,3 python3 assign_img.py --ann_path /media/data3/jian/Text_Detection/COCO-Text/test_anns --img_path /media/data3/jian/Text_Detection/COCO-Text/train2014/ --folder2save /media/data3/jian/Text_Detection/COCO-Text/coco_test/
 
 CUDA_VISIBLE_DEVICES=2,3 python3 assign_img.py --ann_path /media/data3/jian/Text_Detection/COCO-Text/val_anns --img_path /media/data3/jian/Text_Detection/COCO-Text/train2014/ --folder2save /media/data3/jian/Text_Detection/COCO-Text/coco_valid/  
-(''')
+(```)
 
 # Step 4 Now you get it
