@@ -101,4 +101,4 @@ if __name__ == '__main__':
 
     whole_split(opt)
 
-# CUDA_VISIBLE_DEVICES=2,3 python3 assign_img.py --COCO_path ./COCO_Text.json --img_path ./train2014/
+# CUDA_VISIBLE_DEVICES=2,3 python3 whole_split.py --COCO_path ./COCO_Text.json --img_path ./train2014/
