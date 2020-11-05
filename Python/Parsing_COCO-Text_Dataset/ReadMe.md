@@ -33,6 +33,15 @@ Get values in Part B via assign_img.py.
 **[Method 2](https://github.com/jiansfoggy/CODE-SHOW/tree/master/Python/Parsing_COCO-Text_Dataset/Method2)**  
 This method returns 2 parts at the same time.
 
+**[Method 3](https://github.com/jiansfoggy/CODE-SHOW/tree/master/Python/Parsing_COCO-Text_Dataset/Method3)**  
+This methid does the following 4 tasks:  
+1. create a new folder called images, and save splitted train. test, valid image set under this directory.
+2. create a new folder called labels, and save annotation information for train set, test set and valid set under this directory.
+3. create 3 text files to save specific images path for each image in train set, test set and valid set.
+4. create a new file classes.names to save all unique labels here.
+* Note: annotations include the index of class, bbox[x,y,width,height]
+* Note: this file can serve to train yolo-v3
+
 ## Step 3 Run Code  
 Method 1:  
 ```  
@@ -50,7 +59,10 @@ CUDA_VISIBLE_DEVICES=2,3 python3 assign_img.py --ann_path ./val_anns --img_path 
 Method 2:  
 `CUDA_VISIBLE_DEVICES=2,3 python3 assign_img.py --COCO_path ./COCO_Text.json --img_path ./train2014/`
 
+Method 3:
+`CUDA_VISIBLE_DEVICES=3,3 python3 yolo_split.py --COCO_path ./COCO_Text.json --img_path ./train2014/`
+
 ## Step 4 Output  
-Now, there should be six files. Three for new splitted annotations, three for new splitted image sets
+Now, there should be six or even more files. Three for new splitted annotations, three for new splitted image sets
 
 Next, you can play this dataset with your models.
