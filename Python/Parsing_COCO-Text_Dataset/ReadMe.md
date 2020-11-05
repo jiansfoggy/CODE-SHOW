@@ -43,7 +43,7 @@ This methid does the following 4 tasks:
 * Note: this file can serve to train yolo-v3
 
 ## Step 3 Run Code  
-Method 1:  
+**Method 1**:  
 ```  
 #Part A
 CUDA_VISIBLE_DEVICES=2,3 python3 get_ann.py
@@ -56,10 +56,10 @@ CUDA_VISIBLE_DEVICES=2,3 python3 assign_img.py --ann_path ./test_anns --img_path
 CUDA_VISIBLE_DEVICES=2,3 python3 assign_img.py --ann_path ./val_anns --img_path ./train2014/ --folder2save ./coco_valid/
 ```
 
-Method 2:  
+**Method 2**:  
 `CUDA_VISIBLE_DEVICES=2,3 python3 assign_img.py --COCO_path ./COCO_Text.json --img_path ./train2014/`
 
-Method 3:
+**Method 3**:  
 `CUDA_VISIBLE_DEVICES=3,3 python3 yolo_split.py --COCO_path ./COCO_Text.json --img_path ./train2014/`
 
 ## Step 4 Output  
