@@ -173,4 +173,4 @@ if __name__ == '__main__':
 
     yolo_split(opt)
 
-# CUDA_VISIBLE_DEVICES=3,3 python3 yolo_split.py --COCO_path ./COCO_Text.json --img_path ./train2014/
+# CUDA_VISIBLE_DEVICES=1,3 python3 yolo_split.py --COCO_path ./COCO_Text.json --img_path ./train2014/
