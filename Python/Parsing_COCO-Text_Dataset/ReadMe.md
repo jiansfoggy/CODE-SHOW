@@ -60,7 +60,7 @@ CUDA_VISIBLE_DEVICES=2,3 python3 assign_img.py --ann_path ./val_anns --img_path 
 `CUDA_VISIBLE_DEVICES=2,3 python3 assign_img.py --COCO_path ./COCO_Text.json --img_path ./train2014/`
 
 **Method 3**:  
-`CUDA_VISIBLE_DEVICES=3,3 python3 yolo_split.py --COCO_path ./COCO_Text.json --img_path ./train2014/`
+`CUDA_VISIBLE_DEVICES=1,3 python3 yolo_split.py --COCO_path ./COCO_Text.json --img_path ./train2014/`
 
 ## Step 4 Output  
 Now, there should be six or even more files. Three for new splitted annotations, three for new splitted image sets
