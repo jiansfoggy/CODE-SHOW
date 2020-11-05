@@ -36,7 +36,7 @@ def sub_cls(opt):
     class_names = load_classes(opt.cls_path)
     print("The number of class is: ", class_names)
     # 36239
-    clas = open(opt.cla_path+fl,"a")
+    clas = open(opt.cla_path,"a")
     for root,dirs,files in os.walk(opt.ann_path):
         for fl in files:  
             anns = open(opt.ann_path+"/"+fl,"r")
@@ -67,3 +67,6 @@ if __name__ == '__main__':
 
 # CUDA_VISIBLE_DEVICES=2,3 python3 gen_labels.py --ann_path /media/data3/jian/Text_Detection/COCO-Text/label/valid_anns/ --cls_path /media/data3/jian/Text_Detection/COCO-Text/classes.names --dst_path ./labels/valid/
 # CUDA_VISIBLE_DEVICES=2,3 python3 gen_labels.py --ann_path /media/data3/jian/Text_Detection/COCO-Text/label/train_anns/ --cls_path /media/data3/jian/Text_Detection/COCO-Text/classes.names  --dst_path ./labels/train/
+
+# CUDA_VISIBLE_DEVICES=2,3 python3 gen_labels.py --task 2 --ann_path ./labels/train/ --cls_path ./classes.names --cla_path ./new_cls.names
+# CUDA_VISIBLE_DEVICES=2,3 python3 gen_labels.py --task 2 --ann_path ./labels/valid/ --cls_path ./classes.names --cla_path ./new_cls.names
