@@ -1,5 +1,8 @@
 # EfficientDet: Scalable and Efficient Object Detection
 
+* run ./strt_trn.sh start training.
+* change datapath to the diectory that you save train.txt and valid.txt 
+
 ## Introduction
 
 Here is our pytorch implementation of the model described in the paper **EfficientDet: Scalable and Efficient Object Detection** [paper](https://arxiv.org/abs/1911.09070) (*Note*: We also provide pre-trained weights, which you could see at ./trained_models) 
