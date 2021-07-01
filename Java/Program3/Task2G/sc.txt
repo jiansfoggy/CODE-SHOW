@@ -1,0 +1,193 @@
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.NavigableMap;
+import static java.lang.Double.parseDouble;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.hbase.client.Put;
+import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
+import org.apache.hadoop.hbase.mapreduce.TableInputFormat;
+import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
+import org.apache.hadoop.mapreduce.Job;
+
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.SparkSession;
+import org.apache.spark.storage.StorageLevel;
+import org.apache.spark.util.LongAccumulator;
+
+import scala.Tuple2;
+
+public class AnalyzeMoviesG{
+	public static void main(String[] args) {
+		if (args.length!=3){
+                    System.err.println("usage: BuildMovieTable master inputTable outputTable");
+		}
+		String inputTable = args[1];
+
+		// Create a java spark session and context
+		SparkSession spark = SparkSession.builder().master(args[0])
+                        .appName("SparkHBase").config("spark.hadoop.validateOutputSpecs", false)
+                        .getOrCreate();
+		JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+		// Create the HBase configuration for input
+		Configuration hConf = HBaseConfiguration.create();
+		hConf.set(TableInputFormat.INPUT_TABLE, inputTable);
+
+		// Get an RDD from the HBase table
+		JavaPairRDD<ImmutableBytesWritable, Result> tableRDD = sc.newAPIHadoopRDD(hConf,TableInputFormat.class,ImmutableBytesWritable.class,Result.class);
+
+		tableRDD.persist(StorageLevel.MEMORY_ONLY());
+		// Define output column family and column names
+		byte[] infoBt = "info".getBytes();
+		byte[] ttlBt  = "title".getBytes();
+		byte[] gnrsBt = "genres".getBytes();
+
+		byte[] rateBt = "rating".getBytes();
+
+		byte[] tagBt  = "tag".getBytes();
+
+		// Deal with tag part
+		JavaPairRDD<String, String> tagRDD = tableRDD.mapPartitionsToPair(
+			x ->{
+				// Looks like one input row can save as many output row
+				ArrayList<Tuple2<String, String>> transit1 = new ArrayList<>();
+				while (x.hasNext()) {
+                    Tuple2<ImmutableBytesWritable, Result> tagKV = x.next();
+                    Result trow = tagKV._2;
+
+                    // Check for info family
+                    NavigableMap<byte[], byte[]>infoMap = trow.getFamilyMap(infoBt);
+    				
+                    // Check for tag family
+                    NavigableMap<byte[], byte[]>tagMap  = trow.getFamilyMap(tagBt);
+
+                    // Extract values from each info family
+                    String in_genre = new String(infoMap.get(gnrsBt));
+                    System.out.println(">> test:"+in_genre);
+                    String genreLst[] = in_genre.split("\\|");
+
+                    for(String genre:genreLst){
+    					tagMap.forEach(
+    						(k,v) -> {
+    							String twoPart[] = v.split("\\|").toArray(String[]::new);
+    							String gnrYear = genre+"|"+twoPart[1].take(4);
+    							String tagTxt  = twoPart[0];
+    							transit1.add(new Tuple2<>(gnrYear, tagTxt));
+    					});
+    				}
+    			}
+    			return transit1.iterator();
+			});
+
+		// Tag part: Combine by key 
+		JavaPairRDD<String, ArrayList<String>> tagCBK = tagRDD.combineByKey(
+            grps -> {
+                ArrayList<String> valList = new ArrayList<>();
+                valList.add(grps);
+                return valList;
+            },
+            (valList, grps) -> {valList.add(grps); return valList;},
+            (valList1, valList2) -> {valList1.addAll(valList2); return valList1;}
+            );
+
+		JavaPairRDD<String, Long> tagOut = tagCBK.mapValues(
+			tags -> { 
+                // ArrayList to hold counting value
+                ArrayList<Long> tagCnt = new ArrayList<>();
+                // Create counters for recording tag number
+    			LongAccumulator tagNum = sc.sc().longAccumulator("TagTextNumber");
+    			for (String t:tags) tagNum.add(1);
+    			
+    			tagCnt.add(tagNum.value());
+
+    			return tagCnt;
+    		});
+
+		// Deal with rate part
+		JavaPairRDD<String, String> rateRDD = tableRDD.mapPartitionsToPair(
+			y ->{
+				// Looks like one input row can save as many output row
+				ArrayList<Tuple2<String, String>> transit2 = new ArrayList<>();
+				while (y.hasNext()) {
+    				Tuple2<ImmutableBytesWritable, Result> ratKV = y.next();
+    				Result rrow = ratKV._2;
+
+    				// Check for info family
+    				NavigableMap<byte[], byte[]>infoMap = rrow.getFamilyMap(infoBt);
+    				
+				    // Check for rate family
+				    NavigableMap<byte[], byte[]>rateMap = rrow.getFamilyMap(rateBt);
+                                 
+                    // Check for tag family
+                    NavigableMap<byte[], byte[]>tagMap  = rrow.getFamilyMap(tagBt);
+                    // 
+
+				    // Extract values from each info family
+    				String fo_genre = new String(infoMap.get(gnrsBt));
+    				String genreLst[] = fo_genre.split("\\|");
+
+    				for(Stirng genre:genreLst){
+    					rateMap.forEach(
+    						(k,v) -> {
+                                if(tagMap!=null & v==null){
+                                    transit2.add(new Tuple2<>(gnrYear, 0));
+                                } else {
+                                    String twoPart[] = v.split("\\|");
+    							String gnrYear = genre+"|"+twoPart[1].take(4);
+    							String ratVal  = twoPart[0];
+    							transit2.add(new Tuple2<>(gnrYear, ratVal));
+                            }
+                        });
+    				}
+    			}
+    			return transit2.iterator();
+			});
+
+		// Rate part: Combine by key 
+		JavaPairRDD<String, ArrayList<String>> rateCBK = rateRDD.combineByKey(
+            grps -> {
+                ArrayList<String> valList = new ArrayList<>();
+                valList.add(grps);
+                return valList;
+            },
+            (valList, grps) -> {valList.add(grps); return valList;},
+            (valList1, valList2) -> {valList1.addAll(valList2); return valList1;}
+            );
+
+		JavaPairRDD<String, Float> rateOut = rateCBK.mapValues(
+			rates -> { 
+				// ArrayList to hold counting value
+				ArrayList<Float> rateAve = new ArrayList<>();
+				// Create total value for rate value
+				Double rateSum = 0.0;
+				// Create counters for recording rate number
+    			LongAccumulator rateNum = sc.sc().longAccumulator("RateSumNumber");
+    			for (String r:rates) {
+    				rateSum += parseDouble(r);
+    				rateNum.add(1);
+    			}
+    			Double rtAveVal = rateSum/rateNum.value();
+    			rateAve.add(rtAveVal.floatValue());
+    			return rateAve;
+    			// Can I use function
+    			/*
+    			Double rateLst[] = rates.stream().map(i->parseDouble(i)).toArray(Double[]::new);
+    			Float rateAve = rateLst.stream().mapToDouble(Number::doubleValue).average()
+    								   .getAsDouble().floatValue();
+
+    			Double rateVal = rates.stream().mapToDouble(String::doubleValue).average().getAsDouble();
+    			Float rateAve = rateVal.floatValue();
+    			return rateAve;
+    			*/
+    		});
+
+		JavaPairRDD<String, Tuple2<Float, Long>> output = rateOut.join(tagOut);
+		// Save the references back to the output file
+    	output.sortByKey().saveAsTextFile(args[2]);
+	}
+}

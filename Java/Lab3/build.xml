@@ -1,0 +1,37 @@
+<project name="Map_Sub_Problems" basedir="." default="jar">
+  <description>
+    COMP3705/4333 Lab 3 Map Sub Problems
+  </description>
+  <property name="src" location="src" />  <!-- Find source code here -->
+  <property name="build" location="build" />  <!-- Put .class files here -->
+  <property name="jar" location="jar" />  <!-- Put final .jar file here -->
+  <property environment="env"/>
+
+  <target name="init">
+    <!-- Create time stamp (sets the DSTAMP, TSTAMP, and TODAY properties in the current project) -->
+    <tstamp/>
+    <!-- Create build directory structure used by compile -->
+    <mkdir dir="${build}"/>
+  </target>
+
+  <target name="compile" depends="init"
+          description="compile the source">
+    <!-- Compile the java code from ${src} into ${build}
+         NOTE: must specify fork="true" to correctly interpret CLASSPATH -->
+    <javac srcdir="${src}" destdir="${build}" includeantruntime="false" fork="true" classpath="${env.CLASSPATH}"/>
+  </target>
+
+  <target name="jar" depends="compile" description="generate the jar file">
+    <!-- Create the jar directory -->
+    <mkdir dir="${jar}"/>
+    <!-- Put everything in ${build} into the jar file -->
+    <jar jarfile="${jar}/${ant.project.name}.jar" basedir="${build}"/>
+  </target>
+
+  <target name="clean" description="clean up">
+    <!-- Delete the ${build} and ${jar} directory trees -->
+    <delete dir="${build}"/>
+    <delete dir="${jar}"/>
+  </target>
+  
+</project>
