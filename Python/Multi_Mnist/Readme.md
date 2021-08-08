@@ -13,7 +13,7 @@ We design a very specific structure there.
 
 * Fuse images from train and test set to generate a new image set, so does label set.
 * Sort image set based on class order and split the image set into 10 subsets. Each subset represents 1 category. So does 10 label subsets.
-* Start from class \textit{i} and select related subset and count its sample number as num_0, then pick one out of 10 subsets, 
+* Start from class \textit(t) and select related subset and count its sample number as num_0, then pick one out of 10 subsets, 
 
 
 
