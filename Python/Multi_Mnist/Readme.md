@@ -8,4 +8,15 @@ For each sample of Mnist, which shape is [70000, 28, 28, 1], we combine it with 
 However, this dataset is not ready to download directly like Mnist or Cifar-10, researchers have to generate it firstly before experiment. The current methods published on github is not friendly to beginners. It takes time for readers to understand it. To reduce the burden on reading code, we propose an easy way to generate Multi-Mnist dataset. Our method is a sort of plug-in function, and it suits for both 2 popular framework, Tensorflow and PyTorch. Users can implement it by directly copy and paste it into the their code.
 
 ## Difference between 2 uploaded files.  
+### slow_generate_multimnist.py 
+We design a very specific structure there. 
 
+* Fuse images from train and test set to generate a new image set, so does label set.
+* Sort image set based on class order and split the image set into 10 subsets. Each subset represents 1 category. So does 10 label subsets.
+* Start from class \textit{i} and select related subset and count its sample number as num_0, then pick one out of 10 subsets, 
+
+
+
+fast_generate_multimnist.py
+
+slow_generate_multimnist.py
