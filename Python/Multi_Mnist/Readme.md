@@ -1,7 +1,6 @@
 # Easy Way to generate multi-mnist dataset
 
-## What is Multi-Mnist ?
-
+## What is Multi-Mnist ?  
 Multi-Mnist dataset is a very important to prove the effectiveness of CapsuleNet. It is generated from 70000 samples in Mnist.  
 For each sample of Mnist, which shape is [70000, 28, 28, 1], we combine it with another random sample and generate a new sample with 2 overlapped digits, which is different from placing multiple digits separately into one image. Its shape is [36, 36, 1]. Then we repeat this process 1000 times. Therefore, Multi-Mnist totally has 70M samples.
 
