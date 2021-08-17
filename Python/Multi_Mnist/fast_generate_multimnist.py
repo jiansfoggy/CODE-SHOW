@@ -23,8 +23,9 @@ def multi_batch(batch_x1, batch_y1, batch_x2, batch_y2):
     batch_x2 = batch_deformation(batch_x2, max_shift=4, keep_dim=False)
     batch_x = (batch_x1 + batch_x2)
 
-    batch_y = np.clip(batch_y1+batch_y2, 0, 1)
-  
+    #batch_y = np.clip(batch_y1+batch_y2, 0, 1)
+    batch_y = (batch_y1+batch_y2)
+
     return batch_x, batch_y
 
 # download MNIST dataset from keras
@@ -44,9 +45,9 @@ del y_train
 del x_test
 del y_test
 
-repeat_time=10
+repeat_time=5
 totl_smpl=repeat_time*70000
-trn_smpl =repeat_time*60000
+trn_smpl =(repeat_time-1)*60000
 for i in range(repeat_time):
     if len(X1)==0:
         X1 = x_ind
@@ -61,6 +62,16 @@ rsort = list(range(totl_smpl))
 np.random.shuffle(rsort)
 X2 = X1[rsort,:,:,:]            
 Y2 = Y1[rsort]
+
+uni_ind = []
+for ui in range(totl_smpl):
+    if Y1[ui] != Y2[ui]:
+        uni_ind.append(ui)
+
+X1 = X1[uni_ind,:,:,:] 
+X2 = X2[uni_ind,:,:,:] 
+Y1 = Y1[uni_ind]
+Y2 = Y2[uni_ind]
 
 batch_y1 = np_utils.to_categorical(Y1, 10)
 batch_y2 = np_utils.to_categorical(Y2, 10)
