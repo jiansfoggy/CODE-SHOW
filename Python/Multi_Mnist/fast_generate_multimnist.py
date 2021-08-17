@@ -76,7 +76,7 @@ Y2 = Y2[uni_ind]
 batch_y1 = np_utils.to_categorical(Y1, 10)
 batch_y2 = np_utils.to_categorical(Y2, 10)
 y1_train = np.vstack([Y1[:trn_smpl], Y2[:trn_smpl]]).T
-y1_test  = np.vstack([Y1[trn_smpl:], Y2[trn_smpl:]]).T
+y1_test  = np.vstack([Y1[trn_smpl:280000], Y2[trn_smpl:280000]]).T
 Y1, Y2   = None, None
 del Y1
 del Y2
@@ -86,19 +86,19 @@ del batch_y1
 del batch_y2
 
 x_train  = batch_x[:trn_smpl,:,:,:]
-x_test   = batch_x[trn_smpl:,:,:,:]
+x_test   = batch_x[trn_smpl:280000,:,:,:]
 batch_x  = None
 del batch_x
 x1_train = X1[:trn_smpl,:,:,:]
 x2_train = X2[:trn_smpl,:,:,:]
-x1_test  = X1[trn_smpl:,:,:,:]
-x2_test  = X2[trn_smpl:,:,:,:]
+x1_test  = X1[trn_smpl:280000,:,:,:]
+x2_test  = X2[trn_smpl:280000,:,:,:]
 X1, X2   = None, None
 del X1
 del X2
 
 y_train  = batch_y[:trn_smpl,:]
-y_test   = batch_y[trn_smpl:,:]
+y_test   = batch_y[trn_smpl:280000,:]
 batch_y  = None
 del batch_y
 
