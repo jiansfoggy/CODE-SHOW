@@ -8,8 +8,32 @@ We upload the code based on different dataset.
 
 To train the model, you can run the following codes directly.
 
+To train on MNIST
 ```
-CUDA_VISIBLE_DEVICES=0 python3 ./MNIST/filename.py  
-CUDA_VISIBLE_DEVICES=0 python3 ./CIFAR-10/filename.py  
-CUDA_VISIBLE_DEVICES=0 python3 ./MultiMNIST/filename.py
+CUDA_VISIBLE_DEVICES=0 python3 ./MNIST/mobilenetv2.py  
+CUDA_VISIBLE_DEVICES=0 python3 ./MNIST/MobileNet_XnODR.py
+CUDA_VISIBLE_DEVICES=0 python3 ./MNIST/MobileNet_XnIDR.py
+CUDA_VISIBLE_DEVICES=0 python3 ./MNIST/ResNet50.py
+CUDA_VISIBLE_DEVICES=0 python3 ./MNIST/ResNet_XnODR.py
+CUDA_VISIBLE_DEVICES=0 python3 ./MNIST/ResNet_XnIDR.py
+```
+
+To train on CIFAR-10
+```
+CUDA_VISIBLE_DEVICES=0 python3 ./CIFAR-10/MobileNetV2.py
+CUDA_VISIBLE_DEVICES=0 python3 ./CIFAR-10/MobileNet_XnODR.py
+CUDA_VISIBLE_DEVICES=0 python3 ./CIFAR-10/MobileNet_XnIDR.py
+CUDA_VISIBLE_DEVICES=0 python3 ./CIFAR-10/ResNet50.py
+CUDA_VISIBLE_DEVICES=0 python3 ./CIFAR-10/ResNet_XnODR.py
+CUDA_VISIBLE_DEVICES=0 python3 ./CIFAR-10/ResNet_XnIDR.py
+```
+
+To train on MultiMNIST
+```
+CUDA_VISIBLE_DEVICES=0 python3 ./MultiMNIST/MobileNetV2.py
+CUDA_VISIBLE_DEVICES=0 python3 ./MultiMNIST/MobileNet_XnODR.py
+CUDA_VISIBLE_DEVICES=0 python3 ./MultiMNIST/MobileNet_XnIDR.py
+CUDA_VISIBLE_DEVICES=0 python3 ./MultiMNIST/ResNet50.py
+CUDA_VISIBLE_DEVICES=0 python3 ./MultiMNIST/ResNet_XnODR.py
+CUDA_VISIBLE_DEVICES=0 python3 ./MultiMNIST/ResNet_XnIDR.py
 ```
