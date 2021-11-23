@@ -5,9 +5,6 @@ import numpy as np
 import tensorflow as tf
 from matplotlib import pyplot as plt
 
-
-#K.set_image_data_format('channels_last')  # for capsule net
-#K.clear_session()
 print("Tensorflow version " + tf.__version__)
 
 BATCH_SIZE = 100
@@ -125,52 +122,3 @@ print("loss: ", loss)
 print("accuracy: ", accuracy)
 print("Running Time: ", after_T-before_T)
 
-"""
-1
-FLOPs: 6157200;    Trainable params: 3045258
-loss:  0.02709089290274534
-accuracy:  0.9943
-Running Time:  5768.740991353989
-
-2
-FLOPs: 6157200;    Trainable params: 3045258
-loss:  0.02926681943452877
-accuracy:  0.9934
-Running Time:  4434.523790359497
-
-3
-FLOPs: 6157200;    Trainable params: 3045258
-loss:  0.022714445538416114
-accuracy:  0.995
-Running Time:  5925.068522691727
-
-4
-FLOPs: 6157200;    Trainable params: 3045258
-loss:  0.027165838573455118
-accuracy:  0.9942
-Running Time:  5817.996906995773
-
-5
-FLOPs: 6157200;    Trainable params: 3045258
-loss:  0.026100826487113624
-accuracy:  0.9948
-Running Time:  5771.138465642929
-
-=======================
-Without Reconstruct
-=======================
-
-top1    = [86.40,86.42,86.51,86.15,86.09]
-top5    = [99.15,99.05,99.12,99.13,99.01]
-time_ls = [6819.390365600586,7252.462275266647,6946.476444482803,7026.700607538223,7025.691478967667]
-
-Standard Deviation
-Top1 86.31400000000001 0.1637803407005859
-Top5 99.092 0.053065996645686335
-Time 7014.144234371185 141.13432549923922
-
-ResNet-50
-1
---------------------------------------------------
-
-"""
