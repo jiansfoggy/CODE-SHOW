@@ -9,7 +9,6 @@ from keras.datasets import mnist
 from keras.optimizers import Adam
 from keras.models import Sequential
 from keras.utils import np_utils
-# from keras.optimizers import SGD, Adam, RMSprop
 from tensorflow.python.framework import ops
 from keras.utils.vis_utils import plot_model
 from keras import callbacks, initializers, layers, models, constraints, optimizers
@@ -73,7 +72,6 @@ def binary_tanh(x):
     return 2 * round_through(_hard_sigmoid(x)) - 1
 
 def binarize(W, H=1):
-    # [-H, H] -> -H or H
     Wb = H * binary_tanh(W / H)
     return Wb
 
@@ -86,11 +84,7 @@ def xnorize(W, H=1., axis=None, keepdims=False):
     return Wa, Wb
 
 class Length(layers.Layer):
-    """
-    Compute the length of vectors. This is used to compute a Tensor that has the same shape with y_true in margin_loss
-    inputs: shape=[dim_1, ..., dim_{n-1}, dim_n]
-    output: shape=[dim_1, ..., dim_{n-1}]
-    """
+
     def call(self, inputs, **kwargs):
         return K.sqrt(K.sum(K.square(inputs), -1))
 
@@ -184,12 +178,11 @@ class XDR2_LPLayer(layers.Layer):
         self.input_dim_vector = input_shape[2]
 
         shape=[self.input_num_capsule, self.num_capsule, self.input_dim_vector, self.dim_vector]
-        #print("within build capsule layer input_shape and shape",input_shape, shape)
-        
+
         self.W = self.add_weight(shape=[self.input_num_capsule, self.num_capsule, self.input_dim_vector, self.dim_vector],
                                  initializer=self.kernel_initializer,
                                  name='W')
-        # Coupling coefficient. The redundant dimensions are just to facilitate subsequent matrix calculation.
+        
         self.bias = self.add_weight(shape=[1, self.input_num_capsule, self.num_capsule, 1, 1],
                                     initializer=self.bias_initializer,
                                     name='bias',
@@ -209,7 +202,6 @@ class XDR2_LPLayer(layers.Layer):
             c = tf.nn.softmax(self.bias, axis=2)
             outputs = squash(K.sum(c * inputs_hat, 1, keepdims=True))
 
-            # last iteration needs not compute bias which will not be passed to the graph any more anyway.
             if i != self.num_routing - 1:
                 x_a, x_b = xnorize(inputs_hat, 1., axis=4, keepdims=True) # (nb_sample, 1)
                 w_a, w_b = xnorize(outputs, 1., axis=4, keepdims=True) # (1, units)
@@ -223,20 +215,13 @@ class XDR2_LPLayer(layers.Layer):
 def MBL_Primary(x, dim_vector, n_channels, strides):
     
     x = DepthwiseConv2D(kernel_size = 3, strides = strides, padding = 'same')(x)
-    #x = BatchNormalization(epsilon=1e-6, momentum=0.9, axis=-1)(x)
     x = BatchNormalization()(x)
-    #x = ReLU()(x)
 
     x = Conv2D(filters = dim_vector*n_channels, kernel_size = 1, strides = 1)(x)
     x = tf.keras.layers.GlobalAveragePooling2D()(x)    
-    #x = AvgPool2D (pool_size = 3, strides = 1, data_format='channels_last')(x)
-    #x = tf.nn.max_pool(x, ksize=[1, 7, 7, 1], strides=[1, 1, 1, 1], padding='VALID')
-    #x = tf.keras.layers.Dropout(0.5)(x)
     x = layers.Reshape(target_shape=[n_channels, dim_vector])(x)
     x = layers.Lambda(squash)(x)
-    #x = BatchNormalization(epsilon=1e-6, momentum=0.9, axis=-1)(x)
     x = BatchNormalization()(x)
-    #x = ReLU()(x)
     x = layers.advanced_activations.ReLU()(x)
     return x
 
@@ -251,11 +236,8 @@ def feature_extractor(inputs):
 def classifier(inputs):
     x = MBL_Primary(inputs, dim_vector=8, n_channels=128, strides = 1)
     XDR4 = XDR2_LPLayer(num_capsule=10, dim_vector=16, num_routing=3, name='XDR4')(x)
-    #Bn4 = layers.BatchNormalization(epsilon=epsilon, momentum=momentum, axis=channel_axis, name='Bn4')(XDR4)
     Bn4 = layers.BatchNormalization(name='Bn4')(XDR4)
-    #x = layers.Activation('relu')(Bn4)
     x = layers.advanced_activations.ReLU()(Bn4)
-    #x = tf.keras.layers.Dropout(.2)(x)
     x = Length(name='out_cpxn')(x)
     return x
 
@@ -360,8 +342,6 @@ with tf.Graph().as_default() as graph:
 
     y_train  = batch_y[:trn_smpl,:]
     y_test   = batch_y[trn_smpl:280000,:]
-    #y_train  = y1_train
-    #y_test   = y1_test
     batch_y  = None
     del batch_y
 
@@ -418,7 +398,6 @@ with tf.Graph().as_default() as graph:
 
 y_pred_tr = model.predict([x_train], batch_size=150)
 _, y_pred1_tr = tf.nn.top_k(y_pred_tr, 2)
-#tf.keras.metrics.top_k_categorical_accuracy(y_train, y_pred_tr, k=2)
 y_pred1_tr = K.eval(y_pred1_tr)
 y_pred1_tr.sort(axis = 1)
 y1_train.sort(axis = 1)
@@ -443,41 +422,3 @@ print("Top5 Acc: ", top5)
 print('-'*50)
 print("The total validation time is: ", (after_T-before_T), " seconds.")
 print('-'*50)
-
-"""
-1
-
-=================================
-Total params: 3,751,584
-Trainable params: 2,994,864
-Non-trainable params: 756,720
-_________________________________
-
-FLOPs: 8293934;    Trainable params: 3714864
---------------------------------------------------
-Top1 Acc:  0.20265
-Top2 Acc:  0.97085
-Top5 Acc:  0.999975
---------------------------------------------------
-The total validation time is:  29.409271717071533  seconds.
---------------------------------------------------
-
-
-=======================
-Without Reconstruct
-=======================
-
-top1    = [86.40,86.42,86.51,86.15,86.09]
-top5    = [99.15,99.05,99.12,99.13,99.01]
-time_ls = [6819.390365600586,7252.462275266647,6946.476444482803,7026.700607538223,7025.691478967667]
-
-Standard Deviation
-Top1 86.31400000000001 0.1637803407005859
-Top5 99.092 0.053065996645686335
-Time 7014.144234371185 141.13432549923922
-
-ResNet-50
-1
---------------------------------------------------
-
-"""
