@@ -158,12 +158,10 @@ class XDR2_LPLayer(layers.Layer):
         self.input_dim_vector = input_shape[2]
 
         shape=[self.input_num_capsule, self.num_capsule, self.input_dim_vector, self.dim_vector]
-        #print("within build capsule layer input_shape and shape",input_shape, shape)
-        
+
         self.W = self.add_weight(shape=[self.input_num_capsule, self.num_capsule, self.input_dim_vector, self.dim_vector],
                                  initializer=self.kernel_initializer,
                                  name='W')
-        # Coupling coefficient. The redundant dimensions are just to facilitate subsequent matrix calculation.
         self.bias = self.add_weight(shape=[1, self.input_num_capsule, self.num_capsule, 1, 1],
                                     initializer=self.bias_initializer,
                                     name='bias',
@@ -195,93 +193,53 @@ class XDR2_LPLayer(layers.Layer):
         return tuple([None, self.num_capsule, self.dim_vector])
 
 def RES_Primary(x, filters, n_channels, dim_vector): 
-    #renet block where dimension doesnot change.
-    #The skip connection is just simple identity conncection
-    #we will have 3 blocks and then input will be added
-
     x_skip = x # this will be used for addition with the residual block 
     f1, f2 = filters
   
     #first block 
     x = Conv2D(f1, kernel_size=(1, 1), strides=(1, 1), padding='valid', kernel_regularizer=regularizers.l2(0.001))(x)
     x = BatchNormalization()(x)
-    #x = BatchNormalization(epsilon=1e-6, momentum=0.9, axis=-1)(x)
-    #x = layers.advanced_activations.ReLU()(x)
     x = layers.Activation('relu')(x)
-    #x = ReLU()(x)
 
     #second block # bottleneck (but size kept same with padding)
     x = Conv2D(f1, kernel_size=(3, 3), strides=(1, 1), padding='same', kernel_regularizer=regularizers.l2(0.001))(x)
-    #x = BatchNormalization(epsilon=1e-6, momentum=0.9, axis=-1)(x)
     x = BatchNormalization()(x)
-    #x = layers.advanced_activations.ReLU()(x)
     x = layers.Activation('relu')(x)
-    #x = ReLU()(x)
 
     # third block activation used after adding the input
     x = Conv2D(f2, kernel_size=(1, 1), strides=(1, 1), padding='valid', kernel_regularizer=regularizers.l2(0.001))(x)
-    #x = BatchNormalization(epsilon=1e-6, momentum=0.9, axis=-1)(x)
     x = BatchNormalization()(x)
-    # x = Activation(activations.relu)(x)
 
     # add the input 
     x = Add()([x, x_skip])
-    #x = Conv2D(f1, kernel_size=(1, 1), strides=(1, 1), padding='valid', kernel_regularizer=regularizers.l2(0.001))(x)
     x = tf.keras.layers.GlobalAveragePooling2D()(x)
-    #x = AvgPool2D (pool_size = 7, strides = 1, data_format='channels_last')(x)
-    #x = AvgPool2D (pool_size = 2, strides = 1, data_format='channels_last')(x)
     x = layers.Reshape(target_shape=[n_channels, dim_vector])(x)
     x = layers.Lambda(squash)(x)
     x = BatchNormalization()(x)
-    #x = layers.advanced_activations.ReLU()(x)
     x = layers.Activation('relu')(x)
-    #x = ReLU()(x)
     return x
-"""
-def RES_Primary(x, n_channels, dim_vector):   
 
-    #x = tf.keras.layers.GlobalAveragePooling2D()(x)
-    x = AvgPool2D (pool_size = 7, strides = 1, data_format='channels_last')(x)
-    x = layers.Reshape(target_shape=[n_channels, dim_vector])(x)
-    x = layers.Lambda(squash)(x) 
-    #x = BatchNormalization(epsilon=1e-6, momentum=0.9, axis=-1)(x)
-    x = BatchNormalization()(x)
-    x = layers.advanced_activations.ReLU()(x)
-    #x = layers.Activation('relu')(x)
-    return x
-"""
 def feature_extractor(inputs):
     
-    #mbln = tf.keras.applications.resnet.ResNet50(input_shape=(224, 224, 3),
-    #                                           include_top=False,
-    #                                           weights='imagenet')
     mbln = tf.keras.applications.resnet.ResNet50(input_shape=(224, 224, 3),
                                                include_top=False)
     for layer in mbln.layers[-10:]:
         layer.trainable=False
     feature_extractor = mbln(inputs)
-    """
-    feature_extractor = tf.keras.applications.resnet.ResNet50(input_shape=(224, 224, 3),
-                                               include_top=False,
-                                               weights='imagenet')(inputs)
-    """
+
     return feature_extractor
 
 def classifier(inputs):
-    #x = RES_Primary(inputs, filters=2048, dim_vector=8, n_channels=256)
     x = RES_Primary(inputs, filters=(512, 2048), dim_vector=8, n_channels=256)
-    #x = RES_Primary(inputs, dim_vector=8, n_channels=256)
     XDR4 = XDR2_LPLayer(num_capsule=10, dim_vector=16, num_routing=3, name='XDR4')(x)
     Bn4 = layers.BatchNormalization(name='Bn4')(XDR4)
     Act4 = layers.Activation('relu',name='Act4')(Bn4)
-    #Act4 = layers.advanced_activations.ReLU(name='Act4')(Bn4)
     out_cpxn = Length(name='out_cpxn')(Act4)
     return out_cpxn
 
 def final_model(inputs):
     resize = tf.keras.layers.UpSampling2D(size=(7,7))(inputs)
-    #resize = tf.keras.layers.UpSampling2D(size=(2,2))(inputs)
-
+    
     resnet_feature_extractor = feature_extractor(resize)
     classification_output = classifier(resnet_feature_extractor)
 
@@ -302,10 +260,7 @@ def define_compile_model():
 
 with tf.Graph().as_default() as graph:
     (training_images, training_labels) , (validation_images, validation_labels) = tf.keras.datasets.cifar10.load_data()
-
-    #display_images(training_images, training_labels, training_labels, "Training Data" )
-    #display_images(validation_images, validation_labels, validation_labels, "Validation Data" )
-
+    
     train_X = preprocess_image_input(training_images)
     valid_X = preprocess_image_input(validation_images)
     training_labels = np_utils.to_categorical(training_labels, 10) # -1 or 1 for hinge loss
@@ -336,9 +291,6 @@ with tf.Graph().as_default() as graph:
     history = model.fit_generator(it_train, steps_per_epoch=steps, epochs=EPOCHS,
                                   validation_data=(valid_X, validation_labels), verbose=1, 
                                   callbacks=[log, checkpoint])
-    #history = model.fit(train_X, training_labels, epochs=EPOCHS, verbose=1,
-    #    validation_data = (valid_X, validation_labels), batch_size=batch_size,
-    #    callbacks=[log, checkpoint, lr_schdl])
     print("The list of record that can be plotted out:", history.history.keys())
     # summarize history for accuracy
     plt.plot(history.history['accuracy'])
@@ -367,38 +319,3 @@ with tf.Graph().as_default() as graph:
 print("loss: ", loss)
 print("accuracy: ", accuracy)
 print("Running Time is: ", t_end-t_start)
-
-'''
-Total params: 28,387,296
-Trainable params: 23,862,320
-Non-trainable params: 4,524,976
-
-FLOPs: 87899206;    Trainable params: 28327984
-loss:  0.9257663925886154
-accuracy:  0.9407, 0.9444
-Running Time is:  24.434604167938232
-
-FLOPs: 87899210;    Trainable params: 28327984
-loss:  0.07067402052413672
-accuracy:  0.944 0.9466
-Running Time is:  35.552778244018555
-
-without pretrained weight
-upsample 2x2
-FLOPs: 87899206;    Trainable params: 28327984
-loss:  0.9462854745984077
-accuracy:  0.8664 0.8998
-Running Time is:  10.566937685012817
-
-upsample 7x7
-FLOPs: 87899206;    Trainable params: 28327984
-loss:  0.926772228717804
-accuracy:  0.9408 0.9437
-Running Time is:  35.05783438682556
-
-FLOPs: 87899202;    Trainable params: 28327984
-loss:  0.5143443038463592
-accuracy:  0.9672
-Running Time is:  33.537262201309204
-
-'''
