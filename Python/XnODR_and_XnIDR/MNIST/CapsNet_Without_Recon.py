@@ -1,4 +1,3 @@
-#%tensorflow_version 1.x
 from __future__ import absolute_import, division, print_function
 import os,sys,time,keras
 import numpy as np
@@ -8,20 +7,18 @@ import tensorflow as tf
 #from tensorflow.python.eager import profiler
 import keras.backend as K
 tf.compat.v1.disable_eager_execution()
-#from tensorflow import keras
+
 import matplotlib.pyplot as plt
 from keras.datasets import mnist
 from keras.optimizers import Adam
 from keras.models import Sequential
 from keras.utils import np_utils, to_categorical
-# from keras.optimizers import SGD, Adam, RMSprop
 from tensorflow.python.framework import ops
 from keras.utils.vis_utils import plot_model
 from keras import callbacks, initializers, layers, models, constraints, optimizers
 from keras.layers import Dense, Dropout, Activation, BatchNormalization, MaxPooling2D
 from keras.layers import Flatten, InputSpec, Layer, Conv2D
 from keras.preprocessing.image import ImageDataGenerator
-#K.set_image_data_format('channels_first') # for xnor net
 K.set_image_data_format('channels_last') # for capsule net
 K.clear_session()
 
@@ -32,11 +29,6 @@ def stats_graph(graph):
           params.total_parameters))
 
 class Length(layers.Layer):
-    """
-    Compute the length of vectors. This is used to compute a Tensor that has the same shape with y_true in margin_loss
-    inputs: shape=[dim_1, ..., dim_{n-1}, dim_n]
-    output: shape=[dim_1, ..., dim_{n-1}]
-    """
     def call(self, inputs, **kwargs):
         return K.sqrt(K.sum(K.square(inputs), -1))
 
@@ -142,22 +134,14 @@ class CapsLayer(layers.Layer):
         inputs_expand = K.expand_dims(K.expand_dims(inputs, 2), 2)
         inputs_tiled = K.tile(inputs_expand, [1, 1, self.num_capsule, 1, 1])
         
-        #inputs_hat = tf.scan(lambda ac,x: tf.matmul(x, self.W), 
-        #                     elems=inputs_tiled,
-        #                     initializer=tf.zeros([self.input_num_capsule, self.num_capsule, 1, self.dim_vector]))
-       
         inputs_hat = tf.map_fn(lambda x: tf.matmul(x, self.W), 
                              elems=inputs_tiled)
         self.bias = tf.zeros(shape=[self.input_num_capsule, self.num_capsule, 1, self.dim_vector]) 
 
-        # Routing algorithm V2. Use iteration. V2 and V1 both work without much difference on performance
-        assert self.num_routing > 0, 'The num_routing should be > 0.'
+         assert self.num_routing > 0, 'The num_routing should be > 0.'
         for i in range(self.num_routing):
             c = tf.nn.softmax(self.bias, axis=2)
-            #c = tf.nn.softmax(self.bias, dim=2)  # dim=2 is the num_capsule dimension
-            # outputs.shape=[None, 1, num_capsule, 1, dim_vector]
             outputs = squash(K.sum(c * inputs_hat, 1, keepdims=True))
-            # last iteration needs not compute bias which will not be passed to the graph any more anyway.
             if i != self.num_routing - 1:
                 self.bias = self.bias + K.sum(inputs_hat * outputs, -1, keepdims=True)
         return K.reshape(outputs, [-1, self.num_capsule, self.dim_vector])
@@ -165,15 +149,12 @@ class CapsLayer(layers.Layer):
     def compute_output_shape(self, input_shape):
         return tuple([None, self.num_capsule, self.dim_vector])
 
-
 # download MNIST dataset from keras
 (x_train, y_train), (x_test, y_test1) = tf.keras.datasets.mnist.load_data()
 # convert data type to float 32
 x_train = x_train.reshape(-1, 28, 28, 1).astype('float32') / 255.
 x_test = x_test.reshape(-1, 28, 28, 1).astype('float32') / 255.
 n_class = 10
-#y_train = np_utils.to_categorical(y_train, n_class) * 2 - 1 # -1 or 1 for hinge loss
-#y_test = np_utils.to_categorical(y_test, n_class) *2 - 1
 y_train = np_utils.to_categorical(y_train, n_class)  # -1 or 1 for hinge loss
 y_test = np_utils.to_categorical(y_test1, n_class)
 print("Modified Input Image Shape:",np.shape(x_train))
@@ -234,25 +215,13 @@ def CpXnNet (input_shape1,n_class,epsilon,momentum,use_bias,num_routing):
     out_cpxn = Length(name='out_cpxn')(act5)
     print("the output shape of flatten layer is:",np.shape(out_cpxn),"               |")
     print("--------------------- End of Auxiliary Layer -------------------\n")
-    #'''
+
     # Specify Input and Output.
     print("-------------- Output Check : Four Elements --------------------")
     print("X and Y Input:", np.shape(x),"                         |")
     print("X and Y Output:", np.shape(out_cpxn),"                        |")
     print("--------------------- End of Output Check ----------------------\n")
     return models.Model(inputs=[x], outputs=[out_cpxn])
-    #'''
-'''
-model = CpXnNet(input_shape1=[28, 28, 1],n_class=10,epsilon = 1e-6,momentum = 0.9,
-    use_bias = False, num_routing=3)
-
-model.summary()
-
-try:
-    plot_model(model, to_file='./Without_Recon/Caps_structure.png', show_shapes=True, show_layer_names=True)
-except Exception as e:
-    print('No fancy plot {}'.format(e))
-'''
 
 def train(model, data, NB_EPOCHS, batch_size):
 
@@ -286,17 +255,12 @@ def train(model, data, NB_EPOCHS, batch_size):
                   #loss=[margin_loss,'mse'],
                   #loss_weights=[1.0, 0.0005],
                   metrics={'out_cpxn':'accuracy'})
-    #model.load_weights('trained_model.h5')
-    #"""
+    #model.load_weights('./Without_Recon/Caps_weight.h5')
+
     history = model.fit(x_train, y_train, batch_size=batch_size, epochs=NB_EPOCHS,
                         verbose=1, validation_data=[x_test, y_test], 
                         callbacks=[log, lr_schdl])
     
-    """
-    history = model.fit([x_train, y_train], [y_train, x_train], batch_size=batch_size, epochs=NB_EPOCHS,
-                        verbose=1, validation_data=[[x_test, y_test], [y_test, x_test]], 
-                        callbacks=[log, lr_schdl])
-    """
     model.save_weights('./Without_Recon/Caps_weight.h5')
     print('Trained model saved to \'./Without_Recon/Caps_weight.h5\'')
 
@@ -305,8 +269,6 @@ def train(model, data, NB_EPOCHS, batch_size):
     # summarize history for accuracy
     plt.plot(history.history['accuracy'])
     plt.plot(history.history['val_accuracy'])
-    #plt.plot(history.history['out_cpxn_accuracy'])
-    #plt.plot(history.history['val_out_cpxn_accuracy'])
     plt.title('model accuracy')
     plt.ylabel('accuracy')
     plt.xlabel('epoch')
@@ -317,8 +279,6 @@ def train(model, data, NB_EPOCHS, batch_size):
     # summarize history for loss
     plt.plot(history.history['loss'])
     plt.plot(history.history['val_loss'])
-    #plt.plot(history.history['out_cpxn_loss'])
-    #plt.plot(history.history['val_out_cpxn_loss'])
     plt.title('model loss')
     plt.ylabel('loss')
     plt.xlabel('epoch')
@@ -328,11 +288,6 @@ def train(model, data, NB_EPOCHS, batch_size):
     plt.clf()
 
     return model
-"""
-before_T = time.time()
-train(model=model, data=((x_train, y_train), (x_test, y_test)), NB_EPOCHS=2, batch_size=150)
-after_T = time.time()
-"""    
 
 def combine_images(generated_images):
     num = generated_images.shape[0]
@@ -351,135 +306,42 @@ def combine_images(generated_images):
 def test(model, data):
     
     x_test, y_test = data
-    #, x_recon [x_test, y_test]
     y_pred = model.predict([x_test], batch_size=150)
     top1 = np.sum(np.argmax(y_pred, 1) == np.argmax(y_test, 1))/y_test.shape[0]
     top5 = tf.reduce_mean(tf.keras.metrics.top_k_categorical_accuracy(y_test, y_pred, k=5))
     top5 = top5.eval(session=tf.compat.v1.Session())
-    """
-    print('-'*50)
-    print('Top1 Test Acc:', np.sum(np.argmax(y_pred, 1) == np.argmax(y_test, 1))/y_test.shape[0])
-    print('Top5 Test Acc:', top5)
-    """
+
     a=np.argmax(y_test, 1)
     b=np.argmax(y_pred, 1)
-    #, x_recon
     return a, b, x_test, top1, top5
 
 from sklearn.metrics import classification_report, confusion_matrix   
-#def plott(a,b,x_test,x_recon): 
 def plott(a,b,x_test): 
     label_dict = {0: '0', 1: '1', 2: '2', 3: '3', 4: '4',
                   5: '5', 6: '6', 7: '7', 8: '8', 9: '9'}
     print(confusion_matrix(a, b)) 
     print(classification_report(a, b,
                                 target_names=list(label_dict.values()),digits=3))
-    '''
-    img = combine_images(np.concatenate([x_test[:50],x_recon[:50]]))
-    image = img * 255
-    Image.fromarray(image.astype(np.uint8)).save("./Caps_Result/Caps_recon.png")
-    print()
-    print('Reconstructed images are saved to ./Caps_Result/Caps_recon.png')
-    print('-'*50)
-    plt.imshow(plt.imread("./Caps_Result/Caps_recon.png", ))
-    plt.show()
-    '''
-#"""
-with tf.Graph().as_default() as graph:
-    model = CpXnNet(input_shape1=[28, 28, 1],n_class=10,epsilon = 1e-6,momentum = 0.9,
-                    use_bias = False, num_routing=3)
-    model.summary()
-    try:
-        plot_model(model, to_file='./Without_Recon/Caps_structure.png', show_shapes=True, show_layer_names=True)
-    except Exception as e:
-        print('No fancy plot {}'.format(e))
 
-    before_T = time.time()
-    train(model=model, data=((x_train, y_train), (x_test, y_test)),
-          NB_EPOCHS=60, batch_size=150)
-    after_T = time.time()
-    a,b,x_test,top1,top5 = test(model=model, data=(x_test, y_test))
-    plott(a,b,x_test) 
-    stats_graph(graph)
+
+model = CpXnNet(input_shape1=[28, 28, 1],n_class=10,epsilon = 1e-6,momentum = 0.9,
+                use_bias = False, num_routing=3)
+model.summary()
+try:
+    plot_model(model, to_file='./Without_Recon/Caps_structure.png', show_shapes=True, show_layer_names=True)
+except Exception as e:
+    print('No fancy plot {}'.format(e))
+
+before_T = time.time()
+train(model=model, data=((x_train, y_train), (x_test, y_test)),
+      NB_EPOCHS=60, batch_size=150)
+after_T = time.time()
+a,b,x_test,top1,top5 = test(model=model, data=(x_test, y_test))
+plott(a,b,x_test) 
+
 print('-'*50)
 print('Top1 Test Acc:', top1)
 print('Top5 Test Acc:', top5)
 print('-'*50)
 print("The total training time is: ", (after_T-before_T), " seconds.")
-#"""
-
-'''
-Total params: 1,691,616
-Trainable params: 1,690,544
-Non-trainable params: 1,072
-
-The total training time is:  8502.187513589859  seconds.
-8502.187513589859 / 60 = 141.70 seconds
-acc: 0.9934
-
-155636231
-
-======================
-Without Reconstruct
-======================
-1
-Top1 Test Acc: 99.40\%
-Top5 Test Acc: 99.96\%
-
---------------------------------------------------
-FLOPs: 3889500;    Trainable params: 1690544
-The total training time is:  5589.413856267929  seconds.
---------------------------------------------------
-
-2
-Top1 Test Acc: 99.44\%
-Top5 Test Acc: 99.89\%
-
---------------------------------------------------
-FLOPs: 3889500;    Trainable params: 1690544
-The total training time is:  5839.49662899971  seconds.
---------------------------------------------------
-
-3
-Top1 Test Acc: 99.42\%
-Top5 Test Acc: 100\%
-
---------------------------------------------------
-FLOPs: 3889500;    Trainable params: 1690544
-The total training time is:  6578.1999168396  seconds.
---------------------------------------------------
-
-4
-Top1 Test Acc: 99.38\%
-Top5 Test Acc: 99.99\%
-
---------------------------------------------------
-FLOPs: 3889500;    Trainable params: 1690544
-The total training time is:  7208.7137904167175  seconds.
---------------------------------------------------
-
-5
-Top1 Test Acc: 99.42\%
-Top5 Test Acc: 99.94\%
-
---------------------------------------------------
-FLOPs: 3889500;    Trainable params: 1690544
-The total training time is:  6790.938714265823  seconds.
---------------------------------------------------
-
-top1    = [99.40,99.44,99.42,99.38,99.42]
-top5    = [99.96,99.89,100,99.99,99.94]
-time_ls = [5589.413856267929,5839.49662899971,6578.1999168396,7208.7137904167175,6790.938714265823]
-
-Standard Deviation
-Top1 99.412 0.020396078054371544
-Top5 99.956 0.03929376540877598
-Time 6401.352581357956 601.6329547847423
-
-FLOPS: 10030266;    Trainable params1: 3928832
-'''
-
-
-
-
 
