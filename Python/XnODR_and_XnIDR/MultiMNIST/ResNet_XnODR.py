@@ -97,11 +97,6 @@ def xnorize(W, H=1., axis=None, keepdims=False):
     return Wa, Wb
 
 class Length(layers.Layer):
-    """
-    Compute the length of vectors. This is used to compute a Tensor that has the same shape with y_true in margin_loss
-    inputs: shape=[dim_1, ..., dim_{n-1}, dim_n]
-    output: shape=[dim_1, ..., dim_{n-1}]
-    """
     def call(self, inputs, **kwargs):
         return K.sqrt(K.sum(K.square(inputs), -1))
 
@@ -189,7 +184,6 @@ class XDR1_LPLayer(layers.Layer):
             c = tf.nn.softmax(self.bias, axis=2)
             outputs = squash(K.sum(c * inputs_hat, 1, keepdims=True))
 
-            # last iteration needs not compute bias which will not be passed to the graph any more anyway.
             if i != self.num_routing - 1:
                 self.bias = self.bias + K.sum(inputs_hat * outputs, -1, keepdims=True)
         return K.reshape(outputs, [-1, self.num_capsule, self.dim_vector])
@@ -198,60 +192,32 @@ class XDR1_LPLayer(layers.Layer):
         return tuple([None, self.num_capsule, self.dim_vector])
 
 def RES_Primary(x, filters, n_channels, dim_vector): 
-    #renet block where dimension doesnot change.
-    #The skip connection is just simple identity conncection
-    #we will have 3 blocks and then input will be added
-
     x_skip = x # this will be used for addition with the residual block 
     f1, f2 = filters
   
     #first block 
     x = Conv2D(f1, kernel_size=(1, 1), strides=(1, 1), padding='valid', kernel_regularizer=regularizers.l2(0.001))(x)
     x = BatchNormalization()(x)
-    #x = BatchNormalization(epsilon=1e-6, momentum=0.9, axis=-1)(x)
-    #x = layers.advanced_activations.ReLU()(x)
     x = layers.Activation('relu')(x)
-    #x = ReLU()(x)
 
     #second block # bottleneck (but size kept same with padding)
     x = Conv2D(f1, kernel_size=(3, 3), strides=(1, 1), padding='same', kernel_regularizer=regularizers.l2(0.001))(x)
-    #x = BatchNormalization(epsilon=1e-6, momentum=0.9, axis=-1)(x)
     x = BatchNormalization()(x)
-    #x = layers.advanced_activations.ReLU()(x)
     x = layers.Activation('relu')(x)
-    #x = ReLU()(x)
 
     # third block activation used after adding the input
     x = Conv2D(f2, kernel_size=(1, 1), strides=(1, 1), padding='valid', kernel_regularizer=regularizers.l2(0.001))(x)
-    #x = BatchNormalization(epsilon=1e-6, momentum=0.9, axis=-1)(x)
     x = BatchNormalization()(x)
-    # x = Activation(activations.relu)(x)
-
+     
     # add the input 
     x = Add()([x, x_skip])
-    #x = Conv2D(f1, kernel_size=(1, 1), strides=(1, 1), padding='valid', kernel_regularizer=regularizers.l2(0.001))(x)
-    #x = tf.keras.layers.GlobalAveragePooling2D()(x)
     x = AvgPool2D (pool_size = 4, strides = 1, data_format='channels_last')(x)
     x = layers.Reshape(target_shape=[n_channels, dim_vector])(x)
     x = layers.Lambda(squash)(x)
     x = BatchNormalization()(x)
-    #x = layers.advanced_activations.ReLU()(x)
     x = layers.Activation('relu')(x)
-    #x = ReLU()(x)
     return x
-"""
-def RES_Primary(x, n_channels, dim_vector):   
 
-    #x = tf.keras.layers.GlobalAveragePooling2D()(x)
-    x = AvgPool2D (pool_size = 7, strides = 1, data_format='channels_last')(x)
-    x = layers.Reshape(target_shape=[n_channels, dim_vector])(x)
-    x = layers.Lambda(squash)(x) 
-    #x = BatchNormalization(epsilon=1e-6, momentum=0.9, axis=-1)(x)
-    x = BatchNormalization()(x)
-    x = layers.advanced_activations.ReLU()(x)
-    #x = layers.Activation('relu')(x)
-    return x
-"""
 def feature_extractor(inputs):
     
     mbln = tf.keras.applications.resnet.ResNet50(input_shape=(224, 224, 3),
@@ -260,11 +226,7 @@ def feature_extractor(inputs):
     for layer in mbln.layers[-10:]:
         layer.trainable=False
     feature_extractor = mbln(inputs)
-    """
-    feature_extractor = tf.keras.applications.resnet.ResNet50(input_shape=(224, 224, 3),
-                                               include_top=False,
-                                               weights='imagenet')(inputs)
-    """
+
     return feature_extractor
 
 def classifier(inputs):
@@ -327,21 +289,16 @@ def multi_batch(batch_x1, batch_y1, batch_x2, batch_y2):
 def test(model, data):
     
     x_test, y_test = data
-    #, x_recon [x_test, y_test]
     y_pred = model.predict([x_test], batch_size=100)
     top1 = np.sum(np.argmax(y_pred, 1) == np.argmax(y_test, 1))/y_test.shape[0]
     top2 = tf.reduce_mean(tf.keras.metrics.top_k_categorical_accuracy(y_test, y_pred, k=2))
     top2 = top2.eval(session=tf.compat.v1.Session())   
     top5 = tf.reduce_mean(tf.keras.metrics.top_k_categorical_accuracy(y_test, y_pred, k=5))
     top5 = top5.eval(session=tf.compat.v1.Session())
-    """
-    print('-'*50)
-    print('Top1 Test Acc:', np.sum(np.argmax(y_pred, 1) == np.argmax(y_test, 1))/y_test.shape[0])
-    print('Top5 Test Acc:', top5)
-    """
+
     a=np.argmax(y_test, 1)
     b=np.argmax(y_pred, 1)
-    #, x_recon
+
     return a, b, x_test, top1, top2, top5
 
 with tf.Graph().as_default() as graph:
@@ -459,19 +416,3 @@ print("Top 5 Test Acc: ", top5)
 print('-'*50)
 print("Running Time is: ", t_end-t_start)
 print('-'*50)
-
-'''
-Total params: 28,387,296
-Trainable params: 23,862,320
-Non-trainable params: 4,524,976
-
-FLOPs: 98857278;    Trainable params: 28327984
---------------------------------------------------
-Top 1 Test Acc:  0.649275
-Top 2 Test Acc:  0.992425
-Top 5 Test Acc:  1.0
---------------------------------------------------
-Running Time is:  47.076435565948486
---------------------------------------------------
-
-'''
