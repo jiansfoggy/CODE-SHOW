@@ -8,6 +8,8 @@ We upload the code based on different dataset.
 
 To train the model, you can run the following codes directly.
 
+```
 CUDA_VISIBLE_DEVICES=0 python3 ./MNIST/filename.py  
 CUDA_VISIBLE_DEVICES=0 python3 ./CIFAR-10/filename.py  
 CUDA_VISIBLE_DEVICES=0 python3 ./MultiMNIST/filename.py
+```
