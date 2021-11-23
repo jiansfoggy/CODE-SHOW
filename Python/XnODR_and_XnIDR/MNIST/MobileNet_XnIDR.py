@@ -9,7 +9,6 @@ from keras.datasets import mnist
 from keras.optimizers import Adam
 from keras.models import Sequential
 from keras.utils import np_utils
-# from keras.optimizers import SGD, Adam, RMSprop
 from tensorflow.python.framework import ops
 from keras.utils.vis_utils import plot_model
 from keras import callbacks, initializers, layers, models, constraints, optimizers
@@ -63,11 +62,7 @@ def xnorize(W, H=1., axis=None, keepdims=False):
     return Wa, Wb
 
 class Length(layers.Layer):
-    """
-    Compute the length of vectors. This is used to compute a Tensor that has the same shape with y_true in margin_loss
-    inputs: shape=[dim_1, ..., dim_{n-1}, dim_n]
-    output: shape=[dim_1, ..., dim_{n-1}]
-    """
+
     def call(self, inputs, **kwargs):
         return K.sqrt(K.sum(K.square(inputs), -1))
 
@@ -202,20 +197,13 @@ def preprocess_image_input(input_images):
 def MBL_Primary(x, dim_vector, n_channels, strides):
     
     x = DepthwiseConv2D(kernel_size = 3, strides = strides, padding = 'same')(x)
-    #x = BatchNormalization(epsilon=1e-6, momentum=0.9, axis=-1)(x)
     x = BatchNormalization()(x)
-    #x = ReLU()(x)
 
     x = Conv2D(filters = dim_vector*n_channels, kernel_size = 1, strides = 1)(x)
-    #x = tf.keras.layers.GlobalAveragePooling2D()(x)    
     x = AvgPool2D (pool_size = 7, strides = 1, data_format='channels_last')(x)
-    #x = tf.nn.max_pool(x, ksize=[1, 7, 7, 1], strides=[1, 1, 1, 1], padding='VALID')
-    #x = tf.keras.layers.Dropout(0.5)(x)
     x = layers.Reshape(target_shape=[n_channels, dim_vector])(x)
     x = layers.Lambda(squash)(x)
-    #x = BatchNormalization(epsilon=1e-6, momentum=0.9, axis=-1)(x)
     x = BatchNormalization()(x)
-    #x = ReLU()(x)
     x = layers.advanced_activations.ReLU()(x)
     return x
 
@@ -230,41 +218,12 @@ def feature_extractor(inputs):
 def classifier(inputs):
     x = MBL_Primary(inputs, dim_vector=8, n_channels=128, strides = 1)
     XDR4 = XDR2_LPLayer(num_capsule=10, dim_vector=16, num_routing=3, name='XDR4')(x)
-    #Bn4 = layers.BatchNormalization(epsilon=epsilon, momentum=momentum, axis=channel_axis, name='Bn4')(XDR4)
     Bn4 = layers.BatchNormalization(name='Bn4')(XDR4)
-    #x = layers.Activation('relu')(Bn4)
     x = layers.advanced_activations.ReLU()(Bn4)
-    #x = tf.keras.layers.Dropout(.2)(x)
     x = Length(name='out_cpxn')(x)
     return x
 
 def final_model(inputs):
-    """
-    model = tf.keras.Sequential()
-    model.add(tf.keras.layers.ZeroPadding2D(padding=(2, 2)))
-    model.add(tf.keras.layers.UpSampling2D(size=(7,7)))
-    mbln = tf.keras.applications.mobilenet_v2.MobileNetV2(input_shape=(224, 224, 3),
-                                               include_top=False, weights='imagenet')
-    for layer in mbln.layers[:149]:
-        model.add(layer)
-        
-    model.add(DepthwiseConv2D(kernel_size = 3, strides = strides, padding = 'same'))
-    model.add(BatchNormalization())
-    model.add(Conv2D(filters = 8*128, kernel_size = 1, strides = 1))
-    model.add(tf.keras.layers.GlobalAveragePooling2D())    
-    #x = AvgPool2D (pool_size = 7, strides = 1, data_format='channels_last')(x)
-    #x = tf.nn.max_pool(x, ksize=[1, 7, 7, 1], strides=[1, 1, 1, 1], padding='VALID')
-    #x = tf.keras.layers.Dropout(0.5)(x)
-    model.add(layers.Reshape(target_shape=[128, 8]))
-    model.add(layers.Lambda(squash))
-    model.add(BatchNormalization())
-    model.add(layers.advanced_activations.ReLU())
-    model.add(XDR2_LPLayer(num_capsule=10, dim_vector=16, num_routing=3, name='XDR4'))
-    model.add(layers.BatchNormalization(name='Bn4'))
-    model.add(layers.advanced_activations.ReLU())
-    model.add(Length(name='out_cpxn'))
-    return tf.keras.Model(inputs=inputs, outputs = classification_output)
-    """
     inputs = tf.keras.layers.ZeroPadding2D(padding=(2, 2))(inputs)
     resize = tf.keras.layers.UpSampling2D(size=(7,7))(inputs)
     
@@ -278,8 +237,7 @@ def final_model(inputs):
             i+=1
         else: x = layer(x)
     classification_output = classifier(x)
-    #classification_output = classifier(resnet_feature_extractor)
-    
+
     return classification_output
 
 def define_compile_model():
@@ -301,53 +259,46 @@ def define_compile_model():
 def test(model, data):
     
     x_test, y_test = data
-    #, x_recon [x_test, y_test]
     y_pred = model.predict([x_test], batch_size=100)
     top1 = np.sum(np.argmax(y_pred, 1) == np.argmax(y_test, 1))/y_test.shape[0]
     top5 = tf.reduce_mean(tf.keras.metrics.top_k_categorical_accuracy(y_test, y_pred, k=5))
     top5 = top5.eval(session=tf.compat.v1.Session())
-    """
-    print('-'*50)
-    print('Top1 Test Acc:', np.sum(np.argmax(y_pred, 1) == np.argmax(y_test, 1))/y_test.shape[0])
-    print('Top5 Test Acc:', top5)
-    """
+
     a=np.argmax(y_test, 1)
     b=np.argmax(y_pred, 1)
-    #, x_recon
+ 
     return a, b, x_test, top1, top5
 
-with tf.Graph().as_default() as graph:
-    (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
+(x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
 
-    x_train = preprocess_image_input(x_train)
-    x_test = preprocess_image_input(x_test)
+x_train = preprocess_image_input(x_train)
+x_test = preprocess_image_input(x_test)
     
-    #y_train = np_utils.to_categorical(y_train, 10)  # -1 or 1 for hinge loss
-    #y_test = np_utils.to_categorical(y_test, 10)
-    y_train = np_utils.to_categorical(y_train, 10)*2-1  # -1 or 1 for hinge loss
-    y_test = np_utils.to_categorical(y_test, 10)*2-1
+#y_train = np_utils.to_categorical(y_train, 10)  # -1 or 1 for hinge loss
+#y_test = np_utils.to_categorical(y_test, 10)
+y_train = np_utils.to_categorical(y_train, 10)*2-1  # -1 or 1 for hinge loss
+y_test = np_utils.to_categorical(y_test, 10)*2-1
     
-    log = callbacks.CSVLogger('./Log_Mbl/OMBIDR_log.csv')
-    checkpoint = callbacks.ModelCheckpoint('./Log_Mbl/OMBIDR_weight.h5',
-                                           save_best_only=True, mode='max',
-                                           save_weights_only=True, verbose=1)
-    #lr_schdl = callbacks.LearningRateScheduler(schedule=lambda e: lr_start * lr_decay ** e)
-    lr_schdl = CyclicLR(mode='triangular2')
+log = callbacks.CSVLogger('./Log_Mbl/OMBIDR_log.csv')
+checkpoint = callbacks.ModelCheckpoint('./Log_Mbl/OMBIDR_weight.h5',
+                                       save_best_only=True, mode='max',
+                                       save_weights_only=True, verbose=1)
+#lr_schdl = callbacks.LearningRateScheduler(schedule=lambda e: lr_start * lr_decay ** e)
+lr_schdl = CyclicLR(mode='triangular2')
     
-    model = define_compile_model()
+model = define_compile_model()
 
-    model.summary()
+model.summary()
 
-    EPOCHS = 15
-    before_T = time.time()
-    history = model.fit(x_train, y_train, epochs=EPOCHS, 
-        validation_data = (x_test, y_test), batch_size=100,
-        callbacks=[log, lr_schdl, checkpoint])
-    #loss, accuracy = model.evaluate(valid_X, validation_labels, batch_size=150)
-    before_T = time.time()
-    a,b,x_test,top1,top5 = test(model=model, data=(x_test, y_test))
-    after_T = time.time()
-    stats_graph(graph)
+EPOCHS = 15
+history = model.fit(x_train, y_train, epochs=EPOCHS, 
+                    validation_data = (x_test, y_test), batch_size=100,
+                    callbacks=[log, lr_schdl, checkpoint])
+#loss, accuracy = model.evaluate(valid_X, validation_labels, batch_size=150)
+before_T = time.time()
+a,b,x_test,top1,top5 = test(model=model, data=(x_test, y_test))
+after_T = time.time()
+
 print('-'*50)
 print('Top1 Test Acc:', top1)
 print('Top5 Test Acc:', top5)
@@ -355,32 +306,3 @@ print('-'*50)
 print("The total training time is: ", (after_T-before_T), " seconds.")
 print('-'*50)
 
-"""
-1
-
-FLOPs: 7593941;    Trainable params: 3714864
---------------------------------------------------
-Top1 Test Acc: 0.9925
-Top5 Test Acc: 1.0
---------------------------------------------------
-The total training time is:  18.088958024978638  seconds.
---------------------------------------------------
-
-=======================
-Without Reconstruct
-=======================
-
-top1    = [86.40,86.42,86.51,86.15,86.09]
-top5    = [99.15,99.05,99.12,99.13,99.01]
-time_ls = [6819.390365600586,7252.462275266647,6946.476444482803,7026.700607538223,7025.691478967667]
-
-Standard Deviation
-Top1 86.31400000000001 0.1637803407005859
-Top5 99.092 0.053065996645686335
-Time 7014.144234371185 141.13432549923922
-
-ResNet-50
-1
---------------------------------------------------
-
-"""
