@@ -97,11 +97,7 @@ def xnorize(W, H=1., axis=None, keepdims=False):
     return Wa, Wb
 
 class Length(layers.Layer):
-    """
-    Compute the length of vectors. This is used to compute a Tensor that has the same shape with y_true in margin_loss
-    inputs: shape=[dim_1, ..., dim_{n-1}, dim_n]
-    output: shape=[dim_1, ..., dim_{n-1}]
-    """
+
     def call(self, inputs, **kwargs):
         return K.sqrt(K.sum(K.square(inputs), -1))
 
@@ -159,12 +155,9 @@ class XDR1_LPLayer(layers.Layer):
         self.input_dim_vector = input_shape[2]
 
         shape=[self.input_num_capsule, self.num_capsule, self.input_dim_vector, self.dim_vector]
-        #print("within build capsule layer input_shape and shape",input_shape, shape)
-        
         self.W = self.add_weight(shape=[self.input_num_capsule, self.num_capsule, self.input_dim_vector, self.dim_vector],
                                  initializer=self.kernel_initializer,
                                  name='W')
-        # Coupling coefficient. The redundant dimensions are just to facilitate subsequent matrix calculation.
         self.bias = self.add_weight(shape=[1, self.input_num_capsule, self.num_capsule, 1, 1],
                                     initializer=self.bias_initializer,
                                     name='bias',
@@ -189,7 +182,6 @@ class XDR1_LPLayer(layers.Layer):
             c = tf.nn.softmax(self.bias, axis=2)
             outputs = squash(K.sum(c * inputs_hat, 1, keepdims=True))
 
-            # last iteration needs not compute bias which will not be passed to the graph any more anyway.
             if i != self.num_routing - 1:
                 self.bias = self.bias + K.sum(inputs_hat * outputs, -1, keepdims=True)
         return K.reshape(outputs, [-1, self.num_capsule, self.dim_vector])
@@ -198,60 +190,32 @@ class XDR1_LPLayer(layers.Layer):
         return tuple([None, self.num_capsule, self.dim_vector])
 
 def RES_Primary(x, filters, n_channels, dim_vector): 
-    #renet block where dimension doesnot change.
-    #The skip connection is just simple identity conncection
-    #we will have 3 blocks and then input will be added
-
     x_skip = x # this will be used for addition with the residual block 
     f1, f2 = filters
   
     #first block 
     x = Conv2D(f1, kernel_size=(1, 1), strides=(1, 1), padding='valid', kernel_regularizer=regularizers.l2(0.001))(x)
     x = BatchNormalization()(x)
-    #x = BatchNormalization(epsilon=1e-6, momentum=0.9, axis=-1)(x)
-    #x = layers.advanced_activations.ReLU()(x)
     x = layers.Activation('relu')(x)
-    #x = ReLU()(x)
 
     #second block # bottleneck (but size kept same with padding)
     x = Conv2D(f1, kernel_size=(3, 3), strides=(1, 1), padding='same', kernel_regularizer=regularizers.l2(0.001))(x)
-    #x = BatchNormalization(epsilon=1e-6, momentum=0.9, axis=-1)(x)
     x = BatchNormalization()(x)
-    #x = layers.advanced_activations.ReLU()(x)
     x = layers.Activation('relu')(x)
-    #x = ReLU()(x)
 
     # third block activation used after adding the input
     x = Conv2D(f2, kernel_size=(1, 1), strides=(1, 1), padding='valid', kernel_regularizer=regularizers.l2(0.001))(x)
-    #x = BatchNormalization(epsilon=1e-6, momentum=0.9, axis=-1)(x)
     x = BatchNormalization()(x)
-    # x = Activation(activations.relu)(x)
 
     # add the input 
     x = Add()([x, x_skip])
-    #x = Conv2D(f1, kernel_size=(1, 1), strides=(1, 1), padding='valid', kernel_regularizer=regularizers.l2(0.001))(x)
-    #x = tf.keras.layers.GlobalAveragePooling2D()(x)
     x = AvgPool2D (pool_size = 7, strides = 1, data_format='channels_last')(x)
     x = layers.Reshape(target_shape=[n_channels, dim_vector])(x)
     x = layers.Lambda(squash)(x)
     x = BatchNormalization()(x)
-    #x = layers.advanced_activations.ReLU()(x)
     x = layers.Activation('relu')(x)
-    #x = ReLU()(x)
     return x
-"""
-def RES_Primary(x, n_channels, dim_vector):   
 
-    #x = tf.keras.layers.GlobalAveragePooling2D()(x)
-    x = AvgPool2D (pool_size = 7, strides = 1, data_format='channels_last')(x)
-    x = layers.Reshape(target_shape=[n_channels, dim_vector])(x)
-    x = layers.Lambda(squash)(x) 
-    #x = BatchNormalization(epsilon=1e-6, momentum=0.9, axis=-1)(x)
-    x = BatchNormalization()(x)
-    x = layers.advanced_activations.ReLU()(x)
-    #x = layers.Activation('relu')(x)
-    return x
-"""
 def feature_extractor(inputs):
     
     mbln = tf.keras.applications.resnet.ResNet50(input_shape=(224, 224, 3),
@@ -260,11 +224,7 @@ def feature_extractor(inputs):
     for layer in mbln.layers[-10:]:
         layer.trainable=False
     feature_extractor = mbln(inputs)
-    """
-    feature_extractor = tf.keras.applications.resnet.ResNet50(input_shape=(224, 224, 3),
-                                               include_top=False,
-                                               weights='imagenet')(inputs)
-    """
+
     return feature_extractor
 
 def classifier(inputs):
@@ -300,57 +260,34 @@ def define_compile_model():
                   metrics = ['accuracy'])
   
     return model
+(training_images, training_labels) , (validation_images, validation_labels) = tf.keras.datasets.mnist.load_data()
 
-with tf.Graph().as_default() as graph:
-    (training_images, training_labels) , (validation_images, validation_labels) = tf.keras.datasets.mnist.load_data()
+train_X = preprocess_image_input(training_images)
+valid_X = preprocess_image_input(validation_images)
+#training_labels = np_utils.to_categorical(training_labels, 10) # -1 or 1 for hinge loss
+#validation_labels = np_utils.to_categorical(validation_labels, 10)
+training_labels = np_utils.to_categorical(training_labels, 10)*2-1  # -1 or 1 for hinge loss
+validation_labels = np_utils.to_categorical(validation_labels, 10)*2-1
 
-    #display_images(training_images, training_labels, training_labels, "Training Data" )
-    #display_images(validation_images, validation_labels, validation_labels, "Validation Data" )
+model = define_compile_model()
 
-    train_X = preprocess_image_input(training_images)
-    valid_X = preprocess_image_input(validation_images)
-    #training_labels = np_utils.to_categorical(training_labels, 10) # -1 or 1 for hinge loss
-    #validation_labels = np_utils.to_categorical(validation_labels, 10)
-    training_labels = np_utils.to_categorical(training_labels, 10)*2-1  # -1 or 1 for hinge loss
-    validation_labels = np_utils.to_categorical(validation_labels, 10)*2-1
+model.summary()
+log = callbacks.CSVLogger('./Log_Res/ORES_ODR_log.csv')
+checkpoint = callbacks.ModelCheckpoint('./Log_Res/ORES_ODR_weight.h5',
+                                       save_best_only=True, mode='max',
+                                       save_weights_only=True, verbose=1)
+lr_schdl = CyclicLR(mode='triangular2')
 
-    model = define_compile_model()
+EPOCHS = 20
 
-    model.summary()
-    log = callbacks.CSVLogger('./Log_Res/ORES_ODR_log.csv')
-    checkpoint = callbacks.ModelCheckpoint('./Log_Res/ORES_ODR_weight.h5',
-                                           save_best_only=True, mode='max',
-                                           save_weights_only=True, verbose=1)
-    lr_schdl = CyclicLR(mode='triangular2')
+history = model.fit(train_X, training_labels, epochs=EPOCHS, verbose=1,
+    validation_data = (valid_X, validation_labels), batch_size=80,
+    callbacks=[log, checkpoint, lr_schdl])
+t_start = time.time()
+loss, accuracy = model.evaluate(valid_X, validation_labels, batch_size=80)
+t_end   = time.time()
 
-    EPOCHS = 20
-    t_start = time.time()
-    history = model.fit(train_X, training_labels, epochs=EPOCHS, verbose=1,
-        validation_data = (valid_X, validation_labels), batch_size=80,
-        callbacks=[log, checkpoint, lr_schdl])
-    t_start = time.time()
-    loss, accuracy = model.evaluate(valid_X, validation_labels, batch_size=80)
-    t_end   = time.time()
-    stats_graph(graph)
 print("loss: ", loss)
 print("accuracy: ", accuracy)
 print("Running Time is: ", t_end-t_start)
 
-'''
-Total params: 28,387,296
-Trainable params: 23,862,320
-Non-trainable params: 4,524,976
-
-FLOPs: 98057278;    Trainable params: 28327984
-loss:  0.9023672976493835
-accuracy:  0.9942 0.9965
-Running Time is:  33.39724349975586
-
-57.95M
-
-otal params: 28,111,840
-Trainable params: 28,058,672
-Non-trainable params: 53,168
-
-
-'''
