@@ -9,7 +9,6 @@ from keras.datasets import mnist
 from keras.optimizers import Adam
 from keras.models import Sequential
 from keras.utils import np_utils
-# from keras.optimizers import SGD, Adam, RMSprop
 from tensorflow.python.framework import ops
 from keras.utils.vis_utils import plot_model
 from keras import callbacks, initializers, layers, models, constraints, optimizers
@@ -63,11 +62,7 @@ def xnorize(W, H=1., axis=None, keepdims=False):
     return Wa, Wb
 
 class Length(layers.Layer):
-    """
-    Compute the length of vectors. This is used to compute a Tensor that has the same shape with y_true in margin_loss
-    inputs: shape=[dim_1, ..., dim_{n-1}, dim_n]
-    output: shape=[dim_1, ..., dim_{n-1}]
-    """
+
     def call(self, inputs, **kwargs):
         return K.sqrt(K.sum(K.square(inputs), -1))
 
@@ -162,8 +157,7 @@ class XDR2_LPLayer(layers.Layer):
         self.input_dim_vector = input_shape[2]
 
         shape=[self.input_num_capsule, self.num_capsule, self.input_dim_vector, self.dim_vector]
-        #print("within build capsule layer input_shape and shape",input_shape, shape)
-        
+
         self.W = self.add_weight(shape=[self.input_num_capsule, self.num_capsule, self.input_dim_vector, self.dim_vector],
                                  initializer=self.kernel_initializer,
                                  name='W')
@@ -201,26 +195,17 @@ class XDR2_LPLayer(layers.Layer):
 def MBL_Primary(x, dim_vector, n_channels, strides):
     
     x = DepthwiseConv2D(kernel_size = 3, strides = strides, padding = 'same')(x)
-    #x = BatchNormalization(epsilon=1e-6, momentum=0.9, axis=-1)(x)
     x = BatchNormalization()(x)
-    #x = ReLU()(x)
 
     x = Conv2D(filters = dim_vector*n_channels, kernel_size = 1, strides = 1)(x)
     x = tf.keras.layers.GlobalAveragePooling2D()(x)    
-    #x = AvgPool2D (pool_size = 7, strides = 1, data_format='channels_last')(x)
-    #x = tf.nn.max_pool(x, ksize=[1, 7, 7, 1], strides=[1, 1, 1, 1], padding='VALID')
-    #x = tf.keras.layers.Dropout(0.5)(x)
     x = layers.Reshape(target_shape=[n_channels, dim_vector])(x)
     x = layers.Lambda(squash)(x)
-    #x = BatchNormalization(epsilon=1e-6, momentum=0.9, axis=-1)(x)
     x = BatchNormalization()(x)
-    #x = ReLU()(x)
     x = layers.advanced_activations.ReLU()(x)
     return x
 
 def feature_extractor(inputs):
-    #mbln = tf.keras.applications.mobilenet_v2.MobileNetV2(input_shape=(224, 224, 3),
-    #                                           include_top=False, weights='imagenet')
     mbln = tf.keras.applications.mobilenet_v2.MobileNetV2(input_shape=(224, 224, 3),
                                                include_top=False)
     for layer in mbln.layers[-5:]:
@@ -231,10 +216,7 @@ def feature_extractor(inputs):
 def classifier(inputs):
     x = MBL_Primary(inputs, dim_vector=8, n_channels=128, strides = 1)
     x = XDR2_LPLayer(num_capsule=10, dim_vector=16, num_routing=3)(x)
-    #x = tf.keras.layers.Dropout(.3)(x)
-    #Bn4 = layers.BatchNormalization(epsilon=epsilon, momentum=momentum, axis=channel_axis, name='Bn4')(XDR4)
     Bn4 = layers.BatchNormalization(name='Bn4')(x)
-    #x = layers.Activation('relu')(Bn4)
     x = layers.advanced_activations.ReLU()(Bn4)   
     x = Length(name='out_cpxn')(x)
     return x
@@ -245,17 +227,6 @@ def final_model(inputs):
     resnet_feature_extractor = feature_extractor(resize)
     classification_output = classifier(resnet_feature_extractor)
 
-    '''
-    mbln = tf.keras.applications.mobilenet_v2.MobileNetV2(input_shape=(224, 224, 3),
-                                               include_top=False, weights='imagenet')
-    i = 0
-    for layer in mbln.layers[:149]:
-        if i == 0:
-            x = layer(resize)
-            i+=1
-        else: x = layer(x)
-    classification_output = classifier(x)
-    '''
     return classification_output
 
 def define_compile_model():
@@ -277,19 +248,14 @@ def define_compile_model():
 def test(model, data):
     
     x_test, y_test = data
-    #, x_recon [x_test, y_test]
     y_pred = model.predict([x_test], batch_size=100)
     top1 = np.sum(np.argmax(y_pred, 1) == np.argmax(y_test, 1))/y_test.shape[0]
     top5 = tf.reduce_mean(tf.keras.metrics.top_k_categorical_accuracy(y_test, y_pred, k=5))
     top5 = top5.eval(session=tf.compat.v1.Session())
-    """
-    print('-'*50)
-    print('Top1 Test Acc:', np.sum(np.argmax(y_pred, 1) == np.argmax(y_test, 1))/y_test.shape[0])
-    print('Top5 Test Acc:', top5)
-    """
+
     a=np.argmax(y_test, 1)
     b=np.argmax(y_pred, 1)
-    #, x_recon
+
     return a, b, x_test, top1, top5
 
 with tf.Graph().as_default() as graph:
@@ -330,9 +296,6 @@ with tf.Graph().as_default() as graph:
                                   validation_data=(x_test, y_test), verbose=1, 
                                   callbacks=[log, checkpoint])
     
-    #history = model.fit(x_train, y_train, epochs=EPOCHS, 
-    #    validation_data = (x_test, y_test), batch_size=100,
-    #    callbacks=[log, lr_schdl, checkpoint])
     print("The list of record that can be plotted out:", history.history.keys())
     # summarize history for accuracy
     plt.plot(history.history['accuracy'])
@@ -356,43 +319,11 @@ with tf.Graph().as_default() as graph:
 
     before_T = time.time()
     loss, accuracy = model.evaluate(x_test, y_test, batch_size=batch_size)
-    #a,b,x_test,top1,top5 = test(model=model, data=(x_test, y_test))
     after_T = time.time()
     stats_graph(graph)
 print('-'*50)
-#print('Top1 Test Acc:', top1)
-#print('Top5 Test Acc:', top5)
 print('Top1 Test Acc:', accuracy)
 print('loss:', loss)
 print('-'*50)
 print("The total training time is: ", (after_T-before_T), " seconds.")
 print('-'*50)
-
-"""
-=======================
-Without Reconstruct
-=======================
-FLOPs: 7593942;    Trainable params: 3714864
---------------------------------------------------
-Top1 Test Acc: 0.9511
-Top5 Test Acc: 1.0
---------------------------------------------------
-The total training time is:  17.81812882423401  seconds.
---------------------------------------------------
-
---------------------------------------------------
-Top1 Test Acc: 0.9453
-loss: 0.04900549582205713
---------------------------------------------------
-The total training time is:  11.689507722854614  seconds.
---------------------------------------------------
-
-FLOPs: 7493937;    Trainable params: 3714864
---------------------------------------------------
-Top1 Test Acc: 0.952
-loss: 0.0519070303440094
---------------------------------------------------
-The total training time is:  12.550145387649536  seconds.
---------------------------------------------------
-
-"""
