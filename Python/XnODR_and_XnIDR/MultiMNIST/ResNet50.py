@@ -8,9 +8,6 @@ from keras.utils import np_utils
 from tensorflow.keras.applications.resnet50 import ResNet50
 from matplotlib import pyplot as plt
 
-
-#K.set_image_data_format('channels_last')  # for capsule net
-#K.clear_session()
 print("Tensorflow version " + tf.__version__)
 
 def batch_deformation(batch_images, max_shift = 2, keep_dim= True):
@@ -88,11 +85,9 @@ def stats_graph(graph):
     print('FLOPs: {};    Trainable params: {}'.format(flops.total_float_ops,
                                                       params.total_parameters))
 def preprocess_image_input(input_images):
-    #print("input iamges",np.shape(input_images))
-    #input_images = np.stack((input_images)*3, axis=-1)
     input_images = np.einsum('kzij->zijk', input_images)
     output_ims = tf.keras.applications.resnet50.preprocess_input(input_images)
-    #print("input iamges",np.shape(output_ims))
+   
     return output_ims
 
 def feature_extractor(inputs):
@@ -102,7 +97,6 @@ def feature_extractor(inputs):
     return feature_extractor
 
 def classifier(inputs):
-    #print(np.shape(inputs))
     x = tf.keras.layers.GlobalAveragePooling2D()(inputs)
     x = tf.keras.layers.Flatten()(x)
     x = tf.keras.layers.Dense(1024, activation="relu")(x)
@@ -134,9 +128,7 @@ with tf.Graph().as_default() as graph:
     (x_train, y_train) , (x_test, y_test) = tf.keras.datasets.mnist.load_data()
     x_train = x_train.reshape(-1, 28, 28, 1).astype('float32') 
     x_test = x_test.reshape(-1, 28, 28, 1).astype('float32') 
-    #display_images(training_images, training_labels, training_labels, "Training Data" )
-    #display_images(validation_images, validation_labels, validation_labels, "Validation Data" )
-    
+
     # Create and Prepare dataset
     X1 = []
     Y1 = []
@@ -237,7 +229,6 @@ with tf.Graph().as_default() as graph:
     t_start = time.time()
     history = model.fit(x_train, y_train, batch_size=100, epochs=EPOCHS,
                         verbose=1, validation_data=(x_test, y_test))
-    #history = model.fit(x_train, y_train, epochs=EPOCHS, validation_data = (x_test, y_test), batch_size=100)
     del x_train
     del y_train
     del x1_train
@@ -264,45 +255,4 @@ print("Top2 Acc: ", top2)
 print("Top5 Acc: ", top5)
 print("Running Time is: ", t_end-t_start)
 print(x_test[0:10])
-'''
-1
-FLOPs: 53175701;    Trainable params: 26162698
-loss:  0.8645660677552223
-Top1 Acc:  0.5166
-Top2 Acc:  0.965925
-Top5 Acc:  0.996725
-Running Time is:  8298.654069662094
 
-2
-FLOPs: 53175701;    Trainable params: 26162698
-loss:  0.8748045924305916
-Top1 Acc:  0.59845
-Top2 Acc:  0.971525
-Top5 Acc:  0.99765
-Running Time is:  10351.9458193779
-
-3
-FLOPs: 53175701;    Trainable params: 26162698
-loss:  0.8645924822986126
-Top1 Acc:  0.50375
-Top2 Acc:  0.964925
-Top5 Acc:  0.996925
-Running Time is:  10870.05610203743
-
-4
-FLOPs: 53175701;    Trainable params: 26162698
-loss:  0.8644055292010308
-Top1 Acc:  0.4992
-Top2 Acc:  0.964975
-Top5 Acc:  0.996825
-Running Time is:  7958.604628801346
-
-5
-FLOPs: 53175701;    Trainable params: 26162698
-loss:  0.8649192282557487
-Top1 Acc:  0.5011
-Top2 Acc:  0.964875
-Top5 Acc:  0.99635
-Running Time is:  8362.15176653862
-
-'''
