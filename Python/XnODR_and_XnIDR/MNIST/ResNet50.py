@@ -6,9 +6,6 @@ import tensorflow as tf
 from tensorflow.keras.applications.resnet50 import ResNet50
 from matplotlib import pyplot as plt
 
-
-#K.set_image_data_format('channels_last')  # for capsule net
-#K.clear_session()
 print("Tensorflow version " + tf.__version__)
 
 BATCH_SIZE = 80
@@ -124,27 +121,3 @@ with tf.Graph().as_default() as graph:
 print("loss: ", loss)
 print("accuracy: ", accuracy)
 print("Running Time is: ", t_end-t_start)
-
-'''
-1
-FLOPs: 52375700;    Trainable params: 26162698
-loss:  0.021732591101521394
-accuracy:  0.9945
-Running Time is:  6384.63183259964
-
-2
-FLOPs: 52375700;    Trainable params: 26162698
-loss:  0.0234865586587257
-accuracy:  0.9949
-Running Time is:  9176.446768522263
-
-3
-FLOPs: 52375700;    Trainable params: 26162698
-loss:  0.026018322497329792
-accuracy:  0.9933
-Running Time is:  9151.25530552864
-
-
-
-
-'''
