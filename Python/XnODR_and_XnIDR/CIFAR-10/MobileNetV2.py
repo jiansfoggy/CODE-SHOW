@@ -8,8 +8,6 @@ from matplotlib import pyplot as plt
 from keras.utils.vis_utils import plot_model
 from keras import callbacks
 
-#K.set_image_data_format('channels_last')  # for capsule net
-#K.clear_session()
 print("Tensorflow version " + tf.__version__)
 
 BATCH_SIZE = 100
@@ -69,8 +67,6 @@ def preprocess_image_input(input_images):
     return output_ims
 
 def feature_extractor(inputs):
-    #feature_extractor = tf.keras.applications.mobilenet_v2.MobileNetV2(input_shape=(224, 224, 3),
-    #                                           include_top=False, weights='imagenet')(inputs)
     feature_extractor = tf.keras.applications.mobilenet_v2.MobileNetV2(input_shape=(224, 224, 3),
                                                include_top=False)(inputs)
     return feature_extractor
@@ -161,7 +157,6 @@ with tf.Graph().as_default() as graph:
     plt.legend(['train', 'validation'], loc='upper right')
     plt.savefig('./Log_Mbl/MBV2O_loss.png')
     plt.clf()
-    #, lr_schdl
     #model.save_weights('./Log_Mbl/MBV2Cyc_weight.h5')
     before_T = time.time()
     loss, accuracy = model.evaluate(valid_X, validation_labels, batch_size=100)
@@ -170,57 +165,3 @@ with tf.Graph().as_default() as graph:
 print("loss: ", loss)
 print("accuracy: ", accuracy)
 print("Running Time: ", after_T-before_T)
-
-"""
-FLOPs: 6157200;    Trainable params: 3045258
-loss:  0.35255646912381056accuracy:  0.9462
-Running Time:  8821.123060703278
-
-1
-FLOPs: 6157200;    Trainable params: 3045258
-loss:  0.37325499933212997
-accuracy:  0.9291
-Running Time:  3714.943257331848
-
-2
-FLOPs: 6157200;    Trainable params: 3045258
-loss:  0.3625707419589162
-accuracy:  0.9333
-Running Time:  4848.5132830142975
-
-3
-FLOPs: 6157200;    Trainable params: 3045258
-loss:  0.36256603349000216
-accuracy:  0.9312
-Running Time:  5028.965527772903
-
-4
-FLOPs: 6157200;    Trainable params: 3045258
-loss:  0.36001460524275897
-accuracy:  0.9348
-Running Time:  4920.658530950546
-
-5
-FLOPs: 6157200;    Trainable params: 3045258
-loss:  0.3333879154548049
-accuracy:  0.9369
-Running Time:  4815.19681429863
-
-=======================
-Without Reconstruct
-=======================
-
-top1    = [86.40,86.42,86.51,86.15,86.09]
-top5    = [99.15,99.05,99.12,99.13,99.01]
-time_ls = [6819.390365600586,7252.462275266647,6946.476444482803,7026.700607538223,7025.691478967667]
-
-Standard Deviation
-Top1 86.31400000000001 0.1637803407005859
-Top5 99.092 0.053065996645686335
-Time 7014.144234371185 141.13432549923922
-
-FLOPs: 6157200;    Trainable params: 3045258
-loss:  0.389070438221097
-accuracy:  0.9367
-Running Time:  8775.76508975029
-"""
