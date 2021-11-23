@@ -7,9 +7,6 @@ import tensorflow as tf
 from keras.utils import np_utils
 from matplotlib import pyplot as plt
 
-
-#K.set_image_data_format('channels_last')  # for capsule net
-#K.clear_session()
 print("Tensorflow version " + tf.__version__)
 
 def batch_deformation(batch_images, max_shift = 2, keep_dim= True):
@@ -93,7 +90,7 @@ def preprocess_image_input(input_images):
 
 def feature_extractor(inputs):
     feature_extractor = tf.keras.applications.mobilenet_v2.MobileNetV2(input_shape=(224, 224, 3),
-                                               include_top=False, weights='imagenet')(inputs)
+                                               include_top=False)(inputs)
     return feature_extractor
 
 def classifier(inputs):
@@ -206,8 +203,6 @@ with tf.Graph().as_default() as graph:
 
     y_train  = batch_y[:trn_smpl,:]
     y_test   = batch_y[trn_smpl:280000,:]
-    #y_train  = y1_train
-    #y_test   = y1_test
     batch_y  = None
     del batch_y
 
@@ -261,64 +256,3 @@ print("Running Time: ", after_T-before_T)
 print(x_test[0:10])
 x_test = None
 del x_test
-
-"""
-1
-FLOPs: 6957201;    Trainable params: 3045258
-loss:  0.908426569327712
-Top1 Acc:  0.5238
-Top2 Acc:  0.8216
-Top5 Acc:  0.92305
-Running Time:  5880.714015483856
-
-2
-FLOPs: 6957201;    Trainable params: 3045258
-loss:  0.9042717376351357
-Top1 Acc:  0.599875
-Top2 Acc:  0.917725
-Top5 Acc:  0.97975
-Running Time:  5673.528071165085
-
-3
-FLOPs: 6957201;    Trainable params: 3045258
-loss:  0.9052676470577716
-Top1 Acc:  0.56805
-Top2 Acc:  0.89555
-Top5 Acc:  0.979425
-Running Time:  4587.046112298965
-
-4
-FLOPs: 6957201;    Trainable params: 3045258
-loss: 0.9054064743965864
-Top1 Acc:  0.571375
-Top2 Acc:  0.872
-Top5 Acc:  0.961375
-Running Time:  4515.77347612381
-
-5
-FLOPs: 6957201;    Trainable params: 3045258
-loss: 0.9087471336871386
-Top1 Acc:  0.5014
-Top2 Acc:  0.776575
-Top5 Acc:  0.863325
-Running Time:  5739.617999315262
-
-
-=======================
-Without Reconstruct
-=======================
-
-top1    = [86.40,86.42,86.51,86.15,86.09]
-top5    = [99.15,99.05,99.12,99.13,99.01]
-time_ls = [6819.390365600586,7252.462275266647,6946.476444482803,7026.700607538223,7025.691478967667]
-
-Standard Deviation
-Top1 86.31400000000001 0.1637803407005859
-Top5 99.092 0.053065996645686335
-Time 7014.144234371185 141.13432549923922
-
-ResNet-50
-1
---------------------------------------------------
-
-"""
