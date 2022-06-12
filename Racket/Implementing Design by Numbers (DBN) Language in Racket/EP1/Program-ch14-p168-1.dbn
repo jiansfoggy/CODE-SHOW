@@ -1,0 +1,8 @@
+Paper 0
+// set dot under mouse position to
+// either 0 or 100, which is determined
+// by mouse button state
+Forever
+{
+  Set [<Mouse 1> <Mouse 2>] <Mouse 3>
+}

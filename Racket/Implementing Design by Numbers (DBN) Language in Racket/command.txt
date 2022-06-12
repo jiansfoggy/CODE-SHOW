@@ -1,0 +1,13 @@
+This is a great and very difficult assignment.
+We are required to finish many TODOs in 3 different files, dbn-lexer.rkt, dbn-parser.rkt, dbn-eval.rkt.
+
+In dbn-lever.rkt, we defined Paper, Pen, Line... We define the numericvalue, filename and identifier.
+
+In dbn-parser.rkt, referring to dbn-ast.rkt, we coded Paper, Pen, Set, Line, Repeat and Load. We also coded l-value and r-value.
+
+In dbn-eval.rkt, we coded load-expr, assignment-expr, command-fun, number-fun, 2 apply-expr.
+
+Now, my program can plot most images out, but cannot handle all of them, since that my program lack the definition of the LOAD and FILENAME.
+When I fixed this part, the system told me that there is not FIELDS. And I didn't find any reading materials about FIELD. Hence, I stop here.
+
+Generally speaking, this assignment teaches me to finish the package of DBN, a plot package. I guess I will use more if I dig depth in racket world.

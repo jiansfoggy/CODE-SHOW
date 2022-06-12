@@ -1,0 +1,17 @@
+Paper 0
+// there are 2 lines
+Set [0 0] 20
+Set [1 0] 20
+Set [2 0] 20
+Set [3 0] 100
+// points for the second line
+Set [4 0] 40
+Set [5 0] 20
+Set [6 0] 80
+Set [7 0] 60
+// render lines
+Pen 100
+Repeat A 0 1
+{
+  Line [(A*4) 0] [(A*4+1) 0] [(A*4+2) 0] [(A*4+3) 0]
+}

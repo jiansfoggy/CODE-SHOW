@@ -1,0 +1,8 @@
+Command Rectangle L B R T
+{
+  Line L B R B
+  Line R B R T
+  Line R T L T
+  Line L T L B
+}
+ 

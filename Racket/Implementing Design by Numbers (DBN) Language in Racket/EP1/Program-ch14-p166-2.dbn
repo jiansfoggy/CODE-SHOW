@@ -1,0 +1,8 @@
+Paper 0
+// set the current dot under
+// the mouse to 100% black
+// for 10 thousand cycles of T
+Repeat T 0 10000
+{
+  Set [<Mouse 1> <Mouse 2>] 100
+}

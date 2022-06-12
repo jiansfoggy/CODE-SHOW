@@ -1,0 +1,19 @@
+Paper 0
+Pen 100
+// a variable number of lines, W,
+// are drawn parallel to the current line
+Set H0 <Mouse 1>
+Set V0 <Mouse 2>
+Set W 5
+Forever
+{
+  Set H1 <Mouse 1>
+  Set V1 <Mouse 2>
+  Repeat B 0 W
+  {
+    Line (H0+B) (V0-B) (H1+B) (V1-B)
+  }
+  // update the position
+  Set H0 H1
+  Set V0 V1
+}
