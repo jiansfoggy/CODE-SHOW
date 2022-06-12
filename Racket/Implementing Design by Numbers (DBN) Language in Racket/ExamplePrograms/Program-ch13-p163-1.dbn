@@ -1,0 +1,13 @@
+// struggle between background
+// and foreground
+Repeat B 0 100
+{
+  Paper 0
+  Pen B
+  Repeat A 0 (100-B)
+  {
+    Line A 0 A 100
+  }
+  Pen (100-B)
+  Line B 0 B 100
+}

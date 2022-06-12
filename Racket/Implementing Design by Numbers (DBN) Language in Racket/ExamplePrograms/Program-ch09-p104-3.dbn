@@ -1,0 +1,7 @@
+Paper 0
+// adjusting the focus ...
+Repeat A 0 100
+{
+  Set B (30-A)
+  Set [A (80-B*B/75)] 100
+}

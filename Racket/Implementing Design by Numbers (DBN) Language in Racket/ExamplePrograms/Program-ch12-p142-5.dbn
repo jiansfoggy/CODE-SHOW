@@ -1,0 +1,22 @@
+Command Rectangle L B R T
+{
+  Line L B R B
+  Line R B R T
+  Line R T L T
+  Line L T L B
+}
+// the power of abstraction
+Command RectInRect H V N S
+{
+  Repeat B 0 N
+  {
+    Set A (B*S)
+    Rectangle (H-A) (V-A) (A+H) (A+V)
+  }
+}
+Paper 0
+// increase rectangle count
+RectInRect 26 26 12 4
+RectInRect 74 26 12 4
+RectInRect 26 74 12 4
+RectInRect 74 74 12 4

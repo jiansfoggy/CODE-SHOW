@@ -1,0 +1,8 @@
+Paper 0
+Repeat A 0 100
+{
+  Repeat B 0 100
+  {
+    Set [A B] (A+B)
+  }
+}

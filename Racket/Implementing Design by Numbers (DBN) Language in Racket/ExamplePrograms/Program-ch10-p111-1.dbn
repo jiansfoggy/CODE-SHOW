@@ -1,0 +1,9 @@
+Paper 0
+// behold the magic of a nested Repeat
+Repeat A 0 100
+{
+  Repeat B 50 55
+  {
+    Set [A B] B
+  }
+}

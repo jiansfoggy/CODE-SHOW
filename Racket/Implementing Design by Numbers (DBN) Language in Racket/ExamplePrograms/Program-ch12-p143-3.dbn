@@ -1,0 +1,30 @@
+Command Rectangle L B R T
+{
+  Line L B R B
+  Line R B R T
+  Line R T L T
+  Line L T L B
+}
+Command RectInRect H V N S
+{
+  Repeat B 0 N
+  {
+    Set A (B*S)
+    Rectangle (H-A) (V-A) (A+H) (A+V)
+  }
+}
+Command RectInRectInRect H V N S
+{
+  RectInRect (H-N*S) (V-N*S) N S
+  RectInRect (H+N*S) (V-N*S) N S
+  RectInRect (H+N*S) (V+N*S) N S
+  RectInRect (H-N*S) (V+N*S) N S
+}
+Paper 0
+Repeat H 0 10
+{
+  Repeat V 0 10
+  {
+    RectInRectInRect (10*H) (10*V) 1 2
+  }
+}

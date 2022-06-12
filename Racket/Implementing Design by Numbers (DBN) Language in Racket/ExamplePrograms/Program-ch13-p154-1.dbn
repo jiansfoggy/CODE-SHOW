@@ -1,0 +1,10 @@
+// slow fade to white
+Repeat A 200 0
+{
+  Paper (A/2)
+}
+// fast fade to black
+Repeat A 0 50
+{
+  Paper (A*2)
+}

@@ -1,0 +1,8 @@
+// the art of concealment
+Load dbngraphics.dbn
+Paper 75
+Field 2 2 98 98 25
+Pen 100
+Triangle 50 96 50 4 96 50
+Circle 50 50 46 100
+Rectangle 14 23 68 77

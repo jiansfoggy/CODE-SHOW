@@ -1,0 +1,13 @@
+Paper 0
+// triple nesting with fancy
+// limit adjusting
+Repeat C 1 4
+{
+  Repeat B 0 (100/C)
+  {
+    Repeat A 0 (100/C)
+    {
+      Set [(A*C) (B*C)] (C*25)
+    }
+  }
+}

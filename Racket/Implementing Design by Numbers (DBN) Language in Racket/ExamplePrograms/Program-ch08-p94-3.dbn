@@ -1,0 +1,6 @@
+Paper 50
+Set A [0 0]
+Pen 0
+// Line is shortdned by lightening
+// the tone of the paper
+Line 50 0 50 A

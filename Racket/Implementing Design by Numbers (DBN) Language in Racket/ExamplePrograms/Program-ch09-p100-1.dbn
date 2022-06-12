@@ -1,0 +1,6 @@
+Paper 0
+// horizontal left to vary
+Repeat A 0 100
+{
+  Set [A 50] 100
+}

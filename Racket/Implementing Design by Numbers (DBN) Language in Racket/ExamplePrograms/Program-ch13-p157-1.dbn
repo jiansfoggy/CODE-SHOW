@@ -1,0 +1,8 @@
+Paper 100
+Pen 0
+// a flying line
+Repeat T 0 100
+{
+  Paper 100
+  Line T 0 T 100
+}

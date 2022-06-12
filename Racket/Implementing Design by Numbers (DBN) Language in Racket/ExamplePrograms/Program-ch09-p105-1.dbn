@@ -1,0 +1,7 @@
+Paper 0
+// showing nonlinear tonal gradation
+Repeat A 0 100
+{
+  Set [A 55] (A*A/100)
+  Set [A 45] A
+}

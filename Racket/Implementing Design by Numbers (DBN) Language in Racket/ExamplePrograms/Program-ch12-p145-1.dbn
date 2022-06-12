@@ -1,0 +1,14 @@
+// triangle is simple to code
+Command Triangle H1 V1 H2 V2 H3 V3
+{
+  Line H1 V1 H2 V2
+  Line H2 V2 H3 V3
+  Line H3 V3 H1 V1
+}
+Paper 0
+Pen 100
+// a test pattern
+Repeat A 1 13
+{
+  Triangle (A*4) 50 (A*6) (A*7) (A*8) 50
+}

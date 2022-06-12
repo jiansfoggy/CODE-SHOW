@@ -1,0 +1,22 @@
+Command Rectangle L B R T
+{
+  Line L B R B
+  Line R B R T
+  Line R T L T
+  Line L T L B
+}
+// the power of abstraction
+Command RectInRect H V N S
+{
+  Repeat B 0 N
+  {
+    Set A (B*S)
+    Rectangle (H-A) (V-A) (A+H) (A+V)
+  }
+}
+Paper 0
+// larger step-size
+RectInRect 26 26 6 4
+RectInRect 74 26 6 4
+RectInRect 26 74 6 4
+RectInRect 74 74 6 4

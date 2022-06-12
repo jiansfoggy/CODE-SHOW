@@ -1,0 +1,6 @@
+// incessantly blink
+Repeat T 0 100
+{
+  Paper 0
+  Paper 100
+}

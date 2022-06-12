@@ -1,0 +1,25 @@
+// this time use the Rectangle
+// in a creative manner
+Command Rectangle L B R T
+{
+  Line L B R B
+  Line R B R T
+  Line R T L T
+  Line L T L B
+}
+Paper 0
+Pen 100
+Set PH 50
+Set PV 43
+// feet
+Rectangle (PH-4) PV PH (PV+2)
+Rectangle (PH+4) PV PH (PV+2)
+// legs
+Rectangle (PH-3) (PV+2) PH (PV+8)
+Rectangle (PH+3) (PV+2) PH (PV+8)
+// arms
+Rectangle (PH-5) (PV+6) (PH-3) (PV+14)
+Rectangle (PH+5) (PV+6) (PH+3) (PV+14)
+// head
+Rectangle (PH-2) (PV+14) (PH+2) (PV+19)
+// body is implicit

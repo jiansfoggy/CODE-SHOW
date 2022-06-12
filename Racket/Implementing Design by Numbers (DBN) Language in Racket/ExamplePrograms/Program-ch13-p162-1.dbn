@@ -1,0 +1,8 @@
+Pen 100
+// paper fade in sync with
+// line position
+Repeat T 0 100
+{
+  Paper T
+  Line T 0 T 100
+}

@@ -1,0 +1,12 @@
+Paper 0
+// plain triple nesting
+Repeat C 1 4
+{
+  Repeat B 0 25
+  {
+    Repeat A 0 25
+    {
+      Set [(A*C) (B*C)] (C*25)
+    }
+  }
+}

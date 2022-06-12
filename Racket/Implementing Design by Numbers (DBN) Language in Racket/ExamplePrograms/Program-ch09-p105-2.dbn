@@ -1,0 +1,15 @@
+Paper 0
+// increasing line density
+Repeat A 0 100
+{
+  Set [A 55] (A*A/100)
+  Set [A 54] [A 55]
+  Set [A 53] [A 55]
+  Set [A 52] [A 55]
+  Set [A 51] [A 55]
+  Set [A 50] A
+  Set [A 49] A
+  Set [A 48] A
+  Set [A 47] A
+  Set [A 46] A
+}

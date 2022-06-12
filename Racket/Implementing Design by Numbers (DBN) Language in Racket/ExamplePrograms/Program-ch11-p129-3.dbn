@@ -1,0 +1,15 @@
+Paper 0
+Repeat A 0 100
+{
+  Repeat B 0 100
+  {
+    Smaller? (B*2) A
+    {
+      Set [A B] B
+    }
+    NotSmaller? (B*2) A
+    {
+      Set [A B] A
+    }
+  }
+}

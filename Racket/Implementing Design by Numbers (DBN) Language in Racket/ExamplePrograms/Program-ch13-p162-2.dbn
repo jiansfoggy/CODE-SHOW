@@ -1,0 +1,8 @@
+// paper fade in opposition to
+// line position
+Repeat T 0 100
+{
+  Paper T
+  Pen (100-T)
+  Line T 0 T 100
+}

@@ -1,0 +1,14 @@
+Paper 0
+Pen 100
+// throw in a calculation
+Repeat A 0 100
+{
+  Same? (A+20) 30
+  {
+    Line 100 A A A
+  }
+  NotSame? (A+20) 30
+  {
+    Line A A A 100
+  }
+}

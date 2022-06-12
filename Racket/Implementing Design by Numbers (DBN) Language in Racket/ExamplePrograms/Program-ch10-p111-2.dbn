@@ -1,0 +1,10 @@
+Paper 0
+// back to where we started with
+// one change to the limits
+Repeat A 0 100
+{
+  Repeat B 50 52
+  {
+    Set [A B] B
+  }
+}

@@ -1,0 +1,41 @@
+//
+// define Box command again,
+// this time with descriptors
+//
+Command Box L R T B
+{
+  Repeat A L R
+  {
+    Line A T A B
+  }
+}
+// code goes on a diet
+Box 0 100 10 0
+Box 1 15 25 10
+Box 4 12 28 25
+Box 17 31 40 10
+Box 20 28 50 40
+Box 21 27 53 50
+Box 22 26 56 53
+Box 23 25 58 56
+Box 24 24 64 58
+Box 35 45 72 10
+Box 47 57 72 10
+Box 38 38 76 72
+Box 62 76 50 10
+Box 63 75 55 50
+Box 65 73 61 55
+Box 68 70 70 61
+Box 69 69 70 70
+Box 80 98 30 10
+Box 82 96 35 30
+Box 86 92 38 35
+Box 89 89 42 38
+Box 16 17 20 10
+Box 33 33 20 10
+Box 34 35 15 10
+Box 45 46 17 10
+Box 57 59 22 10
+Box 59 61 24 10
+Box 79 81 15 10
+Box 100 100 16 10

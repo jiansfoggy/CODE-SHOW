@@ -1,0 +1,4 @@
+Paper 25
+Pen 100
+// dot position by calculation
+Line 50 0 50 ([([0 0]*2) 0])

@@ -1,0 +1,6 @@
+Paper 0
+// value left to vary
+Repeat A 0 100
+{
+  Set [A A] A
+}

@@ -1,0 +1,15 @@
+Command Rectangle L B R T
+{
+  Line L B R B
+  Line R B R T
+  Line R T L T
+  Line L T L B
+}
+Paper 0
+// ode to gerstner
+Repeat B 0 25
+{
+  Set A (B*2)
+  Pen A
+  Rectangle (50-A) (50-A) (A+50) (A+50)
+}

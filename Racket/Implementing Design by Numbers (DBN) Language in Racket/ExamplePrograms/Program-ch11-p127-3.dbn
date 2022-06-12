@@ -1,0 +1,15 @@
+Paper 0
+Pen 100
+// be multivariate
+Set B 60
+Repeat A 0 100
+{
+  Same? A B
+  {
+    Line A 0 A B
+  }
+  NotSame? A B
+  {
+    Line A 100 A B
+  }
+}

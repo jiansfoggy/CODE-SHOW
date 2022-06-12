@@ -1,0 +1,6 @@
+Paper 0
+// zooming in ...
+Repeat A 0 100
+{
+  Set [A (A*A/200)] 100
+}

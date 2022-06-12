@@ -1,0 +1,12 @@
+// make a rectangle command
+Command Rectangle L B R T
+{
+  Line L B R B
+  Line R B R T
+  Line R T L T
+  Line L T L B
+}
+// use it
+Paper 0
+Pen 100
+Rectangle 30 40 70 60

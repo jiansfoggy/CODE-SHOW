@@ -1,0 +1,5 @@
+// even finer grain blink
+Repeat T 100 0
+{
+  Paper T
+}

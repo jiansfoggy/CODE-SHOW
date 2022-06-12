@@ -1,0 +1,6 @@
+Paper 0
+// shifted horizontally
+Repeat A 0 100
+{
+  Set [((A/2)+20) A] A
+}

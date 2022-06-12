@@ -1,0 +1,61 @@
+Command Triangle H1 V1 H2 V2 H3 V3
+{
+  Line H1 V1 H2 V2
+  Line H2 V2 H3 V3
+  Line H3 V3 H1 V1
+}
+Command Rectangle L B R T
+{
+  Line L B R B
+  Line R B R T
+  Line R T L T
+  Line L T L B
+}
+Command Field L B R T G
+{
+  Pen G
+  Repeat H L R
+  {
+    Line H T H B
+  }
+}
+Command CirclePixels CX CY DX DY V
+{
+  Set [(CX+DX) (CY+DY)] V
+  Set [(CX+DX) (CY-DY)] V
+  Set [(CX-DX) (CY+DY)] V
+  Set [(CX-DX) (CY-DY)] V
+  Set [(CX+DY) (CY+DX)] V
+  Set [(CX+DY) (CY-DX)] V
+  Set [(CX-DY) (CY+DX)] V
+  Set [(CX-DY) (CY-DX)] V
+}
+Command Circle CS CY Radius V
+{
+  Set X 0
+  Set Y Radius
+  Set D (1-Radius)
+  CirclePixels CS CY X Y V
+  // 707/1000 approximates
+  // square root of 0.5 = cos(45)
+  Repeat X 0 (Radius*707/1000)
+  {
+    Set TempD D
+    Smaller? TempD 0
+    {
+      Set D (D+(2*X)+3)
+    }
+    NotSmaller? TempD 0
+    {
+      Set D (D+(2*(X-Y))+5)
+      Set Y (Y-1)
+    }
+    CirclePixels CS CY X Y V
+  }
+}
+Paper 75
+Field 2 2 98 98 25
+Pen 100
+Triangle 50 96 50 4 96 50
+Circle 50 50 46 100
+Rectangle 14 23 68 77

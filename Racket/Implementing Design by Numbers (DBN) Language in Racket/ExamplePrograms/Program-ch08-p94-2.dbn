@@ -1,0 +1,5 @@
+Paper 100
+Set A [0 0]
+Pen 0
+// a line determined by paper tone
+Line 50 0 50 A

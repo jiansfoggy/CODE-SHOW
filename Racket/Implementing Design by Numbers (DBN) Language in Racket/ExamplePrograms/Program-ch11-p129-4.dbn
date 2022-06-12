@@ -1,0 +1,16 @@
+Paper 0
+// something a bit more decorative
+Repeat A 0 100
+{
+  Repeat B 0 100
+  {
+    Smaller? B (A*A/20)
+    {
+      Set [A B] (100-A*A/100)
+    }
+    NotSmaller? B (A*A/20)
+    {
+      Set [A B] (A*B/20)
+    }
+  }
+}

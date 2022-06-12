@@ -1,0 +1,17 @@
+// house flashing
+Command Drawhouse
+{
+  Field 0 0 100 5 70
+  Field 30 6 60 26 100
+  Repeat A 27 63
+  {
+    Line A 26 45 44
+  }
+}
+Repeat T 0 100
+{
+  Paper 0
+  Drawhouse
+  Paper 100
+  Drawhouse
+}

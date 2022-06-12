@@ -1,0 +1,10 @@
+Paper 100
+Pen 0
+// line races, where the winner
+// is fixed ...
+Repeat T 0 100
+{
+  Paper 100
+  Line (T*2) 0 (T*2) 50
+  Line T 50 T 100
+}

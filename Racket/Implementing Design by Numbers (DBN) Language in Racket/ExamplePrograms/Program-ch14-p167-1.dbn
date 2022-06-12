@@ -1,0 +1,7 @@
+Paper 0
+// set the current dot under
+// the mouse to 100% black *forever*
+Forever
+{
+  Set [<Mouse 1> <Mouse 2>] 100
+}

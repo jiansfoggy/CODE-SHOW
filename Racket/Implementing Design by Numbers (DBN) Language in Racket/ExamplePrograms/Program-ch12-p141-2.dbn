@@ -1,0 +1,30 @@
+Command Rectangle L B R T
+{
+  Line L B R B
+  Line R B R T
+  Line R T L T
+  Line L T L B
+}
+Command Person PH PV
+{
+  Rectangle (PH-4) PV PH (PV+2)
+  Rectangle (PH+4) PV PH (PV+2)
+  Rectangle (PH-3) (PV+2) PH (PV+8)
+  Rectangle (PH+3) (PV+2) PH (PV+8)
+  Rectangle (PH-5) (PV+6) (PH-3) (PV+14)
+  Rectangle (PH+5) (PV+6) (PH+3) (PV+14)
+  Rectangle (PH-2) (PV+14) (PH+2) (PV+19)
+}
+Command Pyramid U V
+{
+  Person U V
+  Person (U+16) V
+  Person (U-16) V
+  Person (U-8) (V+14)
+  Person (U+8) (V+14)
+  Person U (V+28)
+}
+Paper 0
+Pen 100
+// play cheer squad
+Pyramid 50 16
