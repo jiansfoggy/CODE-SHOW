@@ -1,0 +1,22 @@
+Paper 0
+Pen 100
+// this pen leaks grayscale
+// rainbow-style ink
+Set H0 <Mouse 1>
+Set V0 <Mouse 2>
+Set G 0
+Forever
+{
+  Pen G
+  Set H1 <Mouse 1>
+  Set V1 <Mouse 2>
+  Line H0 V0 H1 V1
+  // update the position
+  Set H0 H1
+  Set V0 V1
+  Set G (G + 1)
+  Same? G 101
+  {
+    Set G 0
+  }
+}

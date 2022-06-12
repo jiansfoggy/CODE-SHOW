@@ -1,0 +1,9 @@
+Paper 100
+Pen 0
+// what race?
+Repeat T 0 100
+{
+  Paper 100
+  Line 0 (T/4) T (50-T/4)
+  Line T 50 T 100
+}

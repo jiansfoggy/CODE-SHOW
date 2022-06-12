@@ -1,0 +1,7 @@
+Paper 0
+// line fades into view
+Repeat T 0 100
+{
+  Pen T
+  Line 50 0 50 100
+}

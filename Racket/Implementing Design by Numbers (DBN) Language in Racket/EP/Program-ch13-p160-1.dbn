@@ -1,0 +1,17 @@
+// house day to nite
+// 2 times consecutively
+Paper 0
+Repeat DAY 0 1
+{
+  Repeat T 20 80
+  {
+    Paper T
+    Pen 100
+    Field 0 0 100 5 70
+    Field 30 6 60 26 100
+    Repeat A 27 63
+    {
+      Line A 26 45 44
+    }
+  }
+}

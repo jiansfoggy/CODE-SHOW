@@ -1,0 +1,13 @@
+Paper 0
+Pen 100
+Set H0 <Mouse 1>
+Set V0 <Mouse 2>
+Forever
+{
+  Set H1 <Mouse 1>
+  Set V1 <Mouse 2>
+  Line H0 V0 H1 V1
+  // update the position
+  Set H0 H1
+  Set V0 V1
+}

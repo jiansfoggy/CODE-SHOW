@@ -1,0 +1,13 @@
+// starts out fast &
+// gradually slows
+Repeat S 5 1
+{
+  Repeat T 0 (100/S)
+  {
+    Paper (S*T)
+  }
+  Repeat T (100/S) 0
+  {
+    Paper (S*T)
+  }
+}

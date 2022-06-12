@@ -1,0 +1,54 @@
+// an advanced code that is provided
+// for those that are curious...
+Paper 0
+Set N 0
+Set B <Mouse 3>
+Set LX <Mouse 1>
+Set LY <Mouse 2>
+Set LC 0
+Forever
+{
+  Field 0 1 100 100 0
+  Set MX <Mouse 1>
+  Set MY <Mouse 2>
+  Set MB <Mouse 3>
+  NotSame? B MB
+  {
+    Same? LC 25
+    {
+      Set LC 0
+    }
+// Does the next line contain a Typo? - JeffE
+//  Set P (LC*4+1N)
+    Set P (LC*4+1)
+    Set [P 0] MX
+    Set P (P+1)
+    Set [P 0] MY
+    Set N (N+2)
+    Same? N 4
+    {
+      Set LC (LC+1)
+      Set N 0
+    }
+    Set LX MX
+    Set LY MY
+    Set B MB
+  }
+  Same? N 2
+  {
+    Pen 100
+    Line LX LY MX MY
+  }
+  NotSame? LC 0
+  {
+    Pen 50
+    Repeat A 0 (LC-1)
+    {
+      Set P (A*4+1)
+      Set P1 (P+1)
+      Set P2 (P+2)
+      Set P3 (P+3)
+      Line [P 0] [P1 0] [P2 0] [P3 0]
+    }
+  }
+}
