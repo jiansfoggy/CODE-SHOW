@@ -4,12 +4,12 @@ This code fits the following file structure.
 ILSVRC  
 |  
 |  
-|_____Data  
+|-----Data  
 |        |  
-|________|__CLS-LOC 
+|--------|--CLS-LOC 
 |                 |  
-|_________________|__train  
-|_________________|__val  
+|-----------------|--train  
+|-----------------|--val  
 |                 
 |_____ImageSets
 |        |
