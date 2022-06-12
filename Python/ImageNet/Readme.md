@@ -53,15 +53,27 @@ Import the package ```from tensorflow.keras.preprocessing.image import ImageData
 
 ```ImageDataGenerator.flow_from_directory()``` takes the directory path as input value. Each directory contains many folders. The number of folders equal to the category number. Each folder only includes the images of related category.
 
-Under ```/your_root_path/ILSVRC/Data/CLS-LOC/train```
+Next, let's see our folders.
+
+## Train
+
+```train_cls.txt``` shows the file name of all training images.  
+```map_clsloc.txt``` shows the corresponding category name of each folder.
+
+To prepare training set, we need to assign correct catogory name to each folder and keep the corresponding images.
+
+## Validation
+```val.txt``` shows the file name of all validation images.  
+```ILSVRC2015_clsloc_validation_ground_truth.txt``` shows the label of each image.  
+```ILSVRC2015_clsloc_validation_blacklist.txt``` shows the blacklist of validation images, which are the indexes.
+
+To prepare the testing set, we need to move the related images into new created folders named by different category names. We also need to create a folder named ```BlckLst``` to hold all images in the black list.
 
 # Run Code
 
 Read Code firstly and change to fit your folder names. Then, run this code.
 
-```
-python3 data_prepare.py
-```
+```python3 data_prepare.py```
 
 # Output File Structure
 
