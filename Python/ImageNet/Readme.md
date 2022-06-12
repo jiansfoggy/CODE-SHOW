@@ -42,3 +42,14 @@ K-->M
 K-->N
 ```
 
+
+
+
+# Run Code
+
+```
+python3 data_prepare.py
+```
+
+
+
