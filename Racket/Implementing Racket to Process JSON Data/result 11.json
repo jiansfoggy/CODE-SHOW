@@ -1,0 +1,1921 @@
+> (strictlyIncreasing "/Users/sunjian/Public/Document/3351/Week8/cdc2018.json" "\"data\"")
+"\"Anthrax\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Chikungunya virus disease\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Eastern equine encephalitis virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Jamestown Canyon virus disease \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, La Crosse virus disease \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Powassan virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, St. Louis encephalitis virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Western equine encephalitis virus disease\"": We don't deal with null value 
+"\"Botulism, total\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, foodborne\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, infant\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, other (wound and unspecified)\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Brucellosis\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Chancroid\"": We don't deal with null value 
+"\"Cholera\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Cyclosporiasis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Diphtheria\"": We don't deal with null value 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Serotype b\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Non-b serotype \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Nontypeable\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Unknown serotype\"": 34 cases in 2013, 39 cases in 2014, 167 cases in 2015, 187 cases in 2016, 244 cases in 2017 
+"\"Hansen's disease¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hantavirus infection, non-hantavirus pulmonary syndrome¶\"": We don't deal with null value 
+"\"Hantavirus pulmonary syndrome¶ \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hemolytic uremic syndrome, postdiarrheal¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hepatitis B, perinatal infection\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Influenza-associated pediatric mortality¶,**\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Leptospirosis¶\"": We don't deal with null value 
+"\"Listeriosis\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Measles††\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Serogroups ACWY\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Serogroup B\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Other serogroups\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Unknown serogroup\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Novel Influenza A virus infections§§\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Paratyphoid fever¶¶\"": We don't deal with null value 
+"\"Plague\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Poliomyelitis, paralytic\"": We don't deal with null value 
+"\"Polio virus Infection, nonparalytic¶\"": We don't deal with null value 
+"\"Psittacosis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, total\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, acute\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, chronic\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Rabies, human\"": We don't deal with null value 
+"\"Severe acute respiratory syndrome-associated coronavirus disease (SARS-CoV)\"": We don't deal with null value 
+"\"Smallpox\"": We don't deal with null value 
+"\"Streptococcal toxic-shock syndrome¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Syphilis, congenital\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Toxic-shock syndrome (other than Streptococcal)¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Trichinellosis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Tularemia\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Typhoid fever \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Vancomycin-intermediate Staphylococcus aureus¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Vancomycin-resistant Staphylococcus aureus¶\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Crimean-Congo hemorrhagic fever virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Ebola virus \"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Guanarito virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Junin virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lassa virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lujo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Machupo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Marburg virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Sabia virus\"": We don't deal with null value 
+"\"Yellow fever\"": We don't deal with null value 
+"\"Anthrax\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Chikungunya virus disease\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Eastern equine encephalitis virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Jamestown Canyon virus disease \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, La Crosse virus disease \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Powassan virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, St. Louis encephalitis virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Western equine encephalitis virus disease\"": We don't deal with null value 
+"\"Botulism, total\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, foodborne\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, infant\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, other (wound and unspecified)\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Brucellosis\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Chancroid\"": We don't deal with null value 
+"\"Cholera\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Cyclosporiasis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Diphtheria\"": We don't deal with null value 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Serotype b\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Non-b serotype \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Nontypeable\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Unknown serotype\"": 34 cases in 2013, 39 cases in 2014, 167 cases in 2015, 187 cases in 2016, 245 cases in 2017 
+"\"Hansen's disease¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hantavirus infection, non-hantavirus pulmonary syndrome¶\"": We don't deal with null value 
+"\"Hantavirus pulmonary syndrome¶ \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hemolytic uremic syndrome, postdiarrheal¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hepatitis B, perinatal infection\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Influenza-associated pediatric mortality¶,**\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Leptospirosis¶\"": We don't deal with null value 
+"\"Listeriosis\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Measles††\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Serogroups ACWY\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Serogroup B\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Other serogroups\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Unknown serogroup\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Novel Influenza A virus infections§§\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Paratyphoid fever¶¶\"": We don't deal with null value 
+"\"Plague\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Poliomyelitis, paralytic\"": We don't deal with null value 
+"\"Polio virus Infection, nonparalytic¶\"": We don't deal with null value 
+"\"Psittacosis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, total\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, acute\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, chronic\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Rabies, human\"": We don't deal with null value 
+"\"Severe acute respiratory syndrome-associated coronavirus disease (SARS-CoV)\"": We don't deal with null value 
+"\"Smallpox\"": We don't deal with null value 
+"\"Streptococcal toxic-shock syndrome¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Syphilis, congenital\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Toxic-shock syndrome (other than Streptococcal)¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Trichinellosis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Tularemia\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Typhoid fever \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Vancomycin-intermediate Staphylococcus aureus¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Vancomycin-resistant Staphylococcus aureus¶\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Crimean-Congo hemorrhagic fever virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Ebola virus \"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Guanarito virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Junin virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lassa virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lujo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Machupo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Marburg virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Sabia virus\"": We don't deal with null value 
+"\"Yellow fever\"": We don't deal with null value 
+"\"Anthrax\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Chikungunya virus disease\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Eastern equine encephalitis virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Jamestown Canyon virus disease \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, La Crosse virus disease \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Powassan virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, St. Louis encephalitis virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Western equine encephalitis virus disease\"": We don't deal with null value 
+"\"Botulism, total\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, foodborne\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, infant\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, other (wound and unspecified)\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Brucellosis\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Chancroid\"": We don't deal with null value 
+"\"Cholera\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Cyclosporiasis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Diphtheria\"": We don't deal with null value 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Serotype b\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Non-b serotype \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Nontypeable\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Unknown serotype\"": 34 cases in 2013, 39 cases in 2014, 167 cases in 2015, 187 cases in 2016, 247 cases in 2017 
+"\"Hansen's disease¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hantavirus infection, non-hantavirus pulmonary syndrome¶\"": We don't deal with null value 
+"\"Hantavirus pulmonary syndrome¶ \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hemolytic uremic syndrome, postdiarrheal¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hepatitis B, perinatal infection\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Influenza-associated pediatric mortality¶,**\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Leptospirosis¶\"": We don't deal with null value 
+"\"Listeriosis\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Measles††\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Serogroups ACWY\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Serogroup B\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Other serogroups\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Unknown serogroup\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Novel Influenza A virus infections§§\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Paratyphoid fever¶¶\"": We don't deal with null value 
+"\"Plague\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Poliomyelitis, paralytic\"": We don't deal with null value 
+"\"Polio virus Infection, nonparalytic¶\"": We don't deal with null value 
+"\"Psittacosis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, total\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, acute\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, chronic\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Rabies, human\"": We don't deal with null value 
+"\"Severe acute respiratory syndrome-associated coronavirus disease (SARS-CoV)\"": We don't deal with null value 
+"\"Smallpox\"": We don't deal with null value 
+"\"Streptococcal toxic-shock syndrome¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Syphilis, congenital\"": 348 cases in 2013, 458 cases in 2014, 493 cases in 2015, 633 cases in 2016, 635 cases in 2017 
+"\"Toxic-shock syndrome (other than Streptococcal)¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Trichinellosis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Tularemia\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Typhoid fever \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Vancomycin-intermediate Staphylococcus aureus¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Vancomycin-resistant Staphylococcus aureus¶\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Crimean-Congo hemorrhagic fever virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Ebola virus \"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Guanarito virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Junin virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lassa virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lujo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Machupo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Marburg virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Sabia virus\"": We don't deal with null value 
+"\"Yellow fever\"": We don't deal with null value 
+"\"Anthrax\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Chikungunya virus disease\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Eastern equine encephalitis virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Jamestown Canyon virus disease \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, La Crosse virus disease \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Powassan virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, St. Louis encephalitis virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Western equine encephalitis virus disease\"": We don't deal with null value 
+"\"Botulism, total\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, foodborne\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, infant\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, other (wound and unspecified)\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Brucellosis\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Chancroid\"": We don't deal with null value 
+"\"Cholera\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Cyclosporiasis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Diphtheria\"": We don't deal with null value 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Serotype b\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Non-b serotype \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Nontypeable\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Unknown serotype\"": 34 cases in 2013, 39 cases in 2014, 167 cases in 2015, 187 cases in 2016, 250 cases in 2017 
+"\"Hansen's disease¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hantavirus infection, non-hantavirus pulmonary syndrome¶\"": We don't deal with null value 
+"\"Hantavirus pulmonary syndrome¶ \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hemolytic uremic syndrome, postdiarrheal¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hepatitis B, perinatal infection\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Influenza-associated pediatric mortality¶,**\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Leptospirosis¶\"": We don't deal with null value 
+"\"Listeriosis\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Measles††\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Serogroups ACWY\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Serogroup B\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Other serogroups\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Unknown serogroup\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Novel Influenza A virus infections§§\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Paratyphoid fever¶¶\"": We don't deal with null value 
+"\"Plague\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Poliomyelitis, paralytic\"": We don't deal with null value 
+"\"Polio virus Infection, nonparalytic¶\"": We don't deal with null value 
+"\"Psittacosis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, total\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, acute\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, chronic\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Rabies, human\"": We don't deal with null value 
+"\"Severe acute respiratory syndrome-associated coronavirus disease (SARS-CoV)\"": We don't deal with null value 
+"\"Smallpox\"": We don't deal with null value 
+"\"Streptococcal toxic-shock syndrome¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Syphilis, congenital\"": 348 cases in 2013, 458 cases in 2014, 493 cases in 2015, 633 cases in 2016, 668 cases in 2017 
+"\"Toxic-shock syndrome (other than Streptococcal)¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Trichinellosis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Tularemia\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Typhoid fever \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Vancomycin-intermediate Staphylococcus aureus¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Vancomycin-resistant Staphylococcus aureus¶\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Crimean-Congo hemorrhagic fever virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Ebola virus \"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Guanarito virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Junin virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lassa virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lujo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Machupo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Marburg virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Sabia virus\"": We don't deal with null value 
+"\"Yellow fever\"": We don't deal with null value 
+"\"Anthrax\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Chikungunya virus disease\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Eastern equine encephalitis virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Jamestown Canyon virus disease \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, La Crosse virus disease \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Powassan virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, St. Louis encephalitis virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Western equine encephalitis virus disease\"": We don't deal with null value 
+"\"Botulism, total\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, foodborne\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, infant\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, other (wound and unspecified)\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Brucellosis\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Chancroid\"": We don't deal with null value 
+"\"Cholera\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Cyclosporiasis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Diphtheria\"": We don't deal with null value 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Serotype b\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Non-b serotype \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Nontypeable\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Unknown serotype\"": 34 cases in 2013, 39 cases in 2014, 167 cases in 2015, 187 cases in 2016, 252 cases in 2017 
+"\"Hansen's disease¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hantavirus infection, non-hantavirus pulmonary syndrome¶\"": We don't deal with null value 
+"\"Hantavirus pulmonary syndrome¶ \"": We don't deal with null value 
+"\"Hemolytic uremic syndrome, postdiarrheal¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hepatitis B, perinatal infection\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Influenza-associated pediatric mortality¶,**\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Leptospirosis¶\"": We don't deal with null value 
+"\"Listeriosis\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Measles††\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Serogroups ACWY\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Serogroup B\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Other serogroups\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Unknown serogroup\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Novel Influenza A virus infections§§\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Paratyphoid fever¶¶\"": We don't deal with null value 
+"\"Plague\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Poliomyelitis, paralytic\"": We don't deal with null value 
+"\"Polio virus Infection, nonparalytic¶\"": We don't deal with null value 
+"\"Psittacosis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, total\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, acute\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, chronic\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Rabies, human\"": We don't deal with null value 
+"\"Severe acute respiratory syndrome-associated coronavirus disease (SARS-CoV)\"": We don't deal with null value 
+"\"Smallpox\"": We don't deal with null value 
+"\"Streptococcal toxic-shock syndrome¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Syphilis, congenital\"": 348 cases in 2013, 458 cases in 2014, 493 cases in 2015, 633 cases in 2016, 674 cases in 2017 
+"\"Toxic-shock syndrome (other than Streptococcal)¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Trichinellosis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Tularemia\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Typhoid fever \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Vancomycin-intermediate Staphylococcus aureus¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Vancomycin-resistant Staphylococcus aureus¶\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Crimean-Congo hemorrhagic fever virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Ebola virus \"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Guanarito virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Junin virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lassa virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lujo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Machupo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Marburg virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Sabia virus\"": We don't deal with null value 
+"\"Yellow fever\"": We don't deal with null value 
+"\"Anthrax\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Chikungunya virus disease\"": We don't deal with null value 
+"\"Q fever¶, acute\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Eastern equine encephalitis virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Jamestown Canyon virus disease \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, La Crosse virus disease \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Powassan virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, St. Louis encephalitis virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Western equine encephalitis virus disease\"": We don't deal with null value 
+"\"Botulism, total\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, foodborne\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, infant\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, other (wound and unspecified)\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Brucellosis\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Chancroid\"": We don't deal with null value 
+"\"Cholera\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Cyclosporiasis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Diphtheria\"": We don't deal with null value 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Serotype b\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Non-b serotype \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Nontypeable\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Unknown serotype\"": 34 cases in 2013, 39 cases in 2014, 167 cases in 2015, 187 cases in 2016, 252 cases in 2017 
+"\"Hansen's disease¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hantavirus infection, non-hantavirus pulmonary syndrome¶\"": We don't deal with null value 
+"\"Hantavirus pulmonary syndrome¶ \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hemolytic uremic syndrome, postdiarrheal¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hepatitis B, perinatal infection\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Influenza-associated pediatric mortality¶,**\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Leptospirosis¶\"": We don't deal with null value 
+"\"Listeriosis\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Measles††\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Serogroups ACWY\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Serogroup B\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Other serogroups\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Unknown serogroup\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Novel Influenza A virus infections§§\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Paratyphoid fever¶¶\"": We don't deal with null value 
+"\"Plague\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Poliomyelitis, paralytic\"": We don't deal with null value 
+"\"Polio virus Infection, nonparalytic¶\"": We don't deal with null value 
+"\"Psittacosis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, total\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, chronic\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Rabies, human\"": We don't deal with null value 
+"\"Severe acute respiratory syndrome-associated coronavirus disease (SARS-CoV)\"": We don't deal with null value 
+"\"Smallpox\"": We don't deal with null value 
+"\"Streptococcal toxic-shock syndrome¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Syphilis, congenital\"": 348 cases in 2013, 458 cases in 2014, 493 cases in 2015, 633 cases in 2016, 690 cases in 2017 
+"\"Toxic-shock syndrome (other than Streptococcal)¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Trichinellosis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Tularemia\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Typhoid fever \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Vancomycin-intermediate Staphylococcus aureus¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Vancomycin-resistant Staphylococcus aureus¶\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Crimean-Congo hemorrhagic fever virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Ebola virus \"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Guanarito virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Junin virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lassa virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lujo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Machupo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Marburg virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Sabia virus\"": We don't deal with null value 
+"\"Yellow fever\"": We don't deal with null value 
+"\"Anthrax\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Chikungunya virus disease\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Eastern equine encephalitis virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Jamestown Canyon virus disease \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, La Crosse virus disease \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Powassan virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, St. Louis encephalitis virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Western equine encephalitis virus disease\"": We don't deal with null value 
+"\"Botulism, total\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, foodborne\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, infant\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, other (wound and unspecified)\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Brucellosis\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Chancroid\"": We don't deal with null value 
+"\"Cholera\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Cyclosporiasis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Diphtheria\"": We don't deal with null value 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Serotype b\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Viral hemorrhagic fevers***, Lassa virus\"": We don't deal with null value 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Non-b serotype \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Nontypeable\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Unknown serotype\"": 34 cases in 2013, 39 cases in 2014, 167 cases in 2015, 187 cases in 2016, 248 cases in 2017 
+"\"Hansen's disease¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hantavirus infection, non-hantavirus pulmonary syndrome¶\"": We don't deal with null value 
+"\"Hantavirus pulmonary syndrome¶ \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hemolytic uremic syndrome, postdiarrheal¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hepatitis B, perinatal infection\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Influenza-associated pediatric mortality¶,**\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Leptospirosis¶\"": We don't deal with null value 
+"\"Listeriosis\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Measles††\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Serogroups ACWY\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Serogroup B\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Other serogroups\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Unknown serogroup\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Novel Influenza A virus infections§§\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Paratyphoid fever¶¶\"": We don't deal with null value 
+"\"Plague\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Poliomyelitis, paralytic\"": We don't deal with null value 
+"\"Polio virus Infection, nonparalytic¶\"": We don't deal with null value 
+"\"Psittacosis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, total\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, acute\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, chronic\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Rabies, human\"": We don't deal with null value 
+"\"Severe acute respiratory syndrome-associated coronavirus disease (SARS-CoV)\"": We don't deal with null value 
+"\"Smallpox\"": We don't deal with null value 
+"\"Streptococcal toxic-shock syndrome¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Syphilis, congenital\"": 348 cases in 2013, 458 cases in 2014, 493 cases in 2015, 633 cases in 2016, 704 cases in 2017 
+"\"Toxic-shock syndrome (other than Streptococcal)¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Trichinellosis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Tularemia\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Typhoid fever \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Vancomycin-intermediate Staphylococcus aureus¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Vancomycin-resistant Staphylococcus aureus¶\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Crimean-Congo hemorrhagic fever virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Ebola virus \"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Guanarito virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Junin virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lujo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Machupo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Marburg virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Sabia virus\"": We don't deal with null value 
+"\"Yellow fever\"": We don't deal with null value 
+"\"Anthrax\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Chikungunya virus disease\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Eastern equine encephalitis virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Jamestown Canyon virus disease \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, La Crosse virus disease \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Powassan virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, St. Louis encephalitis virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Western equine encephalitis virus disease\"": We don't deal with null value 
+"\"Botulism, total\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, foodborne\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, infant\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, other (wound and unspecified)\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Brucellosis\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Chancroid\"": We don't deal with null value 
+"\"Cholera\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Cyclosporiasis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Diphtheria\"": We don't deal with null value 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Serotype b\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Non-b serotype \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Nontypeable\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Unknown serotype\"": 34 cases in 2013, 39 cases in 2014, 167 cases in 2015, 187 cases in 2016, 248 cases in 2017 
+"\"Hansen's disease¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hantavirus infection, non-hantavirus pulmonary syndrome¶\"": We don't deal with null value 
+"\"Hantavirus pulmonary syndrome¶ \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hemolytic uremic syndrome, postdiarrheal¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hepatitis B, perinatal infection\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Influenza-associated pediatric mortality¶,**\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Leptospirosis¶\"": We don't deal with null value 
+"\"Listeriosis\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Measles††\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Serogroups ACWY\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Serogroup B\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Other serogroups\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Unknown serogroup\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Novel Influenza A virus infections§§\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Paratyphoid fever¶¶\"": We don't deal with null value 
+"\"Plague\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Poliomyelitis, paralytic\"": We don't deal with null value 
+"\"Polio virus Infection, nonparalytic¶\"": We don't deal with null value 
+"\"Psittacosis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, total\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, acute\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, chronic\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Rabies, human\"": We don't deal with null value 
+"\"Severe acute respiratory syndrome-associated coronavirus disease (SARS-CoV)\"": We don't deal with null value 
+"\"Smallpox\"": We don't deal with null value 
+"\"Streptococcal toxic-shock syndrome¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Syphilis, congenital\"": 348 cases in 2013, 458 cases in 2014, 493 cases in 2015, 633 cases in 2016, 717 cases in 2017 
+"\"Toxic-shock syndrome (other than Streptococcal)¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Trichinellosis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Tularemia\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Typhoid fever \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Vancomycin-intermediate Staphylococcus aureus¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Vancomycin-resistant Staphylococcus aureus¶\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Crimean-Congo hemorrhagic fever virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Ebola virus \"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Guanarito virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Junin virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lassa virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lujo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Machupo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Marburg virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Sabia virus\"": We don't deal with null value 
+"\"Yellow fever\"": We don't deal with null value 
+"\"Anthrax\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Chikungunya virus disease\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Eastern equine encephalitis virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Jamestown Canyon virus disease \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, La Crosse virus disease \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Powassan virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, St. Louis encephalitis virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Western equine encephalitis virus disease\"": We don't deal with null value 
+"\"Botulism, total\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, foodborne\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, infant\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, other (wound and unspecified)\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Brucellosis\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Chancroid\"": We don't deal with null value 
+"\"Cholera\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Cyclosporiasis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Diphtheria\"": We don't deal with null value 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Serotype b\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Non-b serotype \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Nontypeable\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Unknown serotype\"": 34 cases in 2013, 39 cases in 2014, 167 cases in 2015, 187 cases in 2016, 250 cases in 2017 
+"\"Hansen's disease¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hantavirus infection, non-hantavirus pulmonary syndrome¶\"": We don't deal with null value 
+"\"Hantavirus pulmonary syndrome¶ \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hemolytic uremic syndrome, postdiarrheal¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hepatitis B, perinatal infection\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Influenza-associated pediatric mortality¶,**\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Leptospirosis¶\"": We don't deal with null value 
+"\"Listeriosis\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Measles††\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Serogroups ACWY\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Serogroup B\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Other serogroups\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Unknown serogroup\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Novel Influenza A virus infections§§\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Paratyphoid fever¶¶\"": We don't deal with null value 
+"\"Plague\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Poliomyelitis, paralytic\"": We don't deal with null value 
+"\"Polio virus Infection, nonparalytic¶\"": We don't deal with null value 
+"\"Psittacosis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, total\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, acute\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, chronic\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Rabies, human\"": We don't deal with null value 
+"\"Severe acute respiratory syndrome-associated coronavirus disease (SARS-CoV)\"": We don't deal with null value 
+"\"Smallpox\"": We don't deal with null value 
+"\"Streptococcal toxic-shock syndrome¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Syphilis, congenital\"": 348 cases in 2013, 458 cases in 2014, 493 cases in 2015, 633 cases in 2016, 726 cases in 2017 
+"\"Toxic-shock syndrome (other than Streptococcal)¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Trichinellosis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Tularemia\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Typhoid fever \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Vancomycin-intermediate Staphylococcus aureus¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Vancomycin-resistant Staphylococcus aureus¶\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Crimean-Congo hemorrhagic fever virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Ebola virus \"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Guanarito virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Junin virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lassa virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lujo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Machupo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Marburg virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Sabia virus\"": We don't deal with null value 
+"\"Yellow fever\"": We don't deal with null value 
+"\"Anthrax\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Chikungunya virus disease\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Eastern equine encephalitis virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Jamestown Canyon virus disease \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, La Crosse virus disease \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Powassan virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, St. Louis encephalitis virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Western equine encephalitis virus disease\"": We don't deal with null value 
+"\"Botulism, total\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, foodborne\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, infant\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, other (wound and unspecified)\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Brucellosis\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Chancroid\"": We don't deal with null value 
+"\"Cholera\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Cyclosporiasis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Diphtheria\"": We don't deal with null value 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Serotype b\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Non-b serotype \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Nontypeable\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Unknown serotype\"": 34 cases in 2013, 39 cases in 2014, 167 cases in 2015, 187 cases in 2016, 247 cases in 2017 
+"\"Hansen's disease¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hantavirus infection, non-hantavirus pulmonary syndrome¶\"": We don't deal with null value 
+"\"Hantavirus pulmonary syndrome¶ \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hemolytic uremic syndrome, postdiarrheal¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hepatitis B, perinatal infection\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Influenza-associated pediatric mortality¶,**\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Leptospirosis¶\"": We don't deal with null value 
+"\"Listeriosis\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Measles††\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Serogroups ACWY\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Serogroup B\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Other serogroups\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Unknown serogroup\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Novel Influenza A virus infections§§\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Paratyphoid fever¶¶\"": We don't deal with null value 
+"\"Plague\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Poliomyelitis, paralytic\"": We don't deal with null value 
+"\"Polio virus Infection, nonparalytic¶\"": We don't deal with null value 
+"\"Psittacosis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, total\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, acute\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, chronic\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Rabies, human\"": We don't deal with null value 
+"\"Severe acute respiratory syndrome-associated coronavirus disease (SARS-CoV)\"": We don't deal with null value 
+"\"Smallpox\"": We don't deal with null value 
+"\"Streptococcal toxic-shock syndrome¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Syphilis, congenital\"": 348 cases in 2013, 458 cases in 2014, 493 cases in 2015, 633 cases in 2016, 730 cases in 2017 
+"\"Toxic-shock syndrome (other than Streptococcal)¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Trichinellosis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Tularemia\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Typhoid fever \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Vancomycin-intermediate Staphylococcus aureus¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Vancomycin-resistant Staphylococcus aureus¶\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Crimean-Congo hemorrhagic fever virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Ebola virus \"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Guanarito virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Junin virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lassa virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lujo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Machupo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Marburg virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Sabia virus\"": We don't deal with null value 
+"\"Yellow fever\"": We don't deal with null value 
+"\"Anthrax\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Chikungunya virus disease\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Eastern equine encephalitis virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, chronic\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Jamestown Canyon virus disease \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, La Crosse virus disease \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Powassan virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, St. Louis encephalitis virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Western equine encephalitis virus disease\"": We don't deal with null value 
+"\"Botulism, total\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, foodborne\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, infant\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, other (wound and unspecified)\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Brucellosis\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Chancroid\"": We don't deal with null value 
+"\"Cholera\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Cyclosporiasis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Diphtheria\"": We don't deal with null value 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Serotype b\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Non-b serotype \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Nontypeable\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Unknown serotype\"": 34 cases in 2013, 39 cases in 2014, 167 cases in 2015, 187 cases in 2016, 255 cases in 2017 
+"\"Hansen's disease¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hantavirus infection, non-hantavirus pulmonary syndrome¶\"": We don't deal with null value 
+"\"Hantavirus pulmonary syndrome¶ \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hemolytic uremic syndrome, postdiarrheal¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hepatitis B, perinatal infection\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Influenza-associated pediatric mortality¶,**\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Leptospirosis¶\"": We don't deal with null value 
+"\"Listeriosis\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Measles††\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Serogroups ACWY\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Serogroup B\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Other serogroups\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Unknown serogroup\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Novel Influenza A virus infections§§\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Paratyphoid fever¶¶\"": We don't deal with null value 
+"\"Plague\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Poliomyelitis, paralytic\"": We don't deal with null value 
+"\"Polio virus Infection, nonparalytic¶\"": We don't deal with null value 
+"\"Psittacosis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, total\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, acute\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Rabies, human\"": We don't deal with null value 
+"\"Severe acute respiratory syndrome-associated coronavirus disease (SARS-CoV)\"": We don't deal with null value 
+"\"Smallpox\"": We don't deal with null value 
+"\"Streptococcal toxic-shock syndrome¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Syphilis, congenital\"": 348 cases in 2013, 458 cases in 2014, 493 cases in 2015, 633 cases in 2016, 744 cases in 2017 
+"\"Toxic-shock syndrome (other than Streptococcal)¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Trichinellosis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Tularemia\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Typhoid fever \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Vancomycin-intermediate Staphylococcus aureus¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Vancomycin-resistant Staphylococcus aureus¶\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Crimean-Congo hemorrhagic fever virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Ebola virus \"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Guanarito virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Junin virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lassa virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lujo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Machupo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Marburg virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Sabia virus\"": We don't deal with null value 
+"\"Yellow fever\"": We don't deal with null value 
+"\"Anthrax\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Chikungunya virus disease\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Eastern equine encephalitis virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Jamestown Canyon virus disease \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, La Crosse virus disease \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Powassan virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, St. Louis encephalitis virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Western equine encephalitis virus disease\"": We don't deal with null value 
+"\"Botulism, total\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, foodborne\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, infant\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, other (wound and unspecified)\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Brucellosis\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Chancroid\"": We don't deal with null value 
+"\"Cholera\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Cyclosporiasis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Diphtheria\"": We don't deal with null value 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Serotype b\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Non-b serotype \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Nontypeable\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Unknown serotype\"": 34 cases in 2013, 39 cases in 2014, 167 cases in 2015, 187 cases in 2016, 254 cases in 2017 
+"\"Hansen's disease¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hantavirus infection, non-hantavirus pulmonary syndrome¶\"": We don't deal with null value 
+"\"Hantavirus pulmonary syndrome¶ \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hemolytic uremic syndrome, postdiarrheal¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hepatitis B, perinatal infection\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Influenza-associated pediatric mortality¶,**\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Leptospirosis¶\"": We don't deal with null value 
+"\"Listeriosis\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Measles††\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Serogroups ACWY\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Serogroup B\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Other serogroups\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Unknown serogroup\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Novel Influenza A virus infections§§\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Paratyphoid fever¶¶\"": We don't deal with null value 
+"\"Plague\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Poliomyelitis, paralytic\"": We don't deal with null value 
+"\"Polio virus Infection, nonparalytic¶\"": We don't deal with null value 
+"\"Psittacosis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, total\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, acute\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, chronic\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Rabies, human\"": We don't deal with null value 
+"\"Severe acute respiratory syndrome-associated coronavirus disease (SARS-CoV)\"": We don't deal with null value 
+"\"Smallpox\"": We don't deal with null value 
+"\"Streptococcal toxic-shock syndrome¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Syphilis, congenital\"": 348 cases in 2013, 458 cases in 2014, 493 cases in 2015, 633 cases in 2016, 749 cases in 2017 
+"\"Toxic-shock syndrome (other than Streptococcal)¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Trichinellosis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Tularemia\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Typhoid fever \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Vancomycin-intermediate Staphylococcus aureus¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Vancomycin-resistant Staphylococcus aureus¶\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Crimean-Congo hemorrhagic fever virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Ebola virus \"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Guanarito virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Junin virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lassa virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lujo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Machupo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Marburg virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Sabia virus\"": We don't deal with null value 
+"\"Yellow fever\"": We don't deal with null value 
+"\"Anthrax\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Chikungunya virus disease\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Eastern equine encephalitis virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Jamestown Canyon virus disease \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, La Crosse virus disease \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Powassan virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, St. Louis encephalitis virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Western equine encephalitis virus disease\"": We don't deal with null value 
+"\"Botulism, total\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, foodborne\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, infant\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, other (wound and unspecified)\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Brucellosis\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Chancroid\"": We don't deal with null value 
+"\"Cholera\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Cyclosporiasis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Diphtheria\"": We don't deal with null value 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Serotype b\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Non-b serotype \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Nontypeable\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Unknown serotype\"": 34 cases in 2013, 39 cases in 2014, 167 cases in 2015, 187 cases in 2016, 256 cases in 2017 
+"\"Hansen's disease¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hantavirus infection, non-hantavirus pulmonary syndrome¶\"": We don't deal with null value 
+"\"Hantavirus pulmonary syndrome¶ \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hemolytic uremic syndrome, postdiarrheal¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hepatitis B, perinatal infection\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Influenza-associated pediatric mortality¶,**\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Leptospirosis¶\"": We don't deal with null value 
+"\"Listeriosis\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Measles††\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Serogroups ACWY\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Serogroup B\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Other serogroups\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Unknown serogroup\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Novel Influenza A virus infections§§\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Paratyphoid fever¶¶\"": We don't deal with null value 
+"\"Plague\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Poliomyelitis, paralytic\"": We don't deal with null value 
+"\"Polio virus Infection, nonparalytic¶\"": We don't deal with null value 
+"\"Psittacosis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, total\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, acute\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, chronic\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Rabies, human\"": We don't deal with null value 
+"\"Severe acute respiratory syndrome-associated coronavirus disease (SARS-CoV)\"": We don't deal with null value 
+"\"Smallpox\"": We don't deal with null value 
+"\"Streptococcal toxic-shock syndrome¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Syphilis, congenital\"": 348 cases in 2013, 458 cases in 2014, 493 cases in 2015, 633 cases in 2016, 751 cases in 2017 
+"\"Toxic-shock syndrome (other than Streptococcal)¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Trichinellosis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Tularemia\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Typhoid fever \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Vancomycin-intermediate Staphylococcus aureus¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Vancomycin-resistant Staphylococcus aureus¶\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Crimean-Congo hemorrhagic fever virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Ebola virus \"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Guanarito virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Junin virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lassa virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lujo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Machupo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Marburg virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Sabia virus\"": We don't deal with null value 
+"\"Yellow fever\"": We don't deal with null value 
+"\"Anthrax\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Chikungunya virus disease\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Eastern equine encephalitis virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Jamestown Canyon virus disease \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, La Crosse virus disease \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Powassan virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, St. Louis encephalitis virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Western equine encephalitis virus disease\"": We don't deal with null value 
+"\"Botulism, total\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, foodborne\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, infant\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, other (wound and unspecified)\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Brucellosis\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Chancroid\"": We don't deal with null value 
+"\"Cholera\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Cyclosporiasis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Diphtheria\"": We don't deal with null value 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Serotype b\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Non-b serotype \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Nontypeable\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Unknown serotype\"": 34 cases in 2013, 39 cases in 2014, 167 cases in 2015, 187 cases in 2016, 256 cases in 2017 
+"\"Hansen's disease¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hantavirus infection, non-hantavirus pulmonary syndrome¶\"": We don't deal with null value 
+"\"Hantavirus pulmonary syndrome¶ \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hemolytic uremic syndrome, postdiarrheal¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hepatitis B, perinatal infection\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Influenza-associated pediatric mortality¶,**\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Leptospirosis¶\"": We don't deal with null value 
+"\"Listeriosis\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Measles††\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Serogroups ACWY\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Serogroup B\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Other serogroups\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Unknown serogroup\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Novel Influenza A virus infections§§\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Paratyphoid fever¶¶\"": We don't deal with null value 
+"\"Plague\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Poliomyelitis, paralytic\"": We don't deal with null value 
+"\"Polio virus Infection, nonparalytic¶\"": We don't deal with null value 
+"\"Psittacosis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, total\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, acute\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, chronic\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Rabies, human\"": We don't deal with null value 
+"\"Severe acute respiratory syndrome-associated coronavirus disease (SARS-CoV)\"": We don't deal with null value 
+"\"Smallpox\"": We don't deal with null value 
+"\"Streptococcal toxic-shock syndrome¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Syphilis, congenital\"": 348 cases in 2013, 458 cases in 2014, 493 cases in 2015, 633 cases in 2016, 765 cases in 2017 
+"\"Toxic-shock syndrome (other than Streptococcal)¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Trichinellosis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Tularemia\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Typhoid fever \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Leptospirosis¶\"": We don't deal with null value 
+"\"Vancomycin-intermediate Staphylococcus aureus¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Vancomycin-resistant Staphylococcus aureus¶\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Crimean-Congo hemorrhagic fever virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Ebola virus \"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Guanarito virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Junin virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lassa virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lujo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Machupo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Marburg virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Sabia virus\"": We don't deal with null value 
+"\"Yellow fever\"": We don't deal with null value 
+"\"Anthrax\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Chikungunya virus disease\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Eastern equine encephalitis virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Jamestown Canyon virus disease \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, La Crosse virus disease \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Powassan virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, St. Louis encephalitis virus disease\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Western equine encephalitis virus disease\"": We don't deal with null value 
+"\"Botulism, total\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, foodborne\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, infant\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Botulism, other (wound and unspecified)\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Brucellosis\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Chancroid\"": We don't deal with null value 
+"\"Cholera\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Cyclosporiasis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Diphtheria\"": We don't deal with null value 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Serotype b\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Non-b serotype \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Nontypeable\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Unknown serotype\"": 34 cases in 2013, 39 cases in 2014, 167 cases in 2015, 187 cases in 2016, 248 cases in 2017 
+"\"Hansen's disease¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hantavirus infection, non-hantavirus pulmonary syndrome¶\"": We don't deal with null value 
+"\"Hantavirus pulmonary syndrome¶ \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hemolytic uremic syndrome, postdiarrheal¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Hepatitis B, perinatal infection\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Influenza-associated pediatric mortality¶,**\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Listeriosis\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Measles††\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Serogroups ACWY\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Serogroup B\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Other serogroups\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Meningococcal disease, Unknown serogroup\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Novel Influenza A virus infections§§\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Paratyphoid fever¶¶\"": We don't deal with null value 
+"\"Plague\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Poliomyelitis, paralytic\"": We don't deal with null value 
+"\"Polio virus Infection, nonparalytic¶\"": We don't deal with null value 
+"\"Psittacosis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, total\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, acute\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Q fever¶, chronic\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Rabies, human\"": We don't deal with null value 
+"\"Severe acute respiratory syndrome-associated coronavirus disease (SARS-CoV)\"": We don't deal with null value 
+"\"Smallpox\"": We don't deal with null value 
+"\"Streptococcal toxic-shock syndrome¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Syphilis, congenital\"": 348 cases in 2013, 458 cases in 2014, 493 cases in 2015, 633 cases in 2016, 781 cases in 2017 
+"\"Toxic-shock syndrome (other than Streptococcal)¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Trichinellosis¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Tularemia\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Typhoid fever \"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Vancomycin-intermediate Staphylococcus aureus¶\"" doesn't have strictly increase pattern from 2013 to 2017. 
+"\"Vancomycin-resistant Staphylococcus aureus¶\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Crimean-Congo hemorrhagic fever virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Ebola virus \"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Guanarito virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Junin virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lassa virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lujo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Machupo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Marburg virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Sabia virus\"": We don't deal with null value 
+"\"Yellow fever\"": We don't deal with null value 
+'(#<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>)

@@ -1,0 +1,1559 @@
+> (increasingIncidents "/Users/sunjian/Public/Document/3351/Week8/cdc2018.json" "\"data\"")
+"\"Anthrax\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Chikungunya virus disease\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Eastern equine encephalitis virus disease\"": We don't see increase pattern from 2013 to 2017"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Jamestown Canyon virus disease \"": 22 cases in 2013, 67 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, La Crosse virus disease \"": We don't see increase pattern from 2013 to 2017"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Powassan virus disease\"": 12 cases in 2013, 31 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, St. Louis encephalitis virus disease\"": 1 cases in 2013, 9 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Western equine encephalitis virus disease\"": We don't deal with null value 
+"\"Botulism, total\"": We don't see increase pattern from 2013 to 2017"\"Botulism, foodborne\"": 4 cases in 2013, 5 cases in 2017 
+"\"Botulism, infant\"": We don't see increase pattern from 2013 to 2017"\"Botulism, other (wound and unspecified)\"": We don't see increase pattern from 2013 to 2017"\"Brucellosis\"": 99 cases in 2013, 110 cases in 2017 
+"\"Chancroid\"": We don't deal with null value 
+"\"Cholera\"": We don't see increase pattern from 2013 to 2017"\"Cyclosporiasis¶\"": 784 cases in 2013, 1094 cases in 2017 
+"\"Diphtheria\"": We don't deal with null value 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Serotype b\"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Non-b serotype \"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Nontypeable\"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Unknown serotype\"": 34 cases in 2013, 244 cases in 2017 
+"\"Hansen's disease¶\"": We don't see increase pattern from 2013 to 2017"\"Hantavirus infection, non-hantavirus pulmonary syndrome¶\"": We don't deal with null value 
+"\"Hantavirus pulmonary syndrome¶ \"": We don't see increase pattern from 2013 to 2017"\"Hemolytic uremic syndrome, postdiarrheal¶\"": We don't see increase pattern from 2013 to 2017"\"Hepatitis B, perinatal infection\"": We don't see increase pattern from 2013 to 2017"\"Influenza-associated pediatric mortality¶,**\"": We don't see increase pattern from 2013 to 2017"\"Leptospirosis¶\"": We don't deal with null value 
+"\"Listeriosis\"": 735 cases in 2013, 737 cases in 2017 
+"\"Measles††\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Serogroups ACWY\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Serogroup B\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Other serogroups\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Unknown serogroup\"": We don't see increase pattern from 2013 to 2017"\"Novel Influenza A virus infections§§\"": 21 cases in 2013, 67 cases in 2017 
+"\"Paratyphoid fever¶¶\"": We don't deal with null value 
+"\"Plague\"": We don't see increase pattern from 2013 to 2017"\"Poliomyelitis, paralytic\"": We don't deal with null value 
+"\"Polio virus Infection, nonparalytic¶\"": We don't deal with null value 
+"\"Psittacosis¶\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, total\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, acute\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, chronic\"": We don't see increase pattern from 2013 to 2017"\"Rabies, human\"": 2 cases in 2013, 2 cases in 2017 
+"\"Severe acute respiratory syndrome-associated coronavirus disease (SARS-CoV)\"": We don't deal with null value 
+"\"Smallpox\"": We don't deal with null value 
+"\"Streptococcal toxic-shock syndrome¶\"": 224 cases in 2013, 288 cases in 2017 
+"\"Syphilis, congenital\"": 348 cases in 2013, 605 cases in 2017 
+"\"Toxic-shock syndrome (other than Streptococcal)¶\"": We don't see increase pattern from 2013 to 2017"\"Trichinellosis¶\"": We don't see increase pattern from 2013 to 2017"\"Tularemia\"": 203 cases in 2013, 215 cases in 2017 
+"\"Typhoid fever \"": We don't see increase pattern from 2013 to 2017"\"Vancomycin-intermediate Staphylococcus aureus¶\"": We don't see increase pattern from 2013 to 2017"\"Vancomycin-resistant Staphylococcus aureus¶\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Crimean-Congo hemorrhagic fever virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Ebola virus \"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Guanarito virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Junin virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lassa virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lujo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Machupo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Marburg virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Sabia virus\"": We don't deal with null value 
+"\"Yellow fever\"": We don't deal with null value 
+"\"Anthrax\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Chikungunya virus disease\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Eastern equine encephalitis virus disease\"": We don't see increase pattern from 2013 to 2017"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Jamestown Canyon virus disease \"": 22 cases in 2013, 67 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, La Crosse virus disease \"": We don't see increase pattern from 2013 to 2017"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Powassan virus disease\"": 12 cases in 2013, 31 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, St. Louis encephalitis virus disease\"": 1 cases in 2013, 9 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Western equine encephalitis virus disease\"": We don't deal with null value 
+"\"Botulism, total\"": We don't see increase pattern from 2013 to 2017"\"Botulism, foodborne\"": 4 cases in 2013, 18 cases in 2017 
+"\"Botulism, infant\"": We don't see increase pattern from 2013 to 2017"\"Botulism, other (wound and unspecified)\"": 12 cases in 2013, 14 cases in 2017 
+"\"Brucellosis\"": 99 cases in 2013, 119 cases in 2017 
+"\"Chancroid\"": We don't deal with null value 
+"\"Cholera\"": We don't see increase pattern from 2013 to 2017"\"Cyclosporiasis¶\"": 784 cases in 2013, 1077 cases in 2017 
+"\"Diphtheria\"": We don't deal with null value 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Serotype b\"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Non-b serotype \"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Nontypeable\"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Unknown serotype\"": 34 cases in 2013, 245 cases in 2017 
+"\"Hansen's disease¶\"": We don't see increase pattern from 2013 to 2017"\"Hantavirus infection, non-hantavirus pulmonary syndrome¶\"": We don't deal with null value 
+"\"Hantavirus pulmonary syndrome¶ \"": We don't see increase pattern from 2013 to 2017"\"Hemolytic uremic syndrome, postdiarrheal¶\"": We don't see increase pattern from 2013 to 2017"\"Hepatitis B, perinatal infection\"": We don't see increase pattern from 2013 to 2017"\"Influenza-associated pediatric mortality¶,**\"": We don't see increase pattern from 2013 to 2017"\"Leptospirosis¶\"": We don't deal with null value 
+"\"Listeriosis\"": 735 cases in 2013, 744 cases in 2017 
+"\"Measles††\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Serogroups ACWY\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Serogroup B\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Other serogroups\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Unknown serogroup\"": We don't see increase pattern from 2013 to 2017"\"Novel Influenza A virus infections§§\"": 21 cases in 2013, 67 cases in 2017 
+"\"Paratyphoid fever¶¶\"": We don't deal with null value 
+"\"Plague\"": We don't see increase pattern from 2013 to 2017"\"Poliomyelitis, paralytic\"": We don't deal with null value 
+"\"Polio virus Infection, nonparalytic¶\"": We don't deal with null value 
+"\"Psittacosis¶\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, total\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, acute\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, chronic\"": We don't see increase pattern from 2013 to 2017"\"Rabies, human\"": 2 cases in 2013, 2 cases in 2017 
+"\"Severe acute respiratory syndrome-associated coronavirus disease (SARS-CoV)\"": We don't deal with null value 
+"\"Smallpox\"": We don't deal with null value 
+"\"Streptococcal toxic-shock syndrome¶\"": 224 cases in 2013, 298 cases in 2017 
+"\"Syphilis, congenital\"": 348 cases in 2013, 623 cases in 2017 
+"\"Toxic-shock syndrome (other than Streptococcal)¶\"": We don't see increase pattern from 2013 to 2017"\"Trichinellosis¶\"": We don't see increase pattern from 2013 to 2017"\"Tularemia\"": 203 cases in 2013, 225 cases in 2017 
+"\"Typhoid fever \"": We don't see increase pattern from 2013 to 2017"\"Vancomycin-intermediate Staphylococcus aureus¶\"": We don't see increase pattern from 2013 to 2017"\"Vancomycin-resistant Staphylococcus aureus¶\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Crimean-Congo hemorrhagic fever virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Ebola virus \"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Guanarito virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Junin virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lassa virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lujo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Machupo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Marburg virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Sabia virus\"": We don't deal with null value 
+"\"Yellow fever\"": We don't deal with null value 
+"\"Anthrax\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Chikungunya virus disease\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Eastern equine encephalitis virus disease\"": We don't see increase pattern from 2013 to 2017"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Jamestown Canyon virus disease \"": 22 cases in 2013, 67 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, La Crosse virus disease \"": We don't see increase pattern from 2013 to 2017"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Powassan virus disease\"": 12 cases in 2013, 31 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, St. Louis encephalitis virus disease\"": 1 cases in 2013, 9 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Western equine encephalitis virus disease\"": We don't deal with null value 
+"\"Botulism, total\"": We don't see increase pattern from 2013 to 2017"\"Botulism, foodborne\"": 4 cases in 2013, 18 cases in 2017 
+"\"Botulism, infant\"": We don't see increase pattern from 2013 to 2017"\"Botulism, other (wound and unspecified)\"": 12 cases in 2013, 14 cases in 2017 
+"\"Brucellosis\"": 99 cases in 2013, 120 cases in 2017 
+"\"Chancroid\"": We don't deal with null value 
+"\"Cholera\"": We don't see increase pattern from 2013 to 2017"\"Cyclosporiasis¶\"": 784 cases in 2013, 1084 cases in 2017 
+"\"Diphtheria\"": We don't deal with null value 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Serotype b\"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Non-b serotype \"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Nontypeable\"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Unknown serotype\"": 34 cases in 2013, 247 cases in 2017 
+"\"Hansen's disease¶\"": We don't see increase pattern from 2013 to 2017"\"Hantavirus infection, non-hantavirus pulmonary syndrome¶\"": We don't deal with null value 
+"\"Hantavirus pulmonary syndrome¶ \"": We don't see increase pattern from 2013 to 2017"\"Hemolytic uremic syndrome, postdiarrheal¶\"": We don't see increase pattern from 2013 to 2017"\"Hepatitis B, perinatal infection\"": We don't see increase pattern from 2013 to 2017"\"Influenza-associated pediatric mortality¶,**\"": We don't see increase pattern from 2013 to 2017"\"Leptospirosis¶\"": We don't deal with null value 
+"\"Listeriosis\"": 735 cases in 2013, 750 cases in 2017 
+"\"Measles††\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Serogroups ACWY\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Serogroup B\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Other serogroups\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Unknown serogroup\"": We don't see increase pattern from 2013 to 2017"\"Novel Influenza A virus infections§§\"": 21 cases in 2013, 67 cases in 2017 
+"\"Paratyphoid fever¶¶\"": We don't deal with null value 
+"\"Plague\"": We don't see increase pattern from 2013 to 2017"\"Poliomyelitis, paralytic\"": We don't deal with null value 
+"\"Polio virus Infection, nonparalytic¶\"": We don't deal with null value 
+"\"Psittacosis¶\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, total\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, acute\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, chronic\"": We don't see increase pattern from 2013 to 2017"\"Rabies, human\"": 2 cases in 2013, 2 cases in 2017 
+"\"Severe acute respiratory syndrome-associated coronavirus disease (SARS-CoV)\"": We don't deal with null value 
+"\"Smallpox\"": We don't deal with null value 
+"\"Streptococcal toxic-shock syndrome¶\"": 224 cases in 2013, 303 cases in 2017 
+"\"Syphilis, congenital\"": 348 cases in 2013, 635 cases in 2017 
+"\"Toxic-shock syndrome (other than Streptococcal)¶\"": We don't see increase pattern from 2013 to 2017"\"Trichinellosis¶\"": We don't see increase pattern from 2013 to 2017"\"Tularemia\"": 203 cases in 2013, 225 cases in 2017 
+"\"Typhoid fever \"": We don't see increase pattern from 2013 to 2017"\"Vancomycin-intermediate Staphylococcus aureus¶\"": We don't see increase pattern from 2013 to 2017"\"Vancomycin-resistant Staphylococcus aureus¶\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Crimean-Congo hemorrhagic fever virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Ebola virus \"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Guanarito virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Junin virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lassa virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lujo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Machupo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Marburg virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Sabia virus\"": We don't deal with null value 
+"\"Yellow fever\"": We don't deal with null value 
+"\"Anthrax\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Chikungunya virus disease\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Eastern equine encephalitis virus disease\"": We don't see increase pattern from 2013 to 2017"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Jamestown Canyon virus disease \"": 22 cases in 2013, 66 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, La Crosse virus disease \"": We don't see increase pattern from 2013 to 2017"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Powassan virus disease\"": 12 cases in 2013, 31 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, St. Louis encephalitis virus disease\"": 1 cases in 2013, 9 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Western equine encephalitis virus disease\"": We don't deal with null value 
+"\"Botulism, total\"": We don't see increase pattern from 2013 to 2017"\"Botulism, foodborne\"": 4 cases in 2013, 18 cases in 2017 
+"\"Botulism, infant\"": We don't see increase pattern from 2013 to 2017"\"Botulism, other (wound and unspecified)\"": 12 cases in 2013, 14 cases in 2017 
+"\"Brucellosis\"": 99 cases in 2013, 121 cases in 2017 
+"\"Chancroid\"": We don't deal with null value 
+"\"Cholera\"": We don't see increase pattern from 2013 to 2017"\"Cyclosporiasis¶\"": 784 cases in 2013, 1092 cases in 2017 
+"\"Diphtheria\"": We don't deal with null value 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Serotype b\"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Non-b serotype \"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Nontypeable\"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Unknown serotype\"": 34 cases in 2013, 250 cases in 2017 
+"\"Hansen's disease¶\"": We don't see increase pattern from 2013 to 2017"\"Hantavirus infection, non-hantavirus pulmonary syndrome¶\"": We don't deal with null value 
+"\"Hantavirus pulmonary syndrome¶ \"": We don't see increase pattern from 2013 to 2017"\"Hemolytic uremic syndrome, postdiarrheal¶\"": We don't see increase pattern from 2013 to 2017"\"Hepatitis B, perinatal infection\"": We don't see increase pattern from 2013 to 2017"\"Influenza-associated pediatric mortality¶,**\"": We don't see increase pattern from 2013 to 2017"\"Leptospirosis¶\"": We don't deal with null value 
+"\"Listeriosis\"": 735 cases in 2013, 769 cases in 2017 
+"\"Measles††\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Serogroups ACWY\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Serogroup B\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Other serogroups\"": 17 cases in 2013, 19 cases in 2017 
+"\"Meningococcal disease, Unknown serogroup\"": We don't see increase pattern from 2013 to 2017"\"Novel Influenza A virus infections§§\"": 21 cases in 2013, 67 cases in 2017 
+"\"Paratyphoid fever¶¶\"": We don't deal with null value 
+"\"Plague\"": We don't see increase pattern from 2013 to 2017"\"Poliomyelitis, paralytic\"": We don't deal with null value 
+"\"Polio virus Infection, nonparalytic¶\"": We don't deal with null value 
+"\"Psittacosis¶\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, total\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, acute\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, chronic\"": We don't see increase pattern from 2013 to 2017"\"Rabies, human\"": 2 cases in 2013, 2 cases in 2017 
+"\"Severe acute respiratory syndrome-associated coronavirus disease (SARS-CoV)\"": We don't deal with null value 
+"\"Smallpox\"": We don't deal with null value 
+"\"Streptococcal toxic-shock syndrome¶\"": 224 cases in 2013, 303 cases in 2017 
+"\"Syphilis, congenital\"": 348 cases in 2013, 668 cases in 2017 
+"\"Toxic-shock syndrome (other than Streptococcal)¶\"": We don't see increase pattern from 2013 to 2017"\"Trichinellosis¶\"": We don't see increase pattern from 2013 to 2017"\"Tularemia\"": 203 cases in 2013, 225 cases in 2017 
+"\"Typhoid fever \"": We don't see increase pattern from 2013 to 2017"\"Vancomycin-intermediate Staphylococcus aureus¶\"": We don't see increase pattern from 2013 to 2017"\"Vancomycin-resistant Staphylococcus aureus¶\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Crimean-Congo hemorrhagic fever virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Ebola virus \"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Guanarito virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Junin virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lassa virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lujo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Machupo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Marburg virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Sabia virus\"": We don't deal with null value 
+"\"Yellow fever\"": We don't deal with null value 
+"\"Anthrax\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Chikungunya virus disease\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Eastern equine encephalitis virus disease\"": We don't see increase pattern from 2013 to 2017"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Jamestown Canyon virus disease \"": 22 cases in 2013, 66 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, La Crosse virus disease \"": We don't see increase pattern from 2013 to 2017"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Powassan virus disease\"": 12 cases in 2013, 32 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, St. Louis encephalitis virus disease\"": 1 cases in 2013, 9 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Western equine encephalitis virus disease\"": We don't deal with null value 
+"\"Botulism, total\"": We don't see increase pattern from 2013 to 2017"\"Botulism, foodborne\"": 4 cases in 2013, 18 cases in 2017 
+"\"Botulism, infant\"": We don't see increase pattern from 2013 to 2017"\"Botulism, other (wound and unspecified)\"": 12 cases in 2013, 14 cases in 2017 
+"\"Brucellosis\"": 99 cases in 2013, 121 cases in 2017 
+"\"Chancroid\"": We don't deal with null value 
+"\"Cholera\"": We don't see increase pattern from 2013 to 2017"\"Cyclosporiasis¶\"": 784 cases in 2013, 1099 cases in 2017 
+"\"Diphtheria\"": We don't deal with null value 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Serotype b\"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Non-b serotype \"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Nontypeable\"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Unknown serotype\"": 34 cases in 2013, 252 cases in 2017 
+"\"Hansen's disease¶\"": We don't see increase pattern from 2013 to 2017"\"Hantavirus infection, non-hantavirus pulmonary syndrome¶\"": We don't deal with null value 
+"\"Hantavirus pulmonary syndrome¶ \"": We don't deal with null value 
+"\"Hemolytic uremic syndrome, postdiarrheal¶\"": We don't see increase pattern from 2013 to 2017"\"Hepatitis B, perinatal infection\"": We don't see increase pattern from 2013 to 2017"\"Influenza-associated pediatric mortality¶,**\"": We don't see increase pattern from 2013 to 2017"\"Leptospirosis¶\"": We don't deal with null value 
+"\"Listeriosis\"": 735 cases in 2013, 773 cases in 2017 
+"\"Measles††\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Serogroups ACWY\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Serogroup B\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Other serogroups\"": 17 cases in 2013, 20 cases in 2017 
+"\"Meningococcal disease, Unknown serogroup\"": We don't see increase pattern from 2013 to 2017"\"Novel Influenza A virus infections§§\"": 21 cases in 2013, 67 cases in 2017 
+"\"Paratyphoid fever¶¶\"": We don't deal with null value 
+"\"Plague\"": We don't see increase pattern from 2013 to 2017"\"Poliomyelitis, paralytic\"": We don't deal with null value 
+"\"Polio virus Infection, nonparalytic¶\"": We don't deal with null value 
+"\"Psittacosis¶\"": 6 cases in 2013, 6 cases in 2017 
+"\"Q fever¶, total\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, acute\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, chronic\"": 33 cases in 2013, 35 cases in 2017 
+"\"Rabies, human\"": 2 cases in 2013, 2 cases in 2017 
+"\"Severe acute respiratory syndrome-associated coronavirus disease (SARS-CoV)\"": We don't deal with null value 
+"\"Smallpox\"": We don't deal with null value 
+"\"Streptococcal toxic-shock syndrome¶\"": 224 cases in 2013, 322 cases in 2017 
+"\"Syphilis, congenital\"": 348 cases in 2013, 674 cases in 2017 
+"\"Toxic-shock syndrome (other than Streptococcal)¶\"": We don't see increase pattern from 2013 to 2017"\"Trichinellosis¶\"": We don't see increase pattern from 2013 to 2017"\"Tularemia\"": 203 cases in 2013, 226 cases in 2017 
+"\"Typhoid fever \"": We don't see increase pattern from 2013 to 2017"\"Vancomycin-intermediate Staphylococcus aureus¶\"": We don't see increase pattern from 2013 to 2017"\"Vancomycin-resistant Staphylococcus aureus¶\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Crimean-Congo hemorrhagic fever virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Ebola virus \"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Guanarito virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Junin virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lassa virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lujo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Machupo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Marburg virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Sabia virus\"": We don't deal with null value 
+"\"Yellow fever\"": We don't deal with null value 
+"\"Anthrax\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Chikungunya virus disease\"": We don't deal with null value 
+"\"Q fever¶, acute\"": We don't see increase pattern from 2013 to 2017"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Eastern equine encephalitis virus disease\"": We don't see increase pattern from 2013 to 2017"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Jamestown Canyon virus disease \"": 22 cases in 2013, 67 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, La Crosse virus disease \"": We don't see increase pattern from 2013 to 2017"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Powassan virus disease\"": 12 cases in 2013, 33 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, St. Louis encephalitis virus disease\"": 1 cases in 2013, 9 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Western equine encephalitis virus disease\"": We don't deal with null value 
+"\"Botulism, total\"": We don't see increase pattern from 2013 to 2017"\"Botulism, foodborne\"": 4 cases in 2013, 18 cases in 2017 
+"\"Botulism, infant\"": We don't see increase pattern from 2013 to 2017"\"Botulism, other (wound and unspecified)\"": 12 cases in 2013, 14 cases in 2017 
+"\"Brucellosis\"": 99 cases in 2013, 123 cases in 2017 
+"\"Chancroid\"": We don't deal with null value 
+"\"Cholera\"": We don't see increase pattern from 2013 to 2017"\"Cyclosporiasis¶\"": 784 cases in 2013, 1099 cases in 2017 
+"\"Diphtheria\"": We don't deal with null value 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Serotype b\"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Non-b serotype \"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Nontypeable\"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Unknown serotype\"": 34 cases in 2013, 252 cases in 2017 
+"\"Hansen's disease¶\"": We don't see increase pattern from 2013 to 2017"\"Hantavirus infection, non-hantavirus pulmonary syndrome¶\"": We don't deal with null value 
+"\"Hantavirus pulmonary syndrome¶ \"": 21 cases in 2013, 21 cases in 2017 
+"\"Hemolytic uremic syndrome, postdiarrheal¶\"": We don't see increase pattern from 2013 to 2017"\"Hepatitis B, perinatal infection\"": We don't see increase pattern from 2013 to 2017"\"Influenza-associated pediatric mortality¶,**\"": We don't see increase pattern from 2013 to 2017"\"Leptospirosis¶\"": We don't deal with null value 
+"\"Listeriosis\"": 735 cases in 2013, 786 cases in 2017 
+"\"Measles††\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Serogroups ACWY\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Serogroup B\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Other serogroups\"": 17 cases in 2013, 20 cases in 2017 
+"\"Meningococcal disease, Unknown serogroup\"": We don't see increase pattern from 2013 to 2017"\"Novel Influenza A virus infections§§\"": 21 cases in 2013, 67 cases in 2017 
+"\"Paratyphoid fever¶¶\"": We don't deal with null value 
+"\"Plague\"": We don't see increase pattern from 2013 to 2017"\"Poliomyelitis, paralytic\"": We don't deal with null value 
+"\"Polio virus Infection, nonparalytic¶\"": We don't deal with null value 
+"\"Psittacosis¶\"": 6 cases in 2013, 6 cases in 2017 
+"\"Q fever¶, total\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, chronic\"": 33 cases in 2013, 35 cases in 2017 
+"\"Rabies, human\"": 2 cases in 2013, 2 cases in 2017 
+"\"Severe acute respiratory syndrome-associated coronavirus disease (SARS-CoV)\"": We don't deal with null value 
+"\"Smallpox\"": We don't deal with null value 
+"\"Streptococcal toxic-shock syndrome¶\"": 224 cases in 2013, 331 cases in 2017 
+"\"Syphilis, congenital\"": 348 cases in 2013, 690 cases in 2017 
+"\"Toxic-shock syndrome (other than Streptococcal)¶\"": We don't see increase pattern from 2013 to 2017"\"Trichinellosis¶\"": We don't see increase pattern from 2013 to 2017"\"Tularemia\"": 203 cases in 2013, 220 cases in 2017 
+"\"Typhoid fever \"": We don't see increase pattern from 2013 to 2017"\"Vancomycin-intermediate Staphylococcus aureus¶\"": We don't see increase pattern from 2013 to 2017"\"Vancomycin-resistant Staphylococcus aureus¶\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Crimean-Congo hemorrhagic fever virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Ebola virus \"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Guanarito virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Junin virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lassa virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lujo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Machupo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Marburg virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Sabia virus\"": We don't deal with null value 
+"\"Yellow fever\"": We don't deal with null value 
+"\"Anthrax\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Chikungunya virus disease\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Eastern equine encephalitis virus disease\"": We don't see increase pattern from 2013 to 2017"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Jamestown Canyon virus disease \"": 22 cases in 2013, 69 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, La Crosse virus disease \"": We don't see increase pattern from 2013 to 2017"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Powassan virus disease\"": 12 cases in 2013, 33 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, St. Louis encephalitis virus disease\"": 1 cases in 2013, 9 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Western equine encephalitis virus disease\"": We don't deal with null value 
+"\"Botulism, total\"": We don't see increase pattern from 2013 to 2017"\"Botulism, foodborne\"": 4 cases in 2013, 17 cases in 2017 
+"\"Botulism, infant\"": We don't see increase pattern from 2013 to 2017"\"Botulism, other (wound and unspecified)\"": 12 cases in 2013, 12 cases in 2017 
+"\"Brucellosis\"": 99 cases in 2013, 123 cases in 2017 
+"\"Chancroid\"": We don't deal with null value 
+"\"Cholera\"": We don't see increase pattern from 2013 to 2017"\"Cyclosporiasis¶\"": 784 cases in 2013, 1089 cases in 2017 
+"\"Diphtheria\"": We don't deal with null value 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Serotype b\"": We don't see increase pattern from 2013 to 2017"\"Viral hemorrhagic fevers***, Lassa virus\"": We don't deal with null value 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Non-b serotype \"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Nontypeable\"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Unknown serotype\"": 34 cases in 2013, 248 cases in 2017 
+"\"Hansen's disease¶\"": We don't see increase pattern from 2013 to 2017"\"Hantavirus infection, non-hantavirus pulmonary syndrome¶\"": We don't deal with null value 
+"\"Hantavirus pulmonary syndrome¶ \"": We don't see increase pattern from 2013 to 2017"\"Hemolytic uremic syndrome, postdiarrheal¶\"": We don't see increase pattern from 2013 to 2017"\"Hepatitis B, perinatal infection\"": We don't see increase pattern from 2013 to 2017"\"Influenza-associated pediatric mortality¶,**\"": We don't see increase pattern from 2013 to 2017"\"Leptospirosis¶\"": We don't deal with null value 
+"\"Listeriosis\"": 735 cases in 2013, 795 cases in 2017 
+"\"Measles††\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Serogroups ACWY\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Serogroup B\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Other serogroups\"": 17 cases in 2013, 20 cases in 2017 
+"\"Meningococcal disease, Unknown serogroup\"": We don't see increase pattern from 2013 to 2017"\"Novel Influenza A virus infections§§\"": 21 cases in 2013, 67 cases in 2017 
+"\"Paratyphoid fever¶¶\"": We don't deal with null value 
+"\"Plague\"": We don't see increase pattern from 2013 to 2017"\"Poliomyelitis, paralytic\"": We don't deal with null value 
+"\"Polio virus Infection, nonparalytic¶\"": We don't deal with null value 
+"\"Psittacosis¶\"": 6 cases in 2013, 6 cases in 2017 
+"\"Q fever¶, total\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, acute\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, chronic\"": 33 cases in 2013, 35 cases in 2017 
+"\"Rabies, human\"": 2 cases in 2013, 2 cases in 2017 
+"\"Severe acute respiratory syndrome-associated coronavirus disease (SARS-CoV)\"": We don't deal with null value 
+"\"Smallpox\"": We don't deal with null value 
+"\"Streptococcal toxic-shock syndrome¶\"": 224 cases in 2013, 334 cases in 2017 
+"\"Syphilis, congenital\"": 348 cases in 2013, 704 cases in 2017 
+"\"Toxic-shock syndrome (other than Streptococcal)¶\"": We don't see increase pattern from 2013 to 2017"\"Trichinellosis¶\"": We don't see increase pattern from 2013 to 2017"\"Tularemia\"": 203 cases in 2013, 215 cases in 2017 
+"\"Typhoid fever \"": We don't see increase pattern from 2013 to 2017"\"Vancomycin-intermediate Staphylococcus aureus¶\"": We don't see increase pattern from 2013 to 2017"\"Vancomycin-resistant Staphylococcus aureus¶\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Crimean-Congo hemorrhagic fever virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Ebola virus \"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Guanarito virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Junin virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lujo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Machupo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Marburg virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Sabia virus\"": We don't deal with null value 
+"\"Yellow fever\"": We don't deal with null value 
+"\"Anthrax\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Chikungunya virus disease\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Eastern equine encephalitis virus disease\"": We don't see increase pattern from 2013 to 2017"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Jamestown Canyon virus disease \"": 22 cases in 2013, 69 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, La Crosse virus disease \"": We don't see increase pattern from 2013 to 2017"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Powassan virus disease\"": 12 cases in 2013, 33 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, St. Louis encephalitis virus disease\"": 1 cases in 2013, 10 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Western equine encephalitis virus disease\"": We don't deal with null value 
+"\"Botulism, total\"": We don't see increase pattern from 2013 to 2017"\"Botulism, foodborne\"": 4 cases in 2013, 19 cases in 2017 
+"\"Botulism, infant\"": We don't see increase pattern from 2013 to 2017"\"Botulism, other (wound and unspecified)\"": 12 cases in 2013, 14 cases in 2017 
+"\"Brucellosis\"": 99 cases in 2013, 125 cases in 2017 
+"\"Chancroid\"": We don't deal with null value 
+"\"Cholera\"": We don't see increase pattern from 2013 to 2017"\"Cyclosporiasis¶\"": 784 cases in 2013, 1153 cases in 2017 
+"\"Diphtheria\"": We don't deal with null value 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Serotype b\"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Non-b serotype \"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Nontypeable\"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Unknown serotype\"": 34 cases in 2013, 248 cases in 2017 
+"\"Hansen's disease¶\"": We don't see increase pattern from 2013 to 2017"\"Hantavirus infection, non-hantavirus pulmonary syndrome¶\"": We don't deal with null value 
+"\"Hantavirus pulmonary syndrome¶ \"": We don't see increase pattern from 2013 to 2017"\"Hemolytic uremic syndrome, postdiarrheal¶\"": We don't see increase pattern from 2013 to 2017"\"Hepatitis B, perinatal infection\"": We don't see increase pattern from 2013 to 2017"\"Influenza-associated pediatric mortality¶,**\"": We don't see increase pattern from 2013 to 2017"\"Leptospirosis¶\"": We don't deal with null value 
+"\"Listeriosis\"": 735 cases in 2013, 798 cases in 2017 
+"\"Measles††\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Serogroups ACWY\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Serogroup B\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Other serogroups\"": 17 cases in 2013, 20 cases in 2017 
+"\"Meningococcal disease, Unknown serogroup\"": We don't see increase pattern from 2013 to 2017"\"Novel Influenza A virus infections§§\"": 21 cases in 2013, 67 cases in 2017 
+"\"Paratyphoid fever¶¶\"": We don't deal with null value 
+"\"Plague\"": We don't see increase pattern from 2013 to 2017"\"Poliomyelitis, paralytic\"": We don't deal with null value 
+"\"Polio virus Infection, nonparalytic¶\"": We don't deal with null value 
+"\"Psittacosis¶\"": 6 cases in 2013, 7 cases in 2017 
+"\"Q fever¶, total\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, acute\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, chronic\"": 33 cases in 2013, 36 cases in 2017 
+"\"Rabies, human\"": 2 cases in 2013, 2 cases in 2017 
+"\"Severe acute respiratory syndrome-associated coronavirus disease (SARS-CoV)\"": We don't deal with null value 
+"\"Smallpox\"": We don't deal with null value 
+"\"Streptococcal toxic-shock syndrome¶\"": 224 cases in 2013, 334 cases in 2017 
+"\"Syphilis, congenital\"": 348 cases in 2013, 717 cases in 2017 
+"\"Toxic-shock syndrome (other than Streptococcal)¶\"": We don't see increase pattern from 2013 to 2017"\"Trichinellosis¶\"": We don't see increase pattern from 2013 to 2017"\"Tularemia\"": 203 cases in 2013, 210 cases in 2017 
+"\"Typhoid fever \"": 338 cases in 2013, 360 cases in 2017 
+"\"Vancomycin-intermediate Staphylococcus aureus¶\"": We don't see increase pattern from 2013 to 2017"\"Vancomycin-resistant Staphylococcus aureus¶\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Crimean-Congo hemorrhagic fever virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Ebola virus \"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Guanarito virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Junin virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lassa virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lujo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Machupo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Marburg virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Sabia virus\"": We don't deal with null value 
+"\"Yellow fever\"": We don't deal with null value 
+"\"Anthrax\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Chikungunya virus disease\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Eastern equine encephalitis virus disease\"": We don't see increase pattern from 2013 to 2017"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Jamestown Canyon virus disease \"": 22 cases in 2013, 67 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, La Crosse virus disease \"": We don't see increase pattern from 2013 to 2017"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Powassan virus disease\"": 12 cases in 2013, 33 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, St. Louis encephalitis virus disease\"": 1 cases in 2013, 10 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Western equine encephalitis virus disease\"": We don't deal with null value 
+"\"Botulism, total\"": We don't see increase pattern from 2013 to 2017"\"Botulism, foodborne\"": 4 cases in 2013, 18 cases in 2017 
+"\"Botulism, infant\"": We don't see increase pattern from 2013 to 2017"\"Botulism, other (wound and unspecified)\"": 12 cases in 2013, 14 cases in 2017 
+"\"Brucellosis\"": 99 cases in 2013, 126 cases in 2017 
+"\"Chancroid\"": We don't deal with null value 
+"\"Cholera\"": We don't see increase pattern from 2013 to 2017"\"Cyclosporiasis¶\"": 784 cases in 2013, 1153 cases in 2017 
+"\"Diphtheria\"": We don't deal with null value 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Serotype b\"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Non-b serotype \"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Nontypeable\"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Unknown serotype\"": 34 cases in 2013, 250 cases in 2017 
+"\"Hansen's disease¶\"": We don't see increase pattern from 2013 to 2017"\"Hantavirus infection, non-hantavirus pulmonary syndrome¶\"": We don't deal with null value 
+"\"Hantavirus pulmonary syndrome¶ \"": We don't see increase pattern from 2013 to 2017"\"Hemolytic uremic syndrome, postdiarrheal¶\"": We don't see increase pattern from 2013 to 2017"\"Hepatitis B, perinatal infection\"": We don't see increase pattern from 2013 to 2017"\"Influenza-associated pediatric mortality¶,**\"": We don't see increase pattern from 2013 to 2017"\"Leptospirosis¶\"": We don't deal with null value 
+"\"Listeriosis\"": 735 cases in 2013, 802 cases in 2017 
+"\"Measles††\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Serogroups ACWY\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Serogroup B\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Other serogroups\"": 17 cases in 2013, 20 cases in 2017 
+"\"Meningococcal disease, Unknown serogroup\"": We don't see increase pattern from 2013 to 2017"\"Novel Influenza A virus infections§§\"": 21 cases in 2013, 67 cases in 2017 
+"\"Paratyphoid fever¶¶\"": We don't deal with null value 
+"\"Plague\"": We don't see increase pattern from 2013 to 2017"\"Poliomyelitis, paralytic\"": We don't deal with null value 
+"\"Polio virus Infection, nonparalytic¶\"": We don't deal with null value 
+"\"Psittacosis¶\"": 6 cases in 2013, 7 cases in 2017 
+"\"Q fever¶, total\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, acute\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, chronic\"": 33 cases in 2013, 36 cases in 2017 
+"\"Rabies, human\"": 2 cases in 2013, 2 cases in 2017 
+"\"Severe acute respiratory syndrome-associated coronavirus disease (SARS-CoV)\"": We don't deal with null value 
+"\"Smallpox\"": We don't deal with null value 
+"\"Streptococcal toxic-shock syndrome¶\"": 224 cases in 2013, 336 cases in 2017 
+"\"Syphilis, congenital\"": 348 cases in 2013, 726 cases in 2017 
+"\"Toxic-shock syndrome (other than Streptococcal)¶\"": We don't see increase pattern from 2013 to 2017"\"Trichinellosis¶\"": We don't see increase pattern from 2013 to 2017"\"Tularemia\"": 203 cases in 2013, 210 cases in 2017 
+"\"Typhoid fever \"": 338 cases in 2013, 361 cases in 2017 
+"\"Vancomycin-intermediate Staphylococcus aureus¶\"": We don't see increase pattern from 2013 to 2017"\"Vancomycin-resistant Staphylococcus aureus¶\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Crimean-Congo hemorrhagic fever virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Ebola virus \"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Guanarito virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Junin virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lassa virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lujo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Machupo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Marburg virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Sabia virus\"": We don't deal with null value 
+"\"Yellow fever\"": We don't deal with null value 
+"\"Anthrax\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Chikungunya virus disease\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Eastern equine encephalitis virus disease\"": We don't see increase pattern from 2013 to 2017"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Jamestown Canyon virus disease \"": 22 cases in 2013, 68 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, La Crosse virus disease \"": We don't see increase pattern from 2013 to 2017"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Powassan virus disease\"": 12 cases in 2013, 33 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, St. Louis encephalitis virus disease\"": 1 cases in 2013, 11 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Western equine encephalitis virus disease\"": We don't deal with null value 
+"\"Botulism, total\"": We don't see increase pattern from 2013 to 2017"\"Botulism, foodborne\"": 4 cases in 2013, 18 cases in 2017 
+"\"Botulism, infant\"": We don't see increase pattern from 2013 to 2017"\"Botulism, other (wound and unspecified)\"": 12 cases in 2013, 14 cases in 2017 
+"\"Brucellosis\"": 99 cases in 2013, 119 cases in 2017 
+"\"Chancroid\"": We don't deal with null value 
+"\"Cholera\"": We don't see increase pattern from 2013 to 2017"\"Cyclosporiasis¶\"": 784 cases in 2013, 1093 cases in 2017 
+"\"Diphtheria\"": We don't deal with null value 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Serotype b\"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Non-b serotype \"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Nontypeable\"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Unknown serotype\"": 34 cases in 2013, 247 cases in 2017 
+"\"Hansen's disease¶\"": 81 cases in 2013, 114 cases in 2017 
+"\"Hantavirus infection, non-hantavirus pulmonary syndrome¶\"": We don't deal with null value 
+"\"Hantavirus pulmonary syndrome¶ \"": We don't see increase pattern from 2013 to 2017"\"Hemolytic uremic syndrome, postdiarrheal¶\"": We don't see increase pattern from 2013 to 2017"\"Hepatitis B, perinatal infection\"": We don't see increase pattern from 2013 to 2017"\"Influenza-associated pediatric mortality¶,**\"": We don't see increase pattern from 2013 to 2017"\"Leptospirosis¶\"": We don't deal with null value 
+"\"Listeriosis\"": 735 cases in 2013, 810 cases in 2017 
+"\"Measles††\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Serogroups ACWY\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Serogroup B\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Other serogroups\"": 17 cases in 2013, 20 cases in 2017 
+"\"Meningococcal disease, Unknown serogroup\"": We don't see increase pattern from 2013 to 2017"\"Novel Influenza A virus infections§§\"": 21 cases in 2013, 67 cases in 2017 
+"\"Paratyphoid fever¶¶\"": We don't deal with null value 
+"\"Plague\"": We don't see increase pattern from 2013 to 2017"\"Poliomyelitis, paralytic\"": We don't deal with null value 
+"\"Polio virus Infection, nonparalytic¶\"": We don't deal with null value 
+"\"Psittacosis¶\"": 6 cases in 2013, 7 cases in 2017 
+"\"Q fever¶, total\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, acute\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, chronic\"": 33 cases in 2013, 33 cases in 2017 
+"\"Rabies, human\"": 2 cases in 2013, 2 cases in 2017 
+"\"Severe acute respiratory syndrome-associated coronavirus disease (SARS-CoV)\"": We don't deal with null value 
+"\"Smallpox\"": We don't deal with null value 
+"\"Streptococcal toxic-shock syndrome¶\"": 224 cases in 2013, 336 cases in 2017 
+"\"Syphilis, congenital\"": 348 cases in 2013, 730 cases in 2017 
+"\"Toxic-shock syndrome (other than Streptococcal)¶\"": We don't see increase pattern from 2013 to 2017"\"Trichinellosis¶\"": We don't see increase pattern from 2013 to 2017"\"Tularemia\"": 203 cases in 2013, 208 cases in 2017 
+"\"Typhoid fever \"": We don't see increase pattern from 2013 to 2017"\"Vancomycin-intermediate Staphylococcus aureus¶\"": We don't see increase pattern from 2013 to 2017"\"Vancomycin-resistant Staphylococcus aureus¶\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Crimean-Congo hemorrhagic fever virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Ebola virus \"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Guanarito virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Junin virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lassa virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lujo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Machupo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Marburg virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Sabia virus\"": We don't deal with null value 
+"\"Yellow fever\"": We don't deal with null value 
+"\"Anthrax\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Chikungunya virus disease\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Eastern equine encephalitis virus disease\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, chronic\"": 33 cases in 2013, 33 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Jamestown Canyon virus disease \"": 22 cases in 2013, 69 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, La Crosse virus disease \"": We don't see increase pattern from 2013 to 2017"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Powassan virus disease\"": 12 cases in 2013, 33 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, St. Louis encephalitis virus disease\"": 1 cases in 2013, 11 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Western equine encephalitis virus disease\"": We don't deal with null value 
+"\"Botulism, total\"": We don't see increase pattern from 2013 to 2017"\"Botulism, foodborne\"": 4 cases in 2013, 16 cases in 2017 
+"\"Botulism, infant\"": We don't see increase pattern from 2013 to 2017"\"Botulism, other (wound and unspecified)\"": 12 cases in 2013, 14 cases in 2017 
+"\"Brucellosis\"": 99 cases in 2013, 121 cases in 2017 
+"\"Chancroid\"": We don't deal with null value 
+"\"Cholera\"": We don't see increase pattern from 2013 to 2017"\"Cyclosporiasis¶\"": 784 cases in 2013, 1105 cases in 2017 
+"\"Diphtheria\"": We don't deal with null value 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Serotype b\"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Non-b serotype \"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Nontypeable\"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Unknown serotype\"": 34 cases in 2013, 255 cases in 2017 
+"\"Hansen's disease¶\"": 81 cases in 2013, 107 cases in 2017 
+"\"Hantavirus infection, non-hantavirus pulmonary syndrome¶\"": We don't deal with null value 
+"\"Hantavirus pulmonary syndrome¶ \"": We don't see increase pattern from 2013 to 2017"\"Hemolytic uremic syndrome, postdiarrheal¶\"": We don't see increase pattern from 2013 to 2017"\"Hepatitis B, perinatal infection\"": We don't see increase pattern from 2013 to 2017"\"Influenza-associated pediatric mortality¶,**\"": We don't see increase pattern from 2013 to 2017"\"Leptospirosis¶\"": We don't deal with null value 
+"\"Listeriosis\"": 735 cases in 2013, 831 cases in 2017 
+"\"Measles††\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Serogroups ACWY\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Serogroup B\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Other serogroups\"": 17 cases in 2013, 19 cases in 2017 
+"\"Meningococcal disease, Unknown serogroup\"": We don't see increase pattern from 2013 to 2017"\"Novel Influenza A virus infections§§\"": 21 cases in 2013, 67 cases in 2017 
+"\"Paratyphoid fever¶¶\"": We don't deal with null value 
+"\"Plague\"": We don't see increase pattern from 2013 to 2017"\"Poliomyelitis, paralytic\"": We don't deal with null value 
+"\"Polio virus Infection, nonparalytic¶\"": We don't deal with null value 
+"\"Psittacosis¶\"": 6 cases in 2013, 7 cases in 2017 
+"\"Q fever¶, total\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, acute\"": We don't see increase pattern from 2013 to 2017"\"Rabies, human\"": 2 cases in 2013, 2 cases in 2017 
+"\"Severe acute respiratory syndrome-associated coronavirus disease (SARS-CoV)\"": We don't deal with null value 
+"\"Smallpox\"": We don't deal with null value 
+"\"Streptococcal toxic-shock syndrome¶\"": 224 cases in 2013, 337 cases in 2017 
+"\"Syphilis, congenital\"": 348 cases in 2013, 744 cases in 2017 
+"\"Toxic-shock syndrome (other than Streptococcal)¶\"": We don't see increase pattern from 2013 to 2017"\"Trichinellosis¶\"": We don't see increase pattern from 2013 to 2017"\"Tularemia\"": 203 cases in 2013, 213 cases in 2017 
+"\"Typhoid fever \"": We don't see increase pattern from 2013 to 2017"\"Vancomycin-intermediate Staphylococcus aureus¶\"": We don't see increase pattern from 2013 to 2017"\"Vancomycin-resistant Staphylococcus aureus¶\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Crimean-Congo hemorrhagic fever virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Ebola virus \"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Guanarito virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Junin virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lassa virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lujo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Machupo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Marburg virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Sabia virus\"": We don't deal with null value 
+"\"Yellow fever\"": We don't deal with null value 
+"\"Anthrax\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Chikungunya virus disease\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Eastern equine encephalitis virus disease\"": We don't see increase pattern from 2013 to 2017"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Jamestown Canyon virus disease \"": 22 cases in 2013, 70 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, La Crosse virus disease \"": We don't see increase pattern from 2013 to 2017"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Powassan virus disease\"": 12 cases in 2013, 33 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, St. Louis encephalitis virus disease\"": 1 cases in 2013, 11 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Western equine encephalitis virus disease\"": We don't deal with null value 
+"\"Botulism, total\"": We don't see increase pattern from 2013 to 2017"\"Botulism, foodborne\"": 4 cases in 2013, 16 cases in 2017 
+"\"Botulism, infant\"": We don't see increase pattern from 2013 to 2017"\"Botulism, other (wound and unspecified)\"": 12 cases in 2013, 17 cases in 2017 
+"\"Brucellosis\"": 99 cases in 2013, 122 cases in 2017 
+"\"Chancroid\"": We don't deal with null value 
+"\"Cholera\"": We don't see increase pattern from 2013 to 2017"\"Cyclosporiasis¶\"": 784 cases in 2013, 1120 cases in 2017 
+"\"Diphtheria\"": We don't deal with null value 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Serotype b\"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Non-b serotype \"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Nontypeable\"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Unknown serotype\"": 34 cases in 2013, 254 cases in 2017 
+"\"Hansen's disease¶\"": 81 cases in 2013, 107 cases in 2017 
+"\"Hantavirus infection, non-hantavirus pulmonary syndrome¶\"": We don't deal with null value 
+"\"Hantavirus pulmonary syndrome¶ \"": We don't see increase pattern from 2013 to 2017"\"Hemolytic uremic syndrome, postdiarrheal¶\"": We don't see increase pattern from 2013 to 2017"\"Hepatitis B, perinatal infection\"": We don't see increase pattern from 2013 to 2017"\"Influenza-associated pediatric mortality¶,**\"": We don't see increase pattern from 2013 to 2017"\"Leptospirosis¶\"": We don't deal with null value 
+"\"Listeriosis\"": 735 cases in 2013, 836 cases in 2017 
+"\"Measles††\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Serogroups ACWY\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Serogroup B\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Other serogroups\"": 17 cases in 2013, 19 cases in 2017 
+"\"Meningococcal disease, Unknown serogroup\"": We don't see increase pattern from 2013 to 2017"\"Novel Influenza A virus infections§§\"": 21 cases in 2013, 67 cases in 2017 
+"\"Paratyphoid fever¶¶\"": We don't deal with null value 
+"\"Plague\"": We don't see increase pattern from 2013 to 2017"\"Poliomyelitis, paralytic\"": We don't deal with null value 
+"\"Polio virus Infection, nonparalytic¶\"": We don't deal with null value 
+"\"Psittacosis¶\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, total\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, acute\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, chronic\"": 33 cases in 2013, 33 cases in 2017 
+"\"Rabies, human\"": 2 cases in 2013, 2 cases in 2017 
+"\"Severe acute respiratory syndrome-associated coronavirus disease (SARS-CoV)\"": We don't deal with null value 
+"\"Smallpox\"": We don't deal with null value 
+"\"Streptococcal toxic-shock syndrome¶\"": 224 cases in 2013, 337 cases in 2017 
+"\"Syphilis, congenital\"": 348 cases in 2013, 749 cases in 2017 
+"\"Toxic-shock syndrome (other than Streptococcal)¶\"": We don't see increase pattern from 2013 to 2017"\"Trichinellosis¶\"": We don't see increase pattern from 2013 to 2017"\"Tularemia\"": 203 cases in 2013, 214 cases in 2017 
+"\"Typhoid fever \"": 338 cases in 2013, 339 cases in 2017 
+"\"Vancomycin-intermediate Staphylococcus aureus¶\"": We don't see increase pattern from 2013 to 2017"\"Vancomycin-resistant Staphylococcus aureus¶\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Crimean-Congo hemorrhagic fever virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Ebola virus \"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Guanarito virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Junin virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lassa virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lujo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Machupo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Marburg virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Sabia virus\"": We don't deal with null value 
+"\"Yellow fever\"": We don't deal with null value 
+"\"Anthrax\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Chikungunya virus disease\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Eastern equine encephalitis virus disease\"": We don't see increase pattern from 2013 to 2017"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Jamestown Canyon virus disease \"": 22 cases in 2013, 70 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, La Crosse virus disease \"": We don't see increase pattern from 2013 to 2017"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Powassan virus disease\"": 12 cases in 2013, 33 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, St. Louis encephalitis virus disease\"": 1 cases in 2013, 11 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Western equine encephalitis virus disease\"": We don't deal with null value 
+"\"Botulism, total\"": We don't see increase pattern from 2013 to 2017"\"Botulism, foodborne\"": 4 cases in 2013, 16 cases in 2017 
+"\"Botulism, infant\"": We don't see increase pattern from 2013 to 2017"\"Botulism, other (wound and unspecified)\"": 12 cases in 2013, 18 cases in 2017 
+"\"Brucellosis\"": 99 cases in 2013, 121 cases in 2017 
+"\"Chancroid\"": We don't deal with null value 
+"\"Cholera\"": We don't see increase pattern from 2013 to 2017"\"Cyclosporiasis¶\"": 784 cases in 2013, 1120 cases in 2017 
+"\"Diphtheria\"": We don't deal with null value 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Serotype b\"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Non-b serotype \"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Nontypeable\"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Unknown serotype\"": 34 cases in 2013, 256 cases in 2017 
+"\"Hansen's disease¶\"": 81 cases in 2013, 108 cases in 2017 
+"\"Hantavirus infection, non-hantavirus pulmonary syndrome¶\"": We don't deal with null value 
+"\"Hantavirus pulmonary syndrome¶ \"": We don't see increase pattern from 2013 to 2017"\"Hemolytic uremic syndrome, postdiarrheal¶\"": We don't see increase pattern from 2013 to 2017"\"Hepatitis B, perinatal infection\"": We don't see increase pattern from 2013 to 2017"\"Influenza-associated pediatric mortality¶,**\"": We don't see increase pattern from 2013 to 2017"\"Leptospirosis¶\"": We don't deal with null value 
+"\"Listeriosis\"": 735 cases in 2013, 837 cases in 2017 
+"\"Measles††\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Serogroups ACWY\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Serogroup B\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Other serogroups\"": 17 cases in 2013, 19 cases in 2017 
+"\"Meningococcal disease, Unknown serogroup\"": We don't see increase pattern from 2013 to 2017"\"Novel Influenza A virus infections§§\"": 21 cases in 2013, 67 cases in 2017 
+"\"Paratyphoid fever¶¶\"": We don't deal with null value 
+"\"Plague\"": We don't see increase pattern from 2013 to 2017"\"Poliomyelitis, paralytic\"": We don't deal with null value 
+"\"Polio virus Infection, nonparalytic¶\"": We don't deal with null value 
+"\"Psittacosis¶\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, total\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, acute\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, chronic\"": We don't see increase pattern from 2013 to 2017"\"Rabies, human\"": 2 cases in 2013, 2 cases in 2017 
+"\"Severe acute respiratory syndrome-associated coronavirus disease (SARS-CoV)\"": We don't deal with null value 
+"\"Smallpox\"": We don't deal with null value 
+"\"Streptococcal toxic-shock syndrome¶\"": 224 cases in 2013, 338 cases in 2017 
+"\"Syphilis, congenital\"": 348 cases in 2013, 751 cases in 2017 
+"\"Toxic-shock syndrome (other than Streptococcal)¶\"": We don't see increase pattern from 2013 to 2017"\"Trichinellosis¶\"": We don't see increase pattern from 2013 to 2017"\"Tularemia\"": 203 cases in 2013, 214 cases in 2017 
+"\"Typhoid fever \"": 338 cases in 2013, 340 cases in 2017 
+"\"Vancomycin-intermediate Staphylococcus aureus¶\"": We don't see increase pattern from 2013 to 2017"\"Vancomycin-resistant Staphylococcus aureus¶\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Crimean-Congo hemorrhagic fever virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Ebola virus \"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Guanarito virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Junin virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lassa virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lujo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Machupo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Marburg virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Sabia virus\"": We don't deal with null value 
+"\"Yellow fever\"": We don't deal with null value 
+"\"Anthrax\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Chikungunya virus disease\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Eastern equine encephalitis virus disease\"": We don't see increase pattern from 2013 to 2017"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Jamestown Canyon virus disease \"": 22 cases in 2013, 70 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, La Crosse virus disease \"": We don't see increase pattern from 2013 to 2017"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Powassan virus disease\"": 12 cases in 2013, 33 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, St. Louis encephalitis virus disease\"": 1 cases in 2013, 11 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Western equine encephalitis virus disease\"": We don't deal with null value 
+"\"Botulism, total\"": We don't see increase pattern from 2013 to 2017"\"Botulism, foodborne\"": 4 cases in 2013, 16 cases in 2017 
+"\"Botulism, infant\"": We don't see increase pattern from 2013 to 2017"\"Botulism, other (wound and unspecified)\"": 12 cases in 2013, 18 cases in 2017 
+"\"Brucellosis\"": 99 cases in 2013, 121 cases in 2017 
+"\"Chancroid\"": We don't deal with null value 
+"\"Cholera\"": We don't see increase pattern from 2013 to 2017"\"Cyclosporiasis¶\"": 784 cases in 2013, 1121 cases in 2017 
+"\"Diphtheria\"": We don't deal with null value 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Serotype b\"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Non-b serotype \"": 141 cases in 2013, 141 cases in 2017 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Nontypeable\"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Unknown serotype\"": 34 cases in 2013, 256 cases in 2017 
+"\"Hansen's disease¶\"": 81 cases in 2013, 109 cases in 2017 
+"\"Hantavirus infection, non-hantavirus pulmonary syndrome¶\"": We don't deal with null value 
+"\"Hantavirus pulmonary syndrome¶ \"": We don't see increase pattern from 2013 to 2017"\"Hemolytic uremic syndrome, postdiarrheal¶\"": We don't see increase pattern from 2013 to 2017"\"Hepatitis B, perinatal infection\"": We don't see increase pattern from 2013 to 2017"\"Influenza-associated pediatric mortality¶,**\"": We don't see increase pattern from 2013 to 2017"\"Leptospirosis¶\"": We don't deal with null value 
+"\"Listeriosis\"": 735 cases in 2013, 840 cases in 2017 
+"\"Measles††\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Serogroups ACWY\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Serogroup B\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Other serogroups\"": 17 cases in 2013, 19 cases in 2017 
+"\"Meningococcal disease, Unknown serogroup\"": We don't see increase pattern from 2013 to 2017"\"Novel Influenza A virus infections§§\"": 21 cases in 2013, 67 cases in 2017 
+"\"Paratyphoid fever¶¶\"": We don't deal with null value 
+"\"Plague\"": We don't see increase pattern from 2013 to 2017"\"Poliomyelitis, paralytic\"": We don't deal with null value 
+"\"Polio virus Infection, nonparalytic¶\"": We don't deal with null value 
+"\"Psittacosis¶\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, total\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, acute\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, chronic\"": We don't see increase pattern from 2013 to 2017"\"Rabies, human\"": 2 cases in 2013, 2 cases in 2017 
+"\"Severe acute respiratory syndrome-associated coronavirus disease (SARS-CoV)\"": We don't deal with null value 
+"\"Smallpox\"": We don't deal with null value 
+"\"Streptococcal toxic-shock syndrome¶\"": 224 cases in 2013, 340 cases in 2017 
+"\"Syphilis, congenital\"": 348 cases in 2013, 765 cases in 2017 
+"\"Toxic-shock syndrome (other than Streptococcal)¶\"": We don't see increase pattern from 2013 to 2017"\"Trichinellosis¶\"": We don't see increase pattern from 2013 to 2017"\"Tularemia\"": 203 cases in 2013, 216 cases in 2017 
+"\"Typhoid fever \"": 338 cases in 2013, 341 cases in 2017 
+"\"Leptospirosis¶\"": We don't deal with null value 
+"\"Vancomycin-intermediate Staphylococcus aureus¶\"": We don't see increase pattern from 2013 to 2017"\"Vancomycin-resistant Staphylococcus aureus¶\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Crimean-Congo hemorrhagic fever virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Ebola virus \"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Guanarito virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Junin virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lassa virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lujo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Machupo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Marburg virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Sabia virus\"": We don't deal with null value 
+"\"Yellow fever\"": We don't deal with null value 
+"\"Anthrax\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Chikungunya virus disease\"": We don't deal with null value 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Eastern equine encephalitis virus disease\"": We don't see increase pattern from 2013 to 2017"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Jamestown Canyon virus disease \"": 22 cases in 2013, 70 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, La Crosse virus disease \"": We don't see increase pattern from 2013 to 2017"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Powassan virus disease\"": 12 cases in 2013, 33 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, St. Louis encephalitis virus disease\"": 1 cases in 2013, 11 cases in 2017 
+"\"Arboviral diseases, neuroinvasive and  nonneuroinvasive¶, Western equine encephalitis virus disease\"": We don't deal with null value 
+"\"Botulism, total\"": We don't see increase pattern from 2013 to 2017"\"Botulism, foodborne\"": 4 cases in 2013, 16 cases in 2017 
+"\"Botulism, infant\"": We don't see increase pattern from 2013 to 2017"\"Botulism, other (wound and unspecified)\"": 12 cases in 2013, 18 cases in 2017 
+"\"Brucellosis\"": 99 cases in 2013, 121 cases in 2017 
+"\"Chancroid\"": We don't deal with null value 
+"\"Cholera\"": We don't see increase pattern from 2013 to 2017"\"Cyclosporiasis¶\"": 784 cases in 2013, 1122 cases in 2017 
+"\"Diphtheria\"": We don't deal with null value 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Serotype b\"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Non-b serotype \"": 141 cases in 2013, 150 cases in 2017 
+"\"Haemophilus influenzae, invasive disease, age <5 years, Nontypeable\"": We don't see increase pattern from 2013 to 2017"\"Haemophilus influenzae, invasive disease, age <5 years, Unknown serotype\"": 34 cases in 2013, 248 cases in 2017 
+"\"Hansen's disease¶\"": 81 cases in 2013, 109 cases in 2017 
+"\"Hantavirus infection, non-hantavirus pulmonary syndrome¶\"": We don't deal with null value 
+"\"Hantavirus pulmonary syndrome¶ \"": We don't see increase pattern from 2013 to 2017"\"Hemolytic uremic syndrome, postdiarrheal¶\"": We don't see increase pattern from 2013 to 2017"\"Hepatitis B, perinatal infection\"": We don't see increase pattern from 2013 to 2017"\"Influenza-associated pediatric mortality¶,**\"": We don't see increase pattern from 2013 to 2017"\"Listeriosis\"": 735 cases in 2013, 841 cases in 2017 
+"\"Measles††\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Serogroups ACWY\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Serogroup B\"": We don't see increase pattern from 2013 to 2017"\"Meningococcal disease, Other serogroups\"": 17 cases in 2013, 19 cases in 2017 
+"\"Meningococcal disease, Unknown serogroup\"": We don't see increase pattern from 2013 to 2017"\"Novel Influenza A virus infections§§\"": 21 cases in 2013, 67 cases in 2017 
+"\"Paratyphoid fever¶¶\"": We don't deal with null value 
+"\"Plague\"": We don't see increase pattern from 2013 to 2017"\"Poliomyelitis, paralytic\"": We don't deal with null value 
+"\"Polio virus Infection, nonparalytic¶\"": We don't deal with null value 
+"\"Psittacosis¶\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, total\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, acute\"": We don't see increase pattern from 2013 to 2017"\"Q fever¶, chronic\"": We don't see increase pattern from 2013 to 2017"\"Rabies, human\"": 2 cases in 2013, 2 cases in 2017 
+"\"Severe acute respiratory syndrome-associated coronavirus disease (SARS-CoV)\"": We don't deal with null value 
+"\"Smallpox\"": We don't deal with null value 
+"\"Streptococcal toxic-shock syndrome¶\"": 224 cases in 2013, 340 cases in 2017 
+"\"Syphilis, congenital\"": 348 cases in 2013, 781 cases in 2017 
+"\"Toxic-shock syndrome (other than Streptococcal)¶\"": We don't see increase pattern from 2013 to 2017"\"Trichinellosis¶\"": We don't see increase pattern from 2013 to 2017"\"Tularemia\"": 203 cases in 2013, 216 cases in 2017 
+"\"Typhoid fever \"": 338 cases in 2013, 341 cases in 2017 
+"\"Vancomycin-intermediate Staphylococcus aureus¶\"": We don't see increase pattern from 2013 to 2017"\"Vancomycin-resistant Staphylococcus aureus¶\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Crimean-Congo hemorrhagic fever virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Ebola virus \"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Guanarito virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Junin virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lassa virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Lujo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fevers***, Machupo virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Marburg virus\"": We don't deal with null value 
+"\"Viral hemorrhagic fever***, Sabia virus\"": We don't deal with null value 
+"\"Yellow fever\"": We don't deal with null value 
+'(#<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>
+  #<void>)
+> 
