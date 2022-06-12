@@ -1,0 +1,8 @@
+Paper 0
+Pen 100
+// one point fixed at 25 100
+// and off we go ...
+Repeat A 0 50
+{
+  Line 25 100 A A
+}

@@ -1,0 +1,7 @@
+Paper 0
+Pen 100
+// quadrilateral for free
+Repeat A 25 75
+{
+  Line A 0 0 A
+}

@@ -1,0 +1,12 @@
+Paper 0
+Pen 100
+Repeat A 0 100
+{
+  // invert vertical-1,
+  // raise vertical-2 by 100
+  Set H1 (A/4)
+  Set V1 (100-A)
+  Set H2 (100-A)
+  Set V2 (A+100)
+  Line H1 V1 H2 V2
+}

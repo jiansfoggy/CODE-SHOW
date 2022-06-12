@@ -1,0 +1,18 @@
+Paper 0
+// a change in G changes the palette
+// of the image, as well as its nature.
+Set G 30
+Pen G
+// thick vertical
+Line 19 0 19 100
+Line 20 0 20 100
+Line 21 0 21 100
+Pen 100
+Line 20 20 20 100
+Pen G
+// thick horizontal
+Line 0 59 100 59
+Line 0 60 100 60
+Line 0 61 100 61
+Pen 100
+Line 0 20 100 20

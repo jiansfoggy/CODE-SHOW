@@ -1,0 +1,6 @@
+Paper 30
+Pen 40
+Repeat A 45 55
+{
+  Line A 45 A 55
+}

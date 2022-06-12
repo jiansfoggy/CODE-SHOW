@@ -1,0 +1,27 @@
+// beautifully indentd blocks
+Paper 0
+{
+  {
+    // *B* draw gray 25 swatch
+    Pen 25
+    Line 33 0 33 90
+    Line 35 0 35 90
+    Line 37 0 37 90
+    Line 39 0 39 90
+  }
+  {
+    // *C* draw gray 33 swatch
+    Pen 33
+    Line 50 10 80 40
+    Line 51 10 81 40
+    Line 54 10 84 40
+    Line 55 10 85 40
+  }
+  {
+    // *A* draw black swatch
+    Pen 100
+    Line 20 20 80 20
+    Line 20 21 80 21
+    Line 20 22 80 22
+  }
+}

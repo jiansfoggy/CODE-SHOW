@@ -1,0 +1,5 @@
+Paper 0
+Pen 100
+// V is the vertical position
+Set V 70
+Line 15 V 85 V

@@ -1,0 +1,5 @@
+Paper 0
+Pen 100
+Set A 40
+// hitting right edge
+Line (30+A) 50 (70+A) 50

@@ -1,0 +1,12 @@
+// stack of triangles
+Paper 0
+Repeat A 20 80
+{
+  Pen A
+  Line 50 75 A 20
+}
+Repeat A 36 64
+{
+  Pen 0
+  Line 50 20 A 48
+}

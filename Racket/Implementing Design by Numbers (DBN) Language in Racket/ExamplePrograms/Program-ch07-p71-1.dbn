@@ -1,0 +1,5 @@
+Paper 0
+Pen 100
+Set A 10
+// shifted a tiny bit
+Line (30+A) 50 (70+A) 50

@@ -1,0 +1,9 @@
+// square
+Paper 0
+Repeat A 10 65
+{
+  Pen 60
+  Line 10 35 A 90
+  Pen 100
+  Line 65 90 A 35
+}

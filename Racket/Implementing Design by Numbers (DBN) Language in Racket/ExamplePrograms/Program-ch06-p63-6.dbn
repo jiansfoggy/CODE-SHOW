@@ -1,0 +1,7 @@
+Paper 0
+// shaded to mark direction
+Repeat A 0 50
+{
+  Pen A
+  Line 50 50 A 0
+}

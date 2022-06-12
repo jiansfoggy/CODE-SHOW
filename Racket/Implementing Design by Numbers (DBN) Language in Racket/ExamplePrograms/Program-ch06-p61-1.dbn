@@ -1,0 +1,6 @@
+Paper 20
+Pen 80
+Repeat A 29 100
+{
+  Line A 4 A 100
+}

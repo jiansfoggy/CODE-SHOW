@@ -1,0 +1,8 @@
+Paper 0
+// gradate response
+Repeat A 0 100
+{
+  Pen A
+  Line 100 0 0 A
+  Line 0 0 A 100
+}

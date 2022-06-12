@@ -1,0 +1,6 @@
+Paper 90
+Pen 60
+Repeat A 0 100
+{
+  Line A 5 A 15
+}

@@ -1,0 +1,7 @@
+Paper 0
+Pen 100
+// force add to happen first
+Repeat A 0 10
+{
+  Line ((20+A)*4) 0 ((20+A)*4) 100
+}

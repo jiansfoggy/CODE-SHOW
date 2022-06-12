@@ -1,0 +1,8 @@
+Paper 0
+Pen 100
+// rewriting the square
+// as a Repeat
+Repeat A 45 55
+{
+  Line 45 A 55 A
+}

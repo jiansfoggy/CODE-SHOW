@@ -1,0 +1,16 @@
+// house
+Paper 30
+Pen 80
+Repeat A 0 5
+{
+  Line 0 A 100 A
+}
+Pen 60
+Repeat A 30 60
+{
+  Line A 6 A 26
+}
+Repeat A 27 63
+{
+  Line A 26 45 44
+}

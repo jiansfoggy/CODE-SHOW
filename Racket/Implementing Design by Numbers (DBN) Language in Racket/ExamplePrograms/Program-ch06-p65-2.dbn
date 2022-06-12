@@ -1,0 +1,27 @@
+// periscope
+Paper 80
+Pen 100
+Repeat A 0 25
+{
+  Line 0 A 100 A
+}
+Pen 65
+Repeat A 60 75
+{
+  Line A 26 A 75
+}
+Pen 55
+Repeat A 63 87
+{
+  Line 76 75 58 A
+}
+Pen 45
+Repeat A 49 58
+{
+  Line A 62 A 88
+}
+Pen 60
+Repeat A 40 51
+{
+  Line 59 A 76 A
+}

@@ -1,0 +1,7 @@
+Paper 0
+Pen 100
+// triangle stepping in diagonal
+Repeat A 0 50
+{
+  Line 0 A A 0
+}

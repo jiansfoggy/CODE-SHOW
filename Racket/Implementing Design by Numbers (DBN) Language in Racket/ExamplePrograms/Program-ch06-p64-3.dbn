@@ -1,0 +1,20 @@
+// a pinwheel
+Paper 50
+Pen 0
+Repeat A 50 70
+{
+  Line 50 90 A 50
+}
+Repeat A 30 50
+{
+  Line 50 10 A 50
+}
+Pen 100
+Repeat A 30 50
+{
+  Line 90 50 50 A
+}
+Repeat A 50 70
+{
+  Line 10 50 50 A
+}

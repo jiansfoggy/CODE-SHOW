@@ -1,0 +1,8 @@
+Paper 0
+Pen 100
+// like the waves
+Repeat A 0 50
+{
+  Line A 0 100 A
+  Line A 50 0 A
+}

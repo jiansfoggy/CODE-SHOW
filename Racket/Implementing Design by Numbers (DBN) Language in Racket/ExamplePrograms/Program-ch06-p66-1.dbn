@@ -1,0 +1,12 @@
+Paper 0
+// packet repeat
+Repeat A 0 100
+{
+  Pen 100
+  Line A A 60 A
+  Line A 62 29 78
+  Line 63 70 70 A
+  Line 1 A 3 A
+  Pen 0
+  Line 50 50 A A
+}

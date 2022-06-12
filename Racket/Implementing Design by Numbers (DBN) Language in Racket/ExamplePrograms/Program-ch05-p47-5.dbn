@@ -1,0 +1,7 @@
+Paper 0
+Pen 100
+// the 2 lines are easily moved
+// with one numerical edit
+Set V 20
+Line 15 V 25 V
+Line 50 15 V V

@@ -1,0 +1,7 @@
+Paper 0
+Pen 100
+// multiply comes before add
+Repeat A 0 10
+{
+  Line (20+A*4) 0 (20+A*4) 100
+}

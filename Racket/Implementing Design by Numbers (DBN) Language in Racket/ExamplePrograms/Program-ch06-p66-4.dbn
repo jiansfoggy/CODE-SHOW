@@ -1,0 +1,10 @@
+Paper 0
+// surprisingly subtle
+Repeat A 0 100
+{
+  Pen A
+  Line 50 50 A 100
+  Line 100 0 A 100
+  Line 0 100 100 A
+  Line 50 50 100 A
+}

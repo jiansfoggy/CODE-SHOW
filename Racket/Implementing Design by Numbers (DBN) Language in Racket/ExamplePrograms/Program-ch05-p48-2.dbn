@@ -1,0 +1,6 @@
+Paper 0
+Pen 100
+// slight tug
+Set V 50
+Line 15 V 25 V
+Line 50 15 V V

@@ -1,0 +1,9 @@
+// hi!
+// you can't see me!
+Paper 70
+Pen 0
+Repeat A 15 25
+{
+  Line 50 20 35 A
+  Line 50 20 65 A
+}

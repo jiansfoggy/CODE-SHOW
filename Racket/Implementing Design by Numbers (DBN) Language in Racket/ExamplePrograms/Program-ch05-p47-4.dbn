@@ -1,0 +1,6 @@
+Paper 0
+Pen 100
+Set V 90
+// draw 2 lines that use V
+Line 15 V 25 V
+Line 50 15 V V

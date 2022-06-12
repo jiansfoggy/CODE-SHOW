@@ -1,0 +1,11 @@
+// lightning bolt
+Paper 75
+Pen 0
+Repeat A 42 58
+{
+  Line 70 93 A 51
+}
+Repeat A 57 73
+{
+  Line 45 15 A 57
+}
