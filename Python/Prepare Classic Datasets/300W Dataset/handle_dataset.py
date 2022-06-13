@@ -142,7 +142,9 @@ class LandmarksTestset(Dataset):
      
         for filename in root[2]:
             img_name = filename.attrib['file']
+            # photos from ibug belongs to challenging set.
             if "ibug/" in img_name:
+            # photos from lfpw and helen belongs to challenging set.
             #if "lfpw/testset/" in img_name or "helen/testset/" in img_name:
                 self.image_paths.append(os.path.join(self.root_dir, img_name))
                 self.crops.append(filename[0].attrib)
@@ -174,5 +176,15 @@ preprocessor = Preprocessor(image_dim = 128, brightness = 0.24, saturation = 0.3
     contrast = 0.15, hue = 0.14, angle = 14, face_offset = 32, crop_offset = 16)
 
 train_images = LandmarksDataset(preprocessor, root_dir = data_path, train = True)
+
+# To validate on full set
 test_images  = LandmarksDataset(preprocessor, root_dir = data_path, train = False)
-    
+
+
+# To validate on challenging set
+# use this one -- if "ibug/" in img_name:
+test_images  = LandmarksTestset(preprocessor, root_dir = data_path, train = False)
+
+# To validate on common set
+# use this one -- if "lfpw/testset/" in img_name or "helen/testset/" in img_name:
+test_images  = LandmarksTestset(preprocessor, root_dir = data_path, train = False)
