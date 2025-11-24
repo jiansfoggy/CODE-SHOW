@@ -1,0 +1,9 @@
+torch
+torchvision
+coremltools
+numpy
+timm
+matplotlib
+pycocotools
+ultralytics
+opencv-python
