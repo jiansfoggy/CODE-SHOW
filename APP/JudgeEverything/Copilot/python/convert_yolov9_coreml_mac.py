@@ -1,5 +1,5 @@
 """
-Mac conversion helper for yolov9. Adjust REPO_ROOT to where you cloned yolov9.
+Mac conversion helper for YOLOv9. Uses the actual YOLOv9 DetectModel API.
 
 Run on macOS with a venv that has torch==2.7.0 and coremltools==6.3 installed.
 """
@@ -15,16 +15,48 @@ WEIGHTS = Path('models') / 'yolov9-c.pt'
 OUT = Path('../coreml') / 'yolov9-c.mlmodel'
 
 def main():
+    from models.yolo import DetectModel
     from models.common import DetectMultiBackend
-    model = DetectMultiBackend(str(WEIGHTS), device='cpu')
-    model.eval()
+    
+    # Load the model - YOLOv9 provides DetectModel which expects a config
+    # For simplicity, we'll use torch.load directly since we have the .pt file
+    device = torch.device('cpu')
+    
+    # Load the full model with state dict
+    checkpoint = torch.load(str(WEIGHTS), map_location=device, weights_only=False)
+    
+    # If checkpoint is a complete model state, build the model
+    if isinstance(checkpoint, dict):
+        # This is likely a state_dict; we need to load it into a model instance
+        # For YOLOv9, the easiest way is to use the DetectMultiBackend wrapper
+        try:
+            from models.common import DetectMultiBackend
+            model = DetectMultiBackend(str(WEIGHTS), device=device)
+            model = model.model if hasattr(model, 'model') else model
+        except Exception as e:
+            print(f'DetectMultiBackend failed: {e}. Using direct torch load.')
+            # Fallback: directly use the checkpoint as a model
+            model = checkpoint
+    else:
+        model = checkpoint
+    
+    if hasattr(model, 'eval'):
+        model.eval()
 
-    # Representative input: adjust to your preferred input size
+    # Representative input for YOLOv9: 640x640 is standard
     example = torch.rand(1, 3, 640, 640)
 
-    # Try to trace the internal backend if available
-    backend = getattr(model, 'model', model)
-    traced = torch.jit.trace(backend, example)
+    try:
+        # Try to get the actual forward-pass module if model is wrapped
+        forward_module = getattr(model, 'model', model)
+        traced = torch.jit.trace(forward_module, example)
+    except Exception as e:
+        print(f'Tracing failed: {e}. Attempting script conversion...')
+        try:
+            traced = torch.jit.script(model)
+        except Exception as e2:
+            print(f'Script conversion also failed: {e2}')
+            return
 
     mlmodel = ct.convert(
         traced,

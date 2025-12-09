@@ -1,6 +1,5 @@
 """
-Mac conversion helper for MobileSAM. Adjust REPO_ROOT and model constructor to match the
-MobileSAM repo structure you cloned.
+Mac conversion helper for MobileSAM. Uses the actual MobileSAM build_sam_vit_t_encoder API.
 
 Run on macOS with a venv that has torch==2.7.0 and coremltools==6.3 installed.
 """
@@ -9,31 +8,29 @@ from pathlib import Path
 import torch
 import coremltools as ct
 
-REPO_ROOT = Path.home() / 'Projects' / 'MobileSAM'  # <- change this to your clone path
+REPO_ROOT = Path.home() / 'Projects' / 'MobileSAM' / 'MobileSAMv2'  # <- adjust to your clone path
 sys.path.insert(0, str(REPO_ROOT))
 
 WEIGHTS = Path('models') / 'mobile_sam.pt'
 OUT = Path('../coreml') / 'mobile_sam.mlmodel'
 
 def main():
-    # Import the model factory from MobileSAM repo. Replace `build_sam` with the actual function
-    # name in the repo. Example: from mobile_sam import build_sam
-    try:
-        from mobile_sam import build_sam  # adjust this import
-    except Exception:
-        # If repo exposes differently, update import accordingly
-        raise RuntimeError('Update import to match MobileSAM repo: e.g. `from mobile_sam import build_sam`')
+    # Import the build function from MobileSAM
+    from mobilesamv2.build_sam import build_sam_vit_t_encoder
 
-    model = build_sam()
-    state = torch.load(str(WEIGHTS), map_location='cpu')
-    # If state is a dict with 'model' key, extract it
-    if isinstance(state, dict) and 'model' in state:
-        state = state['model']
-    model.load_state_dict(state)
+    # Build and load the TinyViT encoder model
+    model = build_sam_vit_t_encoder(checkpoint=str(WEIGHTS))
     model.eval()
 
-    example = torch.rand(1, 3, 256, 256)
-    traced = torch.jit.trace(model, example)
+    # Representative input for TinyViT: shape depends on expected image size
+    # TinyViT typically expects 1024x1024 images
+    example = torch.rand(1, 3, 1024, 1024)
+
+    try:
+        traced = torch.jit.trace(model, example)
+    except Exception as e:
+        print(f'Tracing failed: {e}. Attempting script conversion...')
+        traced = torch.jit.script(model)
 
     mlmodel = ct.convert(
         traced,
