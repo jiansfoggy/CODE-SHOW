@@ -18,9 +18,13 @@ def main():
     from models.yolo import DetectModel
     from models.common import DetectMultiBackend
     
-    # Load the model - YOLOv9 provides DetectModel which expects a config
-    # For simplicity, we'll use torch.load directly since we have the .pt file
-    device = torch.device('cpu')
+    # Use Metal Performance Shaders on M-series Macs for faster inference
+    if torch.backends.mps.is_available():
+        device = torch.device('mps')
+        print('Using Metal Performance Shaders (MPS) for acceleration on M-series Mac')
+    else:
+        device = torch.device('cpu')
+        print('MPS not available, using CPU')
     
     # Load the full model with state dict
     checkpoint = torch.load(str(WEIGHTS), map_location=device, weights_only=False)
