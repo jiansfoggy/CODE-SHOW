@@ -1,0 +1,92 @@
+# JudgeE2 — Phase 5 UI 一次性执行清单
+### App 单功能化 + 品牌视觉
+
+## 背景与前提（执行前必读）
+
+- 项目路径：`/Users/jiansun/Documents/PostDoc/CODE-SHOW/APP/JudgeE2/`
+- 开工前请先读：
+  - `shared/tasks.md`（PHASE 5 小节，文件靠后位置）
+  - `shared/architect_output.md` §26（Phase 4 冻结裁决 D-26.1）
+  - `shared/architect_output.md` §27（原 Phase 5 入口点定义 D-27.1）
+
+**冻结表面（本次任务全程不得修改判定逻辑，只能改 UI 层）：**
+
+- `Detection/CameraManager.swift`（核心管线、`checkAndFireReAnchor`）
+- `Interaction/DriftDetector.swift`
+- `Interaction/AnchorTracker.swift`
+- `Interaction/CameraMotionGate.swift`
+- `Interaction/TapInstanceManager.swift`
+- `Persistence/*`（PinStore 系列）
+- `Segmentation/SAMEncoder.swift`
+- `Segmentation/SAMDecoder.swift`
+- `Segmentation/MaskRenderer.swift` 的候选选择算法（R3 六项参数，如 `minComponentPx=30`，INVIOLABLE）
+- `Segmentation/TemporalManager.swift`
+
+允许改动范围仅限：`UI/`、`Assets.xcassets/`、`Shared/AppMode.swift` / `InferenceBackend.swift` 里的 `displayName` 字符串（不改 case 值、不改下游逻辑）、新增图标/素材文件。
+
+**产品方向调整**（2026-08-24 用户明确指示，优先于原 Phase 5 计划里"三模式并存"的设想）：
+
+App 对最终用户只暴露**一个功能**：Tap to Segment（点击分割）+ Add Pin（添加标注）。Detection-only 与 Segmentation-only 两个模式不再是产品功能，改为仅在 DEBUG 构建下通过隐藏的调试面板可达——保留代码与 `AppMode` 三个 case 不变，只改 UI 呈现层，不碰 `CameraManager` 的模式路由逻辑，因此不违反冻结裁决。Release 构建下，App 启动即直接进入 Tap to Segment 模式，没有模式切换 UI。
+
+---
+
+## 任务清单（不分天，一次性做完）
+
+### 1. App 图标与视觉品牌
+
+- [ ] 设计一版简洁、可识别的 App 图标 / Logo，主题围绕"点一下 → 分割 → 标注"（tap → segment → pin）
+- [ ] 产出 1024×1024 主图标，写入 `JudgeE2/Assets.xcassets/AppIcon.appiconset`（先看现有 `Contents.json` 是单尺寸还是多尺寸格式，照现有格式补齐）
+- [ ] 若产品需要启动屏 / Logo 展示位（启动画面、Settings 关于页），补一版简化 wordmark / 图标供复用
+- [ ] 图标配色与 Task 3 的 overlay 调色（C-7 通过后的方案）保持视觉一致，若排期允许，先做 Task 3 再定图标配色
+
+### 2. 单功能化改造（UI 层，不碰 AppMode 枚举语义与 CameraManager 路由）
+
+- [ ] `UI/ContentView.swift`（或拆分出的入口视图）：Release 构建下不再展示三模式切换 UI，App 启动直接以 `tapToSegment` 模式运行
+- [ ] 原 Detection / Segmentation 模式相关 UI（App Mode picker 中的另两项、`ContentView.swift:414-441` 附近的悬浮模式快切按钮）收进 `#if DEBUG` 或明确标记的隐藏调试入口，不删除底层能力
+- [ ] 确认 `AppMode` 枚举本身不改（三个 case 保留），只改 UI 呈现层对普通用户暴露哪些选项
+
+### 3. 底部控制栏（单功能版）
+
+- [ ] 新建 `UI/BottomControlBar.swift`：不做三态切换器（已无必要），改为围绕 Tap to Segment + Pin 单一工作流的核心操作入口——具体按钮（如相机翻转、Pin List 入口、清空全部）由执行者根据现有交互判断，保持精简
+- [ ] 不新建冗余状态，复用现有 `$mode`（固定为 `.tapToSegment`）与既有 Pin 相关状态
+
+### 4. Settings 面板职责分离
+
+- [ ] 新建产品化 Settings 界面（复用现有 `.sheet()` 模式，同 `PinListView` / `AnnotationView`），面向最终用户只保留必要项（如 About、清空所有 Pin、App 版本号）
+- [ ] 原 `Compute Units`、`Encoder Res` A/B、`Force Slow Path (testing)`、P-9 几何往返自检按钮、（现已降级为调试项的）App Mode picker，全部收进明确标注的 "Developer / Debug" 分区或 `#if DEBUG` 块，保留代码不删除
+- [ ] `Perf Quiet Log`：默认按调试项处理，除非重新评估后发现明显面向用户
+
+### 5. Overlay 视觉样式
+
+- [ ] Mask 呈现数值（填充色 / alpha / 描边宽度）可改版，但必须先过既有 C-7 准入流程（算术检验 + 同色系撞色目视测试，见 `architect_output.md` §12 / §14.4）
+- [ ] 不改候选选择算法本身（R3 六项参数 INVIOLABLE，只改数值呈现，不改算法）
+- [ ] 用 App 实际的多实例池（最多 3 个）验证同屏 2–3 个 tap 实例时的可读性
+
+### 6. 动画与交互反馈
+
+- [ ] 复用 / 精修 `TapRippleEffect`、`TapLoadingIndicator`（脉冲圆环——⛔ 不得改造成进度条，见 §10 FINAL 裁决）、`TapFailureIndicator`
+- [ ] 长按固定 Pin → sheet 弹出 → 列表刷新的过渡动画
+
+### 7. UX 细节打磨
+
+- [ ] 空状态文案（Pin List 为空、mask 生成失败）
+- [ ] 首次使用的长按手势提示（若现有 UI 缺失）
+
+---
+
+## 验收方式
+
+- **Release 配置**：App 启动即可直接 tap 分割 → 长按存 Pin → 查看 / 编辑标注 → 从 Pin List 回访，全程不出现模式切换或调试选项
+- **Debug 配置**：原 Detection / Segmentation 模式与全部调试工具仍可通过隐藏入口访问，功能不丢失
+- `git diff` 核对：改动范围仅限 `UI/` 目录 + `Assets.xcassets/` + 上述两处 `displayName` 字符串，不触碰任何冻结表面文件的判定逻辑
+
+## 明确排除在本次任务外
+
+- 性能清理（原 Day 6）、R37 复测协议、基线基准测试、Demo build——这些需要真机测试时间，不适合一次性 UI 冲刺，留作后续单独安排
+- 若发现某项 UI 需求必须改动冻结表面的判定逻辑，**停下来记录，不要自行实现**，等待 Architect 决策
+
+---
+
+## 备注（给执行者）
+
+这份清单把"三模式切换"的产品定位改成了"App 只做 Tap to Segment + Pin 一件事"。这个改动没有改 `AppMode` 枚举的 case 或 `CameraManager` 的路由行为，只改 UI 层对用户暴露什么——因此仍在 Phase 5 "只碰 UI 层" 的授权范围内，不需要重新走 Architect 的 AppMode 变更审批流程（§27.3）。如果你发现某个任务做到一半才发现必须动到冻结表面，停下来问，而不是自行扩大范围。

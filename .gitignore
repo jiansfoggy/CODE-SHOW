@@ -1,0 +1,45 @@
+# ── Model weights ─────────────────────────────────────────────────────────
+# Never commit these. They are large, they are reproducible from the export
+# scripts in APP/JudgeE2/shared/, and two of them (yolov9-c.pt at 103 MB,
+# mobile_sam.pt at 41 MB) are already the biggest objects in this repo's
+# history.
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.onnx
+*.tflite
+*.h5
+*.pb
+*.weights
+*.mlmodel
+*.mlpackage/
+*.mlmodelc/
+APP/JudgeE2/models/
+**/Detection/Models/
+**/Segmentation/Models/
+
+# ── Large media ───────────────────────────────────────────────────────────
+*.MP4
+*.mp4
+*.mov
+*.MOV
+
+# ── Vendored third-party checkouts (fetch them from their own upstreams) ──
+APP/JudgeE2/shared/yolo-ios-app-main/
+APP/JudgeE2/shared/Real-time-Video-Segmentation-on-Iphone-master/
+
+# ── Xcode / build ─────────────────────────────────────────────────────────
+build/
+DerivedData/
+*.xcuserdatad/
+xcuserdata/
+*.xcworkspace/xcuserdata/
+
+# ── Python ────────────────────────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pkg
+
+# ── macOS ─────────────────────────────────────────────────────────────────
+.DS_Store

@@ -1,0 +1,26 @@
+{
+  "model": "yolov9-c.mlmodel (CoreML neuralnetwork, FP16 weights quantized via export.py --half)",
+  "input": {
+    "name": "image",
+    "type": "RGB image",
+    "size": [640, 640],
+    "preprocess": "scale=1/255, bias=[0,0,0] (as in export.py)"
+  },
+  "golden_image": "shared/golden/bus.jpg (resized to 640x640 for predict())",
+  "outputs": {
+    "var_3019": {
+      "shape": [1, 84, 8400],
+      "dtype": "float32",
+      "stats": {"min": 0.0, "max": 637.5, "mean": 9.577201}
+    },
+    "var_3022": {
+      "shape": [1, 84, 8400],
+      "dtype": "float32",
+      "stats": {"min": -12.40625, "max": 637.0, "mean": 9.443334}
+    }
+  },
+  "notes": [
+    "Both outputs have identical shape; treat as raw head tensors. We will confirm which one is the actual prediction tensor by comparing to PyTorch/ONNX in Day3.",
+    "Downstream decode/NMS is NOT included in this CoreML draft. Swift side should just print keys/shapes first."
+  ]
+}

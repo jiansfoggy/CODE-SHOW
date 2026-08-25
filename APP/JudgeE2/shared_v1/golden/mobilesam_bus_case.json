@@ -1,0 +1,31 @@
+{
+  "image": "shared/golden/bus.jpg (resized 640x640)",
+  "yolo_ref": {
+    "weights": "models/yolov9-c.pt",
+    "box_xyxy_640": [
+      6.5843505859375,
+      136.3340301513672,
+      636.0477905273438,
+      437.53656005859375
+    ],
+    "class_id": 5,
+    "score": 0.9463223218917847
+  },
+  "mobilesam": {
+    "checkpoint": "models/mobile_sam.pt",
+    "model_type": "vit_t",
+    "multimask_output": false,
+    "mask_shape": [
+      640,
+      640
+    ],
+    "mask_area_px": 120717,
+    "mask_bbox_xyxy_640": [
+      7,
+      137,
+      632,
+      427
+    ],
+    "mask_score": 0.9831840991973877
+  }
+}

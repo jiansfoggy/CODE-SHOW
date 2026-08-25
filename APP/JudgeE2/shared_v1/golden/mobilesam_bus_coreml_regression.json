@@ -1,0 +1,88 @@
+{
+  "image": "/Users/jiansun/Documents/PostDoc/CODE-SHOW/APP/JudgeEverything/shared/golden/bus.jpg",
+  "orig_size_hw": [
+    1080,
+    810
+  ],
+  "bbox_xyxy": [
+    6.5843505859375,
+    136.3340301513672,
+    636.0477905273438,
+    437.53656005859375
+  ],
+  "resize_pad": {
+    "scale": 0.9481481481481482,
+    "new_w": 768,
+    "new_h": 1024,
+    "pad_w": 256,
+    "pad_h": 0
+  },
+  "point_coords_1024": [
+    [
+      [
+        6.2429399490356445,
+        129.26486206054688
+      ],
+      [
+        603.0675048828125,
+        414.8494873046875
+      ]
+    ]
+  ],
+  "point_labels": [
+    [
+      2.0,
+      3.0
+    ]
+  ],
+  "pytorch": {
+    "low_res_masks": {
+      "shape": [
+        1,
+        1,
+        256,
+        256
+      ],
+      "min": -14.034696578979492,
+      "max": 1.738251805305481,
+      "mean": -8.866048812866211,
+      "std": 2.9675052165985107,
+      "area_logits_gt0": 1116
+    },
+    "iou_predictions": {
+      "shape": [
+        1,
+        1
+      ],
+      "value": 0.5830627679824829
+    }
+  },
+  "coreml": {
+    "low_res_masks": {
+      "shape": [
+        1,
+        1,
+        256,
+        256
+      ],
+      "min": -13.1875,
+      "max": 1.513671875,
+      "mean": -8.420766830444336,
+      "std": 2.740955352783203,
+      "area_logits_gt0": 771
+    },
+    "iou_predictions": {
+      "shape": [
+        1,
+        1
+      ],
+      "value": 0.55615234375
+    }
+  },
+  "diff": {
+    "low_res_masks_mean_abs": 0.47647911310195923,
+    "low_res_masks_max_abs": 1.454300880432129
+  },
+  "case_mobilesam_mask_area_px_640": 120717,
+  "case_mobilesam_mask_score": 0.9831840991973877
+}

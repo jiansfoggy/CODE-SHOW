@@ -1,0 +1,1806 @@
+# Architect Output — Phase 3
+
+Project: JudgeE2 (Phase 3: Tap-to-Segment)
+Target: iPhone 11
+Phase 2 Frozen Baseline: shared_v2/architect_output.md §5
+
+---
+
+# Phase 3 — Day 1 (Architect) Interaction Contract
+
+日期：2026-07-19
+依据：tasks.md Phase 3 Day 1 Architect 任务 + Phase 2 冻结契约 + 代码审查（SAMDecoder.swift / PromptBuilder.swift / TemporalManager.swift）
+
+---
+
+## 1) Tap-to-Segment 模式插入点（锁定）
+
+### 1.1 模式并存规则
+
+```
+AppMode.detectionOnly   → Phase 1 路径（YOLO bbox-only）
+AppMode.segmentation    → Phase 2 路径（YOLO + SAM 自动分割）
+AppMode.tapToSegment    → Phase 3 路径（YOLO 保持运行，SAM 由用户 tap 驱动）
+```
+
+**关键规则：**
+- YOLO Detection Pipeline **永远运行**（三种模式均如此）
+- `.tapToSegment` 模式下，YOLO 输出仅用于维持 FrameGeometry 元数据，**不用于驱动 SAM**
+- Phase 2 `.segmentation` 路径的调度代码（TemporalManager 主目标选择 + 每 12 帧 encode）在 `.tapToSegment` 模式下**必须静默**（不触发）
+- 两种模式**不得同时激活**；模式切换时清空当前模式的所有 mask 实例
+
+### 1.2 插入点位置
+
+```
+[Camera Capture] → [Preprocess] → [YOLO Detection]
+                                        │
+                          ┌─────────────┴──────────────┐
+                          │ .segmentation               │ .tapToSegment
+                          ▼                             ▼
+               [TemporalManager]              [TouchHandler]
+               [SAMEncoder (auto)]            [TapInstanceManager]
+               [SAMDecoder (bbox)]            [SAMEncoder (on-tap)]
+               [MaskRenderer (Phase 2)]       [SAMDecoder (point)]
+                                              [TapMaskRenderer]
+```
+
+- 插入点：Camera Capture 完成后，两条路径共享同一个 `CVPixelBuffer` 和 `FrameGeometry`
+- Phase 3 路径**不接触** TemporalManager；TapInstanceManager 是独立新模块
+- Phase 3 有独立的渲染层（`TapMaskRenderer` 或在 MaskRenderer 内新增 tap 渲染分支），位于 Phase 2 mask layer **之上**
+
+### 1.3 渲染层次（Z 轴）
+
+```
+最上层：TouchHandler 手势识别层（透明，仅捕获手势）
+       ↑
+       TapMaskRenderer（tap 实例 mask 叠加，多色）
+       ↑
+       Phase 2 MaskRenderer（YOLO 驱动 mask，.segmentation 模式独用）
+       ↑
+       BBox Overlay（Phase 1，始终显示）
+       ↑
+最底层：AVCaptureVideoPreviewLayer（相机预览）
+```
+
+**约束：** TouchHandler 的手势识别层不得拦截 Phase 2 渲染层的触摸事件；两者使用不同的 `UIGestureRecognizer` 实例，不共享 target-action。
+
+---
+
+## 2) Tap 坐标变换契约（锁定）
+
+### 2.1 完整变换链
+
+```
+UIKit tap point
+(CGPoint in UIView.bounds, points)
+        │
+        ▼ Step 1: AspectFill 逆映射
+AVCaptureVideoPreviewLayer
+  .captureDevicePointConverted(fromLayerPoint: tapPoint)
+        │ → CGPoint 归一化传感器坐标 [0,1]×[0,1]
+        │   （此 API 内部处理 aspectFill 裁剪偏移，Apple 官方支持）
+        ▼ Step 2: 传感器坐标 → Canonical 像素坐标
+  normalizedPoint.x × FrameGeometry.origW
+  normalizedPoint.y × FrameGeometry.origH
+        │ → CGPoint in Canonical pixel space (origW × origH)
+        ▼ Step 3: 方向 & 镜像修正
+  复用 Phase 1/2 orientation + mirror 变换逻辑
+  （与 CameraManager.preprocessFrame 中使用的同一逻辑）
+        │ → CGPoint in corrected Canonical pixel space ✅
+        ▼ Step 4: 越界裁剪
+  x = clamp(x, 0, origW - 1)
+  y = clamp(y, 0, origH - 1)
+        │ → 最终 Canonical 像素坐标，送入 PointPromptBuilder
+```
+
+### 2.2 实现要求
+
+- **Builder 新增方法**：`FrameGeometry.invertViewPoint(_ point: CGPoint, viewSize: CGSize, previewLayer: AVCaptureVideoPreviewLayer) -> CGPoint`
+  - 封装上述 Step 1–4
+  - 内部调用 `captureDevicePointConverted` + orientation/mirror 修正 + clamp
+  - **不得**在此方法外重复以上任何步骤
+- **验证 Log（Builder 必须输出）**：
+  `[TAP] view=(x,y) normalized=(nx,ny) canonical=(cx,cy) orientation=N mirrored=B`
+- **禁止**：TouchHandler 内部独立计算坐标变换；所有变换必须通过 `FrameGeometry.invertViewPoint`
+
+### 2.3 不变式
+
+| 不变式 | 说明 |
+|--------|------|
+| 坐标系唯一 | Canonical = 原始 camera px（origW × origH），与 Phase 1/2 YOLO 输出坐标系完全一致 |
+| 归一化位置 | 归一化（÷ 1024.0）**仅在 PointPromptBuilder 内部**执行，不在调用层 |
+| 变换路径唯一 | 只允许 `FrameGeometry.invertViewPoint` 一条路径，禁止多处各自实现 |
+| 越界不排除 | tap 越界后裁剪到边界内继续处理，不丢弃 tap |
+
+---
+
+## 3) Multi-Mask 管理模型（锁定）
+
+### 3.1 TapInstance 数据结构契约
+
+```swift
+struct TapInstance {
+    let id: UUID
+    let canonicalPoint: CGPoint         // Canonical 像素坐标
+    let createdAt: Date                 // FIFO 排序依据
+    var mask: MLMultiArray?             // 解码后的 mask（256×256 Float32）
+    var maskTimestamp: Date?            // mask 生成时间（遥测口径 maskAgeMs；不参与有效性判定，见 §11）
+    var iouPred: Float                  // 上次解码的 iou_pred（0 = 尚未解码）
+    let color: UIColor                  // 实例颜色（从色板分配，固定不变）
+    var isPrimary: Bool                 // true = 最近一次 tap
+}
+```
+
+**Mask 生命周期（Day 5 修订，取代原「Mask TTL = 2000 ms」条款）：**
+
+> per-instance mask **不设时间型 TTL**。已解码成功的 tap mask **常驻**，直到被 §3.2 的某个**事件**移除。
+> 原条款「复用 Phase 2 mask TTL = 2000 ms（与 TemporalManager 独立计算，不共享状态）」自 **Day 5 起正式作废**，撤销理由见 §11.2–§11.3。
+> `maskTimestamp` 字段**保留**，语义降级为**遥测时间戳**：仅用于计算 `maskAgeMs` 日志、与 `cacheAge` 做「mask 年龄 × 质量」相关性分析。它**不得**出现在任何显示、过滤或有效性判定路径上。
+> Phase 3 内**唯一**的时间型失效时钟是 embedding TTL（8000 ms，见 §11.6）；mask 侧不存在第二个时钟。
+
+### 3.2 实例池管理规则
+
+| 操作 | 规则 |
+|------|------|
+| 新 tap | 创建新 TapInstance，设为 primary，旧 primary 降为 secondary |
+| 超出 N=3 | FIFO 删除 `createdAt` 最早的实例（不论是否 primary）|
+| 双击已有 mask | 清空全部实例（`clearAll()`） |
+| 点击已有 mask 内部 | 将该实例提升为 primary（不重新 decode） |
+| 模式切换 | 退出 `.tapToSegment` 时清空全部实例 |
+
+#### 3.2.1 mask 移除条件全集（Day 5 新增，封层）
+
+下表是 Phase 3 内 tap mask 消失的**穷尽列表**。不在表内的任何原因导致 mask 消失，都按 bug 处理。
+
+| # | 触发 | 作用范围 | 性质 | 用户可见语义 |
+|---|------|---------|------|-------------|
+| C1 | **双击屏幕** → `clearAll()` | 全部实例 | 用户显式 | 唯一的「我要清干净」入口 |
+| C2 | **第 4 次 tap** → FIFO 淘汰 `createdAt` 最早者 | 单个实例 | 容量约束（N=3）| 最老的那个让位给新的 |
+| C3 | **退出 `.tapToSegment` 模式** | 全部实例 | 生命周期 | 换模式即重来 |
+| C4 | **几何签名变化**（`tapGeometryChanged == true`，如旋转 / 预览尺寸变化）→ 清空实例池 | 全部实例 | **正确性**（旧 mask 属于已失效的坐标空间）| 画面构图变了，选择重置 |
+| C5 | **同一实例的新请求取代旧请求**（per-instance supersession，§10.5 R4）| 单个实例的**在途请求** | 调度 | 不是清除，是替换：旧 decode 结果被丢弃，新结果就位 |
+| C6 | **长按单个 mask 删除**（`removeInstance(id:)`，Day 6 接手势）| 单个实例 | 用户显式 | 精确删掉一个 |
+
+- **时间流逝不在表内。** 无论 mask 存在多久，只要 C1–C6 均未发生，它必须保持可见。
+- C5 属「替换」而非「移除」：在途请求被注销时不得触发失败提示（§10.4 要求 C 的「静默清除加载指示禁令」只约束**真失败**，用户自己替换掉的请求应静默注销）。
+- C4 是唯一由系统自动触发的全清。它是**事件驱动**的正确性保护，与被撤销的时间型 TTL 有本质区别：它对应一个可观测的失效事实，而非一个墙钟阈值。
+
+### 3.3 呈现色彩规格（Day 5 追加修订 2026-08-11，取代原「颜色色板（固定顺序，循环分配）」）
+
+> **原文（正式作废）：** `实例 1：systemBlue (alpha 0.55 primary / 0.35 secondary) / 实例 2：systemGreen / 实例 3：systemOrange`。
+> 作废理由见 §12.2–§12.3：该色板把「mask 是否看得见」整个压在「填充色 vs 物体本色的对比」上，而**物体本色是不可控输入** ⇒ 撞色不是偶发事故，是这套规格的必然产物。2026-08-11 录像实证：蓝色保温杯被涂 systemBlue、绿色键盘被涂 systemGreen、橙色文件架被涂 systemOrange，三块 mask **同时隐身**。
+
+#### 3.3.1 呈现的三层职责模型（新增；本节其余条款均由此推出）
+
+| 层 | 它回答的问题 | 承载者 | 允许依赖不可控输入？ |
+|---|---|---|---|
+| **L1 可见性** | 「屏幕上存在一块被选中的区域」 | **双色轮廓描边** | ❌ **绝不允许** |
+| **L2 归属** | 「这块是我最近那一下点出来的」 | primary / secondary 的 alpha 分级 + tap 锚点标记 | 允许 |
+| **L3 区分** | 「这三块分别来自三次不同点击」 | 描边样式分级 + tap 锚点编号（**不由色相承担**） | 允许 |
+
+> **裁决：L1 不得由色相承担。** 色相只服务 L3，而且只有在 L1 已被描边独立保证之后才有意义。
+> 任何「把可见性交给填充色」的规格都是有缺陷的——它把正确性押在用户拍什么上。
+
+#### 3.3.2 填充色约束原则（C-1 … C-7；**换色时必须逐条检验并把数值写回本表**）
+
+| # | 约束 | 判据 | 现行/历史色的检验结果 |
+|---|---|---|---|
+| **C-1** | **稀有色带**：填充色相必须落在日常物体低发色带内 | **允许带（唯一）：H ∈ [160°, 194.78°]，宽 34.8°**（青–蓝绿）。上界不是 200°，而是 C-2 在 S=1.00/V=1.00 时的截断点 H=194.78°（Y 恰为 0.450）；把 S 放到 C-3 下限 0.85 最远可延到 H≈197.6°，**该 2.8° 不计为可用余量**（要靠掉饱和度换，与 C-3 的立意相反）。**禁用带**：[0°,60°] 红/橙/棕/木/肤色；[60°,90°] 黄/纸/暖光；[90°,155°] 绿植与绿色制品；[195°,260°] 蓝色塑料/牛仔布/天空/屏幕蓝。❌ **原「品红备选带 H ∈ [280°,330°]」已删除（2026-08-11 勘误，见 §13.2.3）—— 它在 C-2∩C-3 下是空集**，该带内满足 S≥0.85 且 V≥0.90 的颜色最高只能到 **Y = 0.2988**（H=300°, S=0.85, V=1.00），永远够不到 C-2 的 0.45。留着会误导下一次换色 | slot 0 **188.94° ✅** ／ slot 1 **176.94° ✅** ／ slot 2 **160.00° ✅（零余量，见 C-1a）** ／ systemBlue **211° ❌** ／ systemGreen **135° ❌** ／ systemOrange **35° ❌** |
+| **C-1a** | **边界余量（新增 2026-08-11）**：允许带的两个端点**不是安全线** | 推荐取色区间 **H ∈ [165°, 190°]**（两端各留 ≥5° 余量）。落在余量区内的色值属**例外**，须在 C-7 记录中单独标注风险并在 (b) 目视测试里**专门覆盖**相邻禁用带的代表物 | slot 2 = 160.00° 是**已批准的例外**：距 [90°,155°] 绿色禁用带仅 5°、零余量；放行条件 = C-7(b) 必须包含薄荷/春绿实物 |
+| **C-2** | **相对亮度下界** Y ≥ 0.45（sRGB relative luminance） | 保证半透明叠加把区域**提亮**而不是压暗；压暗的覆盖层在暗物体/阴影里等于不存在 | 青 **0.569 ✅** ／ systemBlue **0.211 ❌** ／ systemGreen **0.428 ❌** ／ systemOrange **0.425 ❌** |
+| **C-3** | **人造信号特征**：HSV **S ≥ 0.85 且 V ≥ 0.90** | 真实光照下的自然表面普遍被去饱和；「高饱和 + 高明度」本身就是「这是叠加图层，不是物体」的信号 | 青 S=1.00 V=1.00 ✅ |
+| **C-4** | **L1 不得由色相承担** | 任何被显示的 mask（含 secondary）必须带 §3.4 的双色描边 | 规格要求；实现已从 Day 6 提前至 Day 5（§12.6） |
+| **C-5** | **描边在屏幕坐标系生成** | 线宽以 **pt** 定义；**不得**烧进 256×256 的 alpha 位图——否则线宽会随 mask 一起被放大 4–8×，且与 D-13「让 GPU 直接缩放 256×256」的重构方向不兼容 | 约束（非现状） |
+| **C-6** | **单变量回退能力** | 描边必须能由**单点开关**整体关闭，以便与 Day 4 的「无描边」视觉条件做单变量对照评分 | 约束 |
+| **C-7** | **换色准入程序** | 任何填充色变更须同时满足：**(a)** 通过 C-1/C-1a/C-2/C-3/C-8 的算术检验，并把数值补进本表；**(b)** 在**至少一个自身即为该色系的真实物体**上做目视「撞色测试」——多色板须**逐槽位各测一个**，且**必须包含一次同屏三实例**、判「能否看出这三块来自三次不同点击」。**两项缺一不得合入。** 失败判据是「连轮廓都找不到」（有描边兜底后，「填充看不清但轮廓仍在」**不算失败**）| 程序（本次事故的防复发机制）。⚠️ 现行三槽色板**只通过了 (a)**，(b) 未执行 ⇒ 属程序违例，处置见 §13.2.5 W-2 |
+| **C-8** | **混合封闭性（新增 2026-08-11）**：多色板在 `compositeLayers` 的 source-over 叠放下必须**封闭** | 穷举全部叠放组合（N=3 ⇒ 2 层与 3 层、各种顺序、alpha 0.40/0.40/0.60，共 **12 种**），**每一种重叠产物自身都必须通过 C-1/C-2/C-3**。充分构造技巧：让全部槽位共享一个恒为 0 的分量（本色板 R≡0 ⇒ 任意凸组合仍 R=0 ⇒ S 恒等于 1.000）| 现行三槽色板：H ∈ [163.57°, 186.48°]、S = 1.000、V ∈ [0.930, 1.000]、Y ∈ [0.5997, 0.7706] ⇒ **12/12 全部通过 ✅**（Architect 独立复算确认）。旧三色板 ❌：蓝+橙的混合物掉出整个约束集 |
+
+#### 3.3.3 Phase 3 色板（**Day 5 追加三修订 2026-08-11：恢复按实例配色，条件性追认**）
+
+> **上一版（2026-08-11 追加二）「全实例统一青、按实例配色撤销」正式被本节取代。**
+> 取代的合法性见 §13.2.2：撤销按实例配色的推理前提是「色相在承担 L1 可见性」，
+> 而**双色描边落地后 L1 已由描边独立承担**，色相退回 §3.3.1 的 L3 ⇒ 原推理的前提消失，结论随之失效。
+> 这不是反复横跳：被推翻的是我的**一条论据（允许带装不下三个色相）**，被前提变更作废的是**结论**，两者各有各的原因。
+
+```
+三槽位色板（全部 S = 1.00 / V = 1.00，C-7 (a) 算术检验已过；Architect 独立复算逐项吻合）
+
+  slot 0   青   (0, 217, 255)    H = 188.94°   Y = 0.5685   ← 保留 Day 4 的青
+  slot 1   水青 (0, 255, 242)    H = 176.94°   Y = 0.7793
+  slot 2   春青 (0, 255, 170)    H = 160.00°   Y = 0.7442   ← C-1a 例外（零余量）
+
+  alpha    primary 0.60 / secondary 0.40（**未变**，与追加二一致）
+  描边     双色轮廓，primary 2.0/1.5 pt、secondary 1.5/1.0 pt（**未变**）
+  槽位分配 新实例取当前未占用的槽位；FIFO 淘汰释放槽位 ⇒ 两个存活实例不可能同色
+```
+
+**追认状态：🟢 FINAL（2026-08-16 升级）。** C-7 (b) 真机目视测试已完成（§13.2.5 W-2 已结案）。结果：三槽各测同色系实物，全部「填充看不清但轮廓仍在」或更好；同屏三实例可区分（W-1 PASS）。详见 debug_report.md §28。
+
+**四条封层性质的结论（逐条给出，含两处对上一版的勘误）：**
+
+1. ❌ **上一版理由 1「C-1 允许色带装不下三个彼此可区分的色相」经算术核对不成立，予以撤回。** 在修订后的允许带 H ∈ [160°, 194.78°] 内、slot 0 钉死 188.94° 的前提下，(160.0°, 177.5°, 188.94°) 的最小 CIEDE2000 = 17.4；实际发布的 (160°, 176.94°, 188.94°) = **17.1**，高于「类别可辨识」常用的 ΔE00 ≈ 10。**约束集容得下三个可区分色相；容不下的是「散布在整个色环上的三个」** —— 旧色板 ΔE00_min = 50.2，正是那种散布把两个色相拖进了禁用带。原表述把「色相间距不够」与「色相位置越界」混为一谈了。
+2. ❌ **上一版理由 2「三色重叠会混出第四种颜色」对本色板不成立，但其成立条件已提炼为 C-8。** 本色板在 source-over 下**封闭**（R ≡ 0 ⇒ 任意凸组合 S = 1.000），12 种叠放组合全部通过 C-1/C-2/C-3。旧色板不成立的原因不是「三色」而是「未检验混合封闭性」：蓝 + 橙的混合物掉出了整个约束集。⇒ 该理由不再作为反对按实例配色的论据，而是作为**每次换色都必须跑的检验（C-8）**保留。
+3. ✅ **理由 3 仍然成立，但方向反了过来用 —— 色相是 L3 的「载体之一」，不是充分载体。** 见 §13.2.5 W-1：alpha 衰减后 secondary 之间的合成 ΔE00 只有 6.8–10.6，多数背景低于 10。**在 Day 6 的 tap 锚点编号落地之前，L3 处于已知欠载状态**（primary/secondary 的区分由描边分档承担，属 L2；两个 secondary 之间目前只有色相一个载体）。
+4. ✅ **理由 4 仍然成立，且被 slot 0 的选择精确保住：** slot 0 = Day 4 的青 (0,217,255) ⇒ N = 1 时合成输出与 Day 4 `renderMask` 的字面量 (0,217,255,153) **逐位相同**，44/50 = 88% 人工评分基线在**单 tap** 上完全不受影响（多实例场景本就不在该基线的采样协议内）。
+
+`TapInstance.color` 字段语义**回升**为「实例区分色（L3 载体之一）」；`palette` 三个槽位为 plain sRGB 字面量，不得使用 dynamic system color（后台线程解析问题，D-15）。
+
+
+---
+
+### 3.4 呈现层次规则（Day 5 追加修订 2026-08-11，取代原「Primary 渲染规则」）
+
+```
+Primary 实例（最近一次 tap）：
+    填充   该实例的槽位色（slot 0 青 / slot 1 水青 / slot 2 春青，§3.3.3）@ alpha 0.60
+    描边   双色轮廓：外层 2.0 pt 近黑 (0,0,0) @0.85  →  内层 1.5 pt 近白 (255,255,255) @0.95
+Secondary 实例：
+    填充   该实例的槽位色 @ alpha 0.40
+    描边   双色轮廓（减档）：外层 1.5 pt 近黑 @0.70  →  内层 1.0 pt 近白 @0.70
+实例已创建但 mask 尚未就位（mask == nil）：
+    不显示该实例的 mask，在其 tap 位置显示等待指示
+    （§10.3 D2 的脉冲确认动画；语义 =「已收到点击」，非进度）
+实例池为空：
+    maskImage = nil，回退「无 mask」显示状态
+绘制顺序：
+    按 createdAt 升序 —— secondary 在下、primary 最后（压最上层）；与 Builder Day 5 实现一致，不变
+```
+
+**双色描边为什么是背景无关的（这是本次修订的实质）：** 单色白描边在白墙上消失，单色黑描边在暗物体上消失——单色描边只是把「押注」从填充色换到了描边色，仍然依赖不可控输入。「深色外圈 + 浅色内线」则保证无论背景亮度落在量程哪一端，两条线中**至少一条**与背景存在足够的亮度阶跃。这是字幕、地图注记、医学影像叠加层的通行做法。**它把 L1 从「与不可控输入比对比度」改造成「呈现元素自带对比度」。**
+
+**primary / secondary 的区分不再依赖色相后的载体清单（按强度排序）：**
+1. 描边档位（2.0/1.5 pt 全强度 vs 1.5/1.0 pt 减档）——**最强，且背景无关**；
+2. 填充 alpha 0.60 vs 0.40（比值 1.5:1，secondary 仍在「自然场景上可见」的下限之上）；
+3. Z 序（primary 永远压在最上层）；
+4. tap 锚点标记 + 实例编号（Day 6）—— **L3 的必需载体**，定级 P1；在它落地前，两个 secondary 之间只有色相一个 L3 载体，且其合成 ΔE00 多数背景 < 10（§13.2.5 W-1）；
+5. 色相（槽位色，§3.3.3）—— **L3 的载体之一，不是充分载体，且永远不承担 L1**。
+
+**保留条款（Day 5 原文，本次未被推翻，继续有效）：**
+
+> **「不显示」的唯一条件是 `mask == nil`（尚未解码完成 / 解码失败）。**
+> **已解码成功的 mask 不存在「失效」状态**——它不会因为变旧而变得不可显示，只会被 §3.2.1 的 C1–C6 事件移除。
+> 渲染层因此不需要、也**不得**持有任何「mask 是否仍然有效」的时间判定；`drawableInstances()` 的正确行为就是「返回所有已有 alpha 的实例」。
+> （原修订背景：旧表述中的「无有效 mask」曾被合理地读作「TTL 未过期」，与 §3.1 的 2000 ms 叠加后推出「tap 后 2 秒自动消失」的错误行为，见 §11。）
+
+---
+
+## 4) Encoder 触发逻辑（锁定）
+
+### 4.1 encoderQueue 共享规则
+
+```
+encoderQueue = 单一 serial DispatchQueue（Phase 2 已有，Phase 3 复用）
+SAMEncoder   = 单一实例（Phase 2 已有，Phase 3 复用，禁止加载第二份）
+isEncoding   = 已有 Bool flag（Phase 2 已有，Phase 3 共用，不得新建独立 flag）
+```
+
+### 4.2 Tap 模式触发逻辑
+
+```
+用户 tap
+    │
+    ▼
+embedding 是否有效？
+（TTL 未过期 AND geometry 未变化）
+    │
+    ├── YES → 直接进入 decode（point prompt）
+    │          显示短暂波纹动画，mask 通常在 ~61 ms 内出现
+    │
+    └── NO →
+          isEncoding == true？
+              ├── YES → 显示持续脉冲动画（等待 encode 完成）
+              │          encode 完成后自动触发 decode（point prompt）
+              │
+              └── NO → 立即触发 encode
+                        encode 完成 → 触发 decode（point prompt）
+                        decode 完成 → 更新 TapInstance.mask，刷新渲染
+```
+
+### 4.3 Phase 2 与 Phase 3 模式交互规则
+
+| 场景 | 行为 |
+|------|------|
+| `.segmentation` 模式下 encode 进行中，用户切换到 `.tapToSegment` | 等待当前 encode 完成后 Phase 2 回调被忽略（mode check），下一次 tap 触发新 encode |
+| `.tapToSegment` 模式下，Phase 2 每 12 帧调度 encode | **Phase 2 调度必须 no-op**（mode != .segmentation 时 TemporalManager 不得触发 encode）|
+| 两模式均需 encode，encoderQueue 有任务 | 串行排队，后者等待，不并发 |
+| encode 失败（任何原因） | `isEncoding = false` 复位，tap 实例保持 iouPred=0，显示 fallback 状态 |
+
+### 4.4 Phase 2 TemporalManager 静默规则（重要）
+
+在 `.tapToSegment` 模式下，`CameraManager` 必须在调用 TemporalManager 前检查 `currentMode`：
+
+```swift
+// CameraManager 中的检查（伪代码）
+if currentMode == .segmentation {
+    temporalManager.update(detections: detections, ...)
+    // 后续 encode/decode 调度由 TemporalManager 驱动
+}
+// .tapToSegment 模式：TemporalManager 静默，不调用
+```
+
+---
+
+## 5) SAMDecoder 加法重载设计（审批）
+
+### 5.1 现有 API（冻结，不得修改）
+
+```swift
+// SAMDecoder.swift — 现有方法，Phase 2 使用，不得改动签名或方法体
+func decode(embedding: MLMultiArray,
+            prompt: PromptBuilder.BoxPrompt) -> MLMultiArray?
+```
+
+### 5.2 新增重载（Phase 3 — 加法 ONLY）
+
+```swift
+// 新增：点提示重载，与上方方法并存
+// 文件：SAMDecoder.swift（在现有 decode 方法之后追加）
+func decode(embedding: MLMultiArray,
+            pointPrompt: PointPromptBuilder.PointPrompt) -> (mask: MLMultiArray, iouPred: Float)?
+```
+
+**约束：**
+- 此重载**不得修改**现有 `decode(embedding:prompt:)` 的任何一行
+- 内部仅调用 `model.prediction(from:)`，输入 tensor 来自 `PointPromptBuilder.PointPrompt`
+- 输出增加 `iouPred`（点提示质量评估依赖 iou_pred，bbox 路径不返回此值是已知遗留，Phase 3 新增）
+- 返回可选 tuple：decode 失败时返回 `nil`，调用方必须处理 nil
+
+### 5.3 PointPromptBuilder.PointPrompt 契约
+
+```swift
+// 新文件：Interaction/PointPromptBuilder.swift
+struct PointPromptBuilder {
+    struct PointPrompt {
+        let pointCoords: MLMultiArray    // shape 由 ML_Vision Day 1 确认（[1,1,2] 或 padding 到 [1,2,2]）
+        let pointLabels: MLMultiArray    // 对应 shape，foreground label = 1
+        let maskInput: MLMultiArray      // shape [1,1,256,256]，全零
+        let hasMaskInput: MLMultiArray   // shape [1]，值 0.0
+    }
+
+    /// 将 Canonical 像素坐标转为 SAM 点提示 tensor
+    /// - canonicalPoint: CGPoint in original camera px space
+    /// - origSize: CGSize(width: origW, height: origH)
+    /// - inputSize: SAM encoder input size（default 1024，Phase 3 优化后可改）
+    static func buildPointPrompt(canonicalPoint: CGPoint,
+                                 origSize: CGSize,
+                                 inputSize: Int = 1024) -> PointPrompt?
+}
+```
+
+**归一化规则（与 PromptBuilder 一致）：**
+1. Apply ResizeLongestSide(inputSize) + centered padding（与 PromptBuilder.buildBoxPrompt 相同的变换）
+2. 结果：SAM 空间坐标（0 ~ inputSize）
+3. **不得**在此函数外部预先归一化
+
+> ⚠️ tensor shape（[1,1,2] vs [1,2,2]）待 ML_Vision Day 1 确认模型实际接受的 point_coords 形状后，Builder Day 2 方可实现。
+
+---
+
+## 6) isolate_phase2.md 剩余 Checklist 裁决
+
+| 项 | 裁决 | 说明 |
+|----|------|------|
+| SAMDecoder 加法重载设计 Architect 审批 | ✅ **批准** | 见 §5，加法设计符合冻结契约，现有方法不受影响 |
+| 坐标变换链契约确认 | ✅ **锁定** | 见 §2，完整变换链已定义，Builder 按此实现 |
+| Agent 分工对齐 | ✅ **确认** | 见下表 |
+
+### Agent 分工（Phase 3 Day 2 起生效）
+
+| Agent | Phase 3 职责 |
+|-------|-------------|
+| **Architect** | 契约冻结、SAMDecoder 重载审批（已完成）、Day 4 分辨率裁决、Day 7 架构冻结 |
+| **ML_Vision** | 点提示 tensor shape 确认、ANE 修复方案（Day 1）、分辨率评估（Day 3） |
+| **Builder** | Interaction/ 全部模块实现、FrameGeometry.invertViewPoint、PointPromptBuilder、TapInstanceManager |
+| **Debugger** | tap 坐标误差验证（Day 2）、端到端延迟测量（Day 4）、多实例内存压测（Day 5）、性能回归监控 |
+
+---
+
+## 7) Deliverable 确认
+
+Phase 3 Day 1 Architect 契约已锁定，以下内容均已定义：
+
+- [x] Tap-to-Segment 插入点（§1）
+- [x] 坐标变换契约（§2）
+- [x] Multi-Mask 管理模型（§3）
+- [x] Encoder 触发逻辑（§4）
+- [x] SAMDecoder 加法重载设计审批（§5）
+- [x] Agent 分工对齐（§6）
+
+**Phase 2 pipeline 保护状态：**
+- YOLO 路径不受影响 ✅
+- TemporalManager 不被 Phase 3 代码调用 ✅（mode check 保护）
+- SAMEncoder / SAMDecoder 实例不重复加载 ✅
+- encoderQueue 共享但串行，无并发风险 ✅
+
+可进入 Day 2（ML_Vision ANE 修复交付 + Builder TouchHandler 实现）。
+
+---
+
+END OF PHASE 3 DAY 1 ARCHITECT OUTPUT
+
+---
+
+# Phase 3 — Day 4 (Architect) 降编码分辨率裁决
+
+日期：2026-07-23  
+依据：ML_Vision Day 3 评估报告（shared/resolution_eval_report.md）+ 原始 JSON 数据（shared/resolution_eval_results.json）+ model_plan.md §C + Phase 3 冻结契约  
+
+---
+
+## 8) 降编码分辨率裁决（Day 4）
+
+### 8.1 裁决结论
+
+| 分辨率 | 裁决 | 说明 |
+|--------|------|------|
+| **1024×1024** | ✅ 保留为当前默认 | Phase 3 主路径，质量基准，不变 |
+| **768×768** | ✅ **批准 Builder 展开 AB 测试** | 有条件接受；AB 人工评审是主门控 |
+| **512×512** | ❌ **Phase 3 拒绝** | 保留给 Phase 4 fine-tuning 后评估 |
+
+---
+
+### 8.2 评估数据质量审查（⚠️ 重要）
+
+在审阅 ML_Vision Day 3 评估报告时，Architect 发现报告结论与原始 JSON 数据之间存在**关键不一致**，须在裁决前正式记录：
+
+| 数据项 | 报告声称 | JSON 原始数据 | 差异 |
+|--------|---------|--------------|------|
+| 768 IoU vs 1024（均值） | 0.581 | **0.0（所有样本）** | ⚠️ 完全矛盾 |
+| 512 IoU vs 1024（均值） | 0.592 | **0.0（所有样本）** | ⚠️ 完全矛盾 |
+| 有效测试样本数 | 「20 样本（4 图×5 点）」 | **2 张图像（n_images=2）** | ⚠️ 样本不足 |
+| 768 iou_pred（内部评分） | — | 0.664 / 0.697（两图均值 ~0.68） | ✅ 与报告相符 |
+| 512 iou_pred（内部评分） | — | 0.716 / 0.850（两图均值 ~0.78） | ✅ 与报告相符 |
+
+**根因分析（Architect 判断）：**
+
+- `iou_vs_1024 = 0.0` 意味着 768/512 encoder 产生的 mask 与 1024 mask 在像素层面**完全不重叠**
+- 像素数对比支持这一结论：good1.PNG 中 1024 mask 有 8319 px，而 768 mask 仅 1186 px（14%）
+- 根本原因：TinyViT-5M 从未在 768/512 上训练，降分辨率后模型在不同语义尺度上产生分割，与 1024 输出在空间上不对齐
+- 报告中的 IoU=0.581 数字来源不明（可能为理论估算或脚本 bug），**不应作为裁决依据**
+- 模型内部的 `iou_pred` (~0.68–0.78) 表明模型仍在分割某个有意义的区域，但不保证与 1024 语义一致
+
+**裁决影响：** 上述发现使 768 的批准条件更为严格。AB 测试中的**人工视觉评估**成为唯一可信的质量门控（不可依赖 iou_vs_1024 数字）。
+
+---
+
+### 8.3 768×768 批准依据与约束条件
+
+**批准理由：**
+1. **延迟收益显著且数据可靠**：Mac 实测比例法预测 iPhone 11 encoder 从 857ms 降至 ~555ms（×1.54），该数字来自可重复的 Mac CPU 计时，具有参考价值
+2. **实现可逆**：通过 `encoderInputSize` 配置项控制，1024 路径不受任何修改，失败时立即回退
+3. **内部 iou_pred 尚可**：~0.68，高于 Phase 3 质量门控下限（0.5），说明模型在低分辨率下仍在有效分割，但语义可能与 1024 有偏差
+4. **AB 测试可验证**：真机上的人工评审将给出最终答案；Phase 3 尚有时间在 Day 5 撤销
+
+**批准约束（Builder 必须严格遵守）：**
+
+| 约束编号 | 约束内容 | 理由 |
+|---------|---------|------|
+| C-1 | Phase 3 **默认分辨率保持 1024**；768 仅通过 `SAMConfiguration.encoderInputSize = 768` 显式启用 | 1024 为质量基准，768 为待验证优化 |
+| C-2 | `PointPromptBuilder` 中点坐标**永远在 1024 空间计算**，不随 encoderInputSize 变化 | Decoder 固定以 1024 归一化，坐标混用会导致 mask 完全错位（见 model_plan §C.4）|
+| C-3 | 768 encoder 输出 `[1,256,48,48]`，**必须**在 Swift 层双线性上采样至 `[1,256,64,64]` 后再传入 Decoder | Decoder 固定接受 64×64 embedding |
+| C-4 | 768 模型导出**必须**同步应用 milfix（`export_encoder_fp16_milfix.py` + trace 尺寸改为 768）| 保持 ANE 对齐修复，维持与 1024-milfix 相同的性能基线 |
+| C-5 | AB 测试**必须包含人工视觉评分**（1–5 分，5=视觉上与 1024 无区别）| iou_vs_1024 数值不可信，人工评审是唯一可靠质量门控 |
+| C-6 | AB 测试数据（延迟 + iou_pred + 人工评分）必须写入 `builder_progress.md` | 供 Day 5 Architect 审批 |
+
+---
+
+### 8.4 512×512 拒绝依据
+
+| 拒绝理由 | 具体数据 |
+|---------|--------|
+| 质量无优于 768 | iou_pred ~0.78，与 768 (~0.68) 接近；iou_vs_1024 同样为 0.0 |
+| 极端退化风险更高 | 512 时 1 特征单元对应 32px，tap 精度粗糙；mask 极端失真风险更大 |
+| 强依赖 fine-tuning | zero-shot 可用性无法保证；需专项训练才有意义 |
+| Phase 3 范畴外 | Phase 3 聚焦 UX 正确性与流水线稳定性；精度优化属 Phase 4 |
+
+**保留入口点（Phase 4）：** 512 fine-tuning 后可重新评估；导出脚本与 768 相同，仅修改 trace 尺寸为 `(1,3,512,512)`。
+
+---
+
+### 8.5 Phase 3 冻结参数表（Day 4 中间态 — **已被 §9.5 取代，勿引用**）
+
+| 参数 | 当前状态 | Day 5 目标 |
+|------|---------|----------|
+| Encoder 输入分辨率 | ~~**1024（默认）；768（AB 测试中）**~~ | ✅ 已裁决 — **封层 1024，撤销 768**（见 §9.1）|
+| Decoder 输入 embedding | `[1, 256, 64, 64]`（固定） | 不变 |
+| Point prompt 坐标空间 | **永远 1024 空间**（锁定） | 不变 |
+| Encoder 模型系列 | milfix fp16（已锁定）| ✅ 已裁决 — 768 变体撤销，milfix fp16 单模型封层（见 §9.5）|
+| Embedding TTL | 8000ms（Phase 2 继承）| 不变（Tap 路径 TTL 修复在 Day 6）|
+| Mask TTL | 2000ms（Phase 2 继承）| 不变 |
+| 最大实例数 N | 3（Day 1 锁定）| 不变 |
+| fine-tuning | Phase 4 范畴 | 不变 |
+
+---
+
+### 8.6 Builder Day 4 AB 测试规格（正式授权）
+
+Builder 按以下规格展开，结果写入 `builder_progress.md`：
+
+**模型导出（如未完成）：**
+1. 修改 `shared/export_encoder_fp16_milfix.py`：将 dummy_trace 改为 `torch.randn(1, 3, 768, 768)` + monkeypatch `forward_features` 动态化（`feat_size = img_size // 16`）
+2. 输出 `MobileSAM_ImageEncoder_fp16_milfix_768.mlpackage`（~14 MB）
+3. Decoder mlpackage 不变
+
+**Swift 适配（3 处）：**
+1. `SAMConfiguration.encoderInputSize: Int`（default=1024，AB 测试时设为 768）
+2. Encoder 预处理 resize 适配 encoderInputSize
+3. Encoder 输出上采样桥接（`[1,256,48,48]` → `[1,256,64,64]`，双线性插值）
+
+**AB 采样要求：**
+- 同场景同目标，分别运行 1024 和 768 各 5 次
+- 记录：encoder latency mean + p95、iou_pred 均值、人工视觉评分（1–5）
+- 人工评分标准：5=mask 完整覆盖目标对象；3=大致覆盖但有缺口；1=mask 完全错位或无意义
+
+---
+
+### 8.7 Day 5 Architect 最终封层条件（预告）
+
+| AB 结果 | Day 5 决定 |
+|---------|----------|
+| 768 latency 降幅 ≥ **150ms** 且人工评分均值 ≥ **3.5** | ✅ 封层 768 为 Phase 3 默认 encoder 分辨率 |
+| 768 latency 降幅 < 100ms 或人工评分均值 < 3.0 | ❌ 撤销 768，封层 1024 为唯一分辨率 |
+| 介于两者之间（降幅 100–150ms 或评分 3.0–3.5）| Architect 主观裁量，可能封层为可选「速度模式」 |
+
+---
+
+### 8.8 Deliverable 确认
+
+- [x] 768×768 批准 Builder AB 测试（见 §8.3，含严格约束）
+- [x] 512×512 Phase 3 拒绝（见 §8.4）
+- [x] 评估数据质量差异正式记录（见 §8.2）
+- [x] Phase 3 冻结参数表部分更新（见 §8.5）
+- [x] Builder AB 测试规格授权（见 §8.6）
+- [x] Day 5 封层条件预告（见 §8.7）
+
+**Phase 2 pipeline 保护状态：** 无变化，所有 Phase 2 路径不受影响 ✅
+
+---
+
+END OF PHASE 3 DAY 4 ARCHITECT OUTPUT
+
+---
+
+# Phase 3 — Day 5 (Architect) 分辨率封层 + 延迟展示策略裁决
+
+日期：2026-08-09
+依据：Debugger Day 4 真机实测（`shared/debug_report.md` §10.1–10.4、§13）+ Session A 良品率评测（`shared/phase3_day4_test_checklist.md` §2–§3）+ Day 4 tap 延迟全量采样（24 次）+ §8.7 预告的封层条件
+适用设备：iPhone 11 / A13（唯一实测平台）
+
+---
+
+## 9) Encoder 分辨率最终封层裁决
+
+### 9.1 裁决结论
+
+| 分辨率 | Day 4 状态 | **Day 5 最终裁决** |
+|--------|-----------|-------------------|
+| **1024×1024** | 默认 | ✅ **封层为 Phase 3 唯一 encoder 分辨率** |
+| **768×768** | AB 测试中 | ❌ **撤销**（§8.3 的批准正式作废，约束 C-1…C-6 随之失效）|
+| **512×512** | Phase 3 拒绝 | ❌ 维持拒绝（不变，Phase 4 重评入口保留）|
+
+**该行落入 §8.7 门控表的第二行（撤销分支）。裁决即刻生效，Day 5 起 `encoderInputSize` 不再作为可调优化项进入任何后续排期。**
+
+---
+
+### 9.2 撤销依据（实测，同 session 配对设计）
+
+| 指标 | 1024（n=3 warm） | 768（n=4 warm） | 差值 |
+|------|-----------------|-----------------|------|
+| mean | **970.6 ms** | **1036.0 ms** | **+65.4 ms（768 更慢）** |
+| p95 | 1006.1 ms | 1126.5 ms | +120.4 ms |
+
+§8.7 要求「降幅 ≥150 ms」。实测不仅无降幅，方向相反。差距达 215 ms（门控线 −150 与实测 +65 之间），**不在测量噪声可解释的范围内**，无需补采即可裁决。
+
+**理论预测被证伪的原因**（采纳 debug_report §10.3 的机制解释）：
+
+1. ML_Vision Day 3 的 ×1.54 加速预测建立在 **Mac CPU 线性缩放假设**上。A13 的 ANE 并非按像素数线性计费：768 与 1024 两份权重文件同为 14.1 MB，ANE 的图编译与调度开销占比高，计算量下降 44% 并未按比例转化为墙钟时间下降。
+2. 768 路径**额外**背负 C-3 要求的 Swift 层 48×48 → 64×64 双线性上采样，把节省的一部分又还了回去，并推迟了 decoderQueue 的入队时刻。
+
+**架构层教训（写入长期约定）：** 跨硬件后端（Mac CPU → iPhone ANE）的比例外推**不得**作为架构裁决的充分依据，只能作为「值得做 AB」的立项依据。今后任何涉及 ANE 的性能提案，门控必须绑定目标设备真机配对实测。
+
+---
+
+### 9.3 门控口径缺陷两则（如实记录，不得美化）
+
+#### 缺陷 1：人工评分维度**从未在 768 上采集**
+
+- §8.7 门控的撤销分支写法为「降幅 <100 ms **或** 评分 <3.0」，而批准分支为「降幅 ≥150 ms **且** 评分 ≥3.5」。
+- 事实：C-5/C-6 要求的 768 人工评分表**未产出**。Session A 的 50 次评分**全部在 1024 上**完成（良品率 44/50 = 88%），与 768 无关。debug_report §13 记为「无法评分（mask 滞后不可见）」。
+- **对本次裁决的影响：无。** 撤销分支的两个条件是**析取**关系，延迟维度单独越线（+65 ms，远差于 <100 ms 的触发线）已足以触发撤销。评分维度缺失不改变结论。
+- **但门控表述必须修订，供未来复用：**
+
+> **门控语义修订（自 Day 5 生效）**
+> 「批准」需**全部**条件满足（合取）；「撤销」**任一**条件触发即可（析取）；仅当所有条件均落在中间带时才进入主观裁量。
+> 推论：一旦某一维度已单独触发撤销，**不要求**补齐其余维度的数据。反之，若仅有部分维度数据且这些维度全部指向「批准」，**不得**据此封层——缺失维度视为未通过。
+
+#### 缺陷 2：热态口径未标注，970.6 ms 曾有被误用为绝对指标的风险
+
+同一份 1024 encoder，在两轮不同会话中给出显著不同的绝对数值：
+
+| 数据来源 | 会话条件 | 实测 | n |
+|---------|---------|------|---|
+| debug_report §10.1（2026-07-23）| **AB 交替会话**：同一进程内先后加载 1024 与 768 两份 encoder，反复切换分辨率触发 counter 重置；warm 样本取自冷启动之后 | mean **970.6** ms / p95 1006.1 ms | 3 |
+| Day 4 Session B（2026-08-01/02）| **单模型稳态会话**：仅 1024 一份 encoder，tapToSegment 空闲态 background refresh，无模型切换 | **573–755 ms，mean ≈648 ms** | 14 |
+
+两者相差约 33%。
+
+> **封层文本标注（必须随 1024 一起引用）**
+> **970.6 ms 是 AB 配对比较量，不是 Phase 3 的 encoder 绝对性能指标。** 它仅在其采集会话内部有效（1024 与 768 共处同一热态与同一模型切换负载，配对设计保证了**内部效度**，因此 §9.2 的相对结论稳健），但**不具备跨会话的外部效度**。
+> **Phase 3 引用 encoder 绝对延迟时，一律使用 648 ms（n=14, warm, 单模型稳态, tapToSegment 空闲 background refresh, iPhone 11）。**
+> 任何后续文档、验收指标、Phase 4 对比基线若引用 970.6 ms 作绝对值，视为口径错误。
+
+**附带要求：** 自 Day 5 起，任何写入 debug_report / builder_progress 的延迟数字**必须**同时标注：(a) 冷/热态及 warm 样本的判定方式；(b) 同会话内是否发生过模型切换；(c) 并发负载（YOLO 是否在跑、模式为何）；(d) n。缺任一项的数字不得进入封层裁决。
+
+---
+
+### 9.4 768 资产处置
+
+- 已导出的 `MobileSAM_ImageEncoder_fp16_milfix_768.mlpackage` **不删除**，归档保留，作为「ANE 非线性缩放」这一结论的实证物。
+- `SAMConfiguration.encoderInputSize` 配置项**保留但冻结**为常量语义：Phase 3 内不得再被任何代码路径设为 1024 以外的值；C-3 要求的 48→64 上采样桥接代码若已实现，允许保留为死代码，但**不得**在主路径被调用。是否物理删除交由 Day 7 冻结时一并处理（属清理，不属功能）。
+- Phase 4 若重启低分辨率议题，**入口条件**为：先在目标设备上取得 ANE 逐层 profile（证明计算量确实是瓶颈），再谈导出与 AB。仅有 FLOPs 下降不构成立项理由。
+
+---
+
+### 9.5 Phase 3 冻结参数表（**Day 5 最终封层**）
+
+本表取代 §8.5。Day 7 架构冻结时直接继承，除非有新的真机数据触发复议。
+
+| 参数 | **封层值** | 状态 | 依据 |
+|------|-----------|------|------|
+| Encoder 输入分辨率 | **1024×1024** | 🔒 **FINAL（Day 5）** | §9.1–9.3；768 撤销、512 拒绝 |
+| Encoder 模型系列 | **milfix fp16 单一模型** | 🔒 FINAL | 768 变体撤销后不再有第二份 encoder |
+| Decoder 输入 embedding | `[1, 256, 64, 64]` | 🔒 FINAL | 与 1024 encoder 原生匹配，无桥接层 |
+| Point prompt 坐标空间 | **恒为 1024 空间** | 🔒 FINAL | C-2 保留；768 撤销后该约束自动恒成立 |
+| Encoder 绝对延迟基线 | **≈648 ms**（warm / 单模型稳态 / n=14）| 🔒 FINAL（口径见 §9.3 缺陷 2）| Day 4 Session B |
+| Decode 延迟基线 | **≈61 ms**（warm, n=24）| 🔒 FINAL | Day 4 Session B 全量 tap 采样 |
+| Embedding TTL | 8000 ms | ⚠️ 未封层 | **Phase 3 内唯一的时间型 TTL**。数值复议留到 Day 6（见 §10.5 风险 R2、§11.6）|
+| ~~Mask TTL~~ | ~~2000 ms~~ | ❌ **作废（Day 5，§11）** | 时间型 mask TTL 整体撤销，本行不再有值可填 |
+| Tap mask 生命周期 | **事件驱动，无时钟**（清除条件全集 = §3.2.1 C1–C6）| 🔒 **FINAL（Day 5）** | §11.1–§11.4；用户实测确认「双击才消失」符合预期 |
+| 最大实例数 N | **3** | 🔒 FINAL | Day 1 锁定，Day 5 多实例照此实现 |
+| Tap 延迟展示策略 | **脉冲确认动画，不设进度条** | 🔒 FINAL（快路径）/ ⚠️ 慢路径待 Day 7 数据 | §10 |
+| Tap mask 填充色 | **三槽色板** slot0 青 (0,217,255) / slot1 水青 (0,255,242) / slot2 春青 (0,255,170) | 🔒 **FINAL（Day 7 C-7(b) 通过，2026-08-16）** | §3.3.3；变更须过 §3.3.2 C-1/C-1a/C-2/C-3/C-8 + C-7 |
+| Tap mask alpha | **primary 0.60 / secondary 0.40** | 🔒 **FINAL（Day 5 追加二）** | §3.4；恢复 Day 4 逐位一致，保住 88% 基线可比性 |
+| Tap mask 描边 | **双色轮廓**（primary 2.0/1.5 pt、secondary 1.5/1.0 pt，屏幕坐标系生成）| 🔒 **FINAL（Day 5 追加二）** | §3.4；L1 唯一承载者，实现从 Day 6 提前到 Day 5 |
+| 按实例配色（per-instance hue）| **Phase 3 内恢复**（`TapInstance.color` 语义回升为「实例区分色」，仅承担 L3）| 🔒 **FINAL（与色板同步升级，2026-08-16）** | §3.3.3 / §13.2；前提变更 = 双色描边已独立承担 L1 |
+| fine-tuning | Phase 4 范畴 | 不变 | §8.4 |
+
+---
+
+## 10) tap-to-mask 延迟展示策略裁决
+
+### 10.1 数据审查
+
+**Day 4 实测（24 次全量采样，iPhone 11，全部为 decode-only 快路径）：**
+
+| 分量 | 实测 |
+|------|------|
+| tap → mask 端到端 | **429–1030 ms，中位 ≈620 ms** |
+| 其中 decode 计算 | **48.9–75.6 ms，mean ≈61 ms** |
+| **无法解释的差值** | **约 400–960 ms** |
+
+**差值已定位，且不是计算开销：** `handleTap` 把 tap 派发到 `videoQueue`，而 `videoQueue` 同时是 `AVCaptureVideoDataOutput` 的 delegate 队列，正在跑 YOLO（单帧占用 400–670 ms）。tap 排在当前帧之后。差值区间 400–960 ms 与 YOLO 单帧区间 400–670 ms 高度吻合（上界处叠加了排队中的第二帧），**归因成立**。
+
+**结论性判断：快路径 620 ms 的中位延迟里，约 90% 是调度排队，只有约 10%（61 ms）是真实计算。**
+
+### 10.2 三个口径缺陷（裁决必须带着走，不得当作干净数据）
+
+| 编号 | 缺陷 | 对裁决的影响 |
+|------|------|-------------|
+| **G-1** | `e2eMs` 计时终点落在**主线程发布 mask 之前**（`CameraManager.swift:761`），不满足「手指离开 → 看到 mask」的定义 | 429–1030 ms 是**下界估计**，真实感知延迟更高。因此本裁决的方向（延迟确实需要治理）**更强**而非更弱；但任何「已达标」的判断不得基于该口径 |
+| **G-2** | 本轮**零个** encode+decode 慢路径样本（唯一一次 parked tap 被丢弃）| 慢路径**无实测基线**。慢路径的 UI 策略**不予封层**，只给临时规则（见 §10.4 Tier 1）|
+| **G-3** | encoder 冷启动 warmup 实测 **1283 ms ~ 8605 ms**（跨度 6.7 倍），而 `scheduleTapBusyTimeout` 兜底仅 **3 秒** | 8.6 秒那一次：超时先清掉加载指示，用户看到「点了没反应」。**这是当前 tap 路径最严重的用户可见失败模式**，且是纯逻辑不一致（兜底值与实测分布不相容），不是调参问题 |
+
+---
+
+### 10.3 裁决结论
+
+> **D1 —— 不引入进度条，不引入「裁剪 / 分段等待」UI。**
+>
+> 理由：快路径的真实计算量是 61 ms。用 UI 去粉饰一个 90% 由错误队列归属造成的排队延迟，是把架构缺陷转译成永久性 UI 债；同时进度条会向用户植入「这个功能本来就慢」的错误心智模型，而事实是它本来很快。**先修调度，再谈 UI。**
+
+> **D2 —— 保留 `TapLoadingIndicator`（脉冲圆环）作为唯一等待反馈，并明确其语义为「已收到点击」的确认，而非进度指示。**
+>
+> 它不表达剩余时间，不分段，不带百分比。`@Published tapProcessing` 保持为布尔量，**不得**扩展为进度值 —— 一旦有了进度数值，就会有人去画进度条。
+
+> **D3 —— 授权并要求 Builder 将 tap 快路径从 `videoQueue` 上摘除（架构级，Day 5 内完成）。**
+>
+> 这是本次裁决的**主要交付物**，UI 策略只是其推论。
+
+> **D4 —— `scheduleTapBusyTimeout` 的 3 秒固定兜底作废，改为按分支分级，且超时必须显式告知失败。**
+
+> **D5 —— `e2eMs` 计时口径修正为架构级验收定义；Day 4 的 429–1030 ms 降级为「下界参考」，不得作为 Day 7 验收基线。**
+
+---
+
+### 10.4 对 Builder 的具体要求（接口级，不含实现）
+
+#### 要求 A（对应 D3）— 快路径去队列化
+
+**契约：** tap 的**快路径不需要 camera pixel buffer**，只需要 letterbox 几何 + 已缓存的 embedding 引用。因此它没有任何理由排在 YOLO 帧后面。
+
+```
+现状（错误）:
+  手势线程 → videoQueue.async { handleTap }      ← 排在 YOLO 帧后（400–670 ms）
+              ├─ stateLock 读 embedding / geometry
+              └─ decoderQueue.async { decode }    ← 61 ms
+
+要求（Day 5）:
+  手势线程 → stateLock 快照 { FrameGeometry, embedding 引用, TTL/geoChanged 判定 }
+              ├─ 判定 = 快路径 → decoderQueue.async { decode }   ← 直达，不经 videoQueue
+              └─ 判定 = 慢路径 → videoQueue.async { 取 pixelBuffer → encode → decode }
+```
+
+- 快照必须在 `stateLock` 保护下完成，且**只做读取与判定**，不做任何模型调用（锁内不得跨队列等待）。
+- 慢路径（`canReuse == false`）路径**不变**，仍需最新 pixel buffer，仍走 videoQueue。
+- §4.2 的触发逻辑语义**不变**（TTL + geometry 判定、encode/decode 顺序、`isEncoding` 共享 flag 全部保持）。本要求只改**判定发生在哪个队列**，属调度层细化，不构成契约变更。
+- 不得为快路径新建第三个队列；`decoderQueue` 仍为唯一 serial decode 队列。
+
+**目标：** 快路径 tap→mask（修正口径）**p95 ≤ 200 ms**。
+
+#### 要求 B（对应 D5）— 计时口径修正
+
+- `e2eMs` 终点必须移到**主线程 mask 实际提交渲染之后**（`maskImage` 赋值 / layer contents 更新所在的 main-thread 块尾）。
+- 起点保持在手势 `.ended`。
+- 日志必须区分快/慢路径标签，并附带 `cacheAge`（见 R2）。
+- Day 7 的 tap→mask 指标**必须**用修正口径重采；Day 4 数字在 Day 7 报告中只能以「旧口径下界」形式出现。
+
+#### 要求 C（对应 D4）— 超时分级与失败可见化
+
+| 分支 | 兜底超时 | 超时后行为 |
+|------|---------|-----------|
+| 快路径（decode-only）| **1.5 s** | 清指示 + 显式失败提示（tap 无效） |
+| 慢路径（encode 在途，encoder 已 warm）| **12 s**（覆盖实测 8605 ms 上界 + 余量）| 清指示 + 显式失败提示 |
+| **冷启动 warmup 未完成期间的 tap** | 不适用 —— 见下 | —— |
+
+- **静默清除加载指示是被禁止的行为。** 任何超时路径都必须给用户一个可见的失败信号（文案 / toast / 指示环变色皆可，由 Builder 选形式），否则失败模式退化为「点了没反应」，这是最坏的一种。
+- **冷启动（1283–8605 ms）的正解不是加长超时，而是不让 tap 掉进一个会超时的等待。** 要求：warmup 未完成时，UI 呈现明确的「初始化中」状态（可复用脉冲指示但语义不同），tap 要么被显式排队一次（parked tap，warmup 完成后立即执行），要么被明确拒绝并提示。**不得**沉默丢弃 —— Day 4 唯一一次 parked tap 就是被丢弃的（G-2 的成因）。
+- `.tapToSegment` 模式**必须**触发 warmup（debug_report §254 记录 `warmupSegmentationIfPossible()` 当前只在 `.segmentation` 下调用）。修复后冷启动窗口应从「首次 tap 时」前移到「进入模式时」，用户可见延迟随之消失。此项归 Builder，Day 5 内完成。
+
+---
+
+### 10.5 保留项与风险（不封层，明确列出）
+
+| 编号 | 保留项 | 处置 |
+|------|-------|------|
+| **R1** | ✅ **已结案（2026-08-16）。** 慢路径 e2eMs：mean=822.9ms / p95=915.1ms（n=5，debug_report §29）。Tier 1 慢路径 UI 临时规则留至 Phase 4 裁决（sample size n=5，p95 估计精度低，Phase 4 Day 1 建议扩充至 n≥20） | 已结案，Phase 4 补采 |
+| **R2** | **embedding 复用过于激进**：TTL 8000 ms + 刷新阈值 5000 ms，tap 可能命中最长 8 秒前的 embedding；手持抖动下 tap 点与 embedding 语义错位，**可能是过分割的隐藏贡献者** | 当前日志不打 cache age，**无法证实也无法排除**。要求 Builder 在要求 B 的日志中补 `cacheAge` 字段（只打日志，不改行为）；TTL 数值本身留在 Day 6 复议（故 §9.5 中 TTL 标为未封层）|
+| **R3** | **低对比失败率约 12%（6/50）在 Day 5 多实例下可见度被放大**：最多 3 个实例并存，单次会话中至少出现一个坏 mask 的概率由 12% 升至约 1−0.88³ ≈ **32%** | 不改 Day 5 范围。按 Day 4 保留项的三步走执行：(1) Builder 打 stability score 日志、**不参与决策**（保护 88% 基线）；(2) 定向复采带 `candidates` 日志；(3) ML_Vision 裁决。Day 5 期间**禁止**在多实例逻辑里夹带任何 mask 质量过滤——两个变量同时动会毁掉归因 |
+| **R4** | 要求 A 落地后，多个实例的 decode 请求会更密集地进入 `decoderQueue`（serial）| Day 5 的 TapInstanceManager 必须按 §3.2 顺序入队、不并发；若出现 decode 排队堆积（debug_report §264 记录 `tapDecodeWithPoint` 无 `isDecoding` 检查），按「同一实例的新 tap 取代旧请求」处理，不做无界排队 |
+| **R5** | 本裁决全部数据来自 iPhone 11 / A13 单一设备 | A16/A17 上排队占比与 encoder 绝对值都会变。§9.5 的绝对值列为 A13 专属；跨设备结论不得外推（同 §9.2 教训）|
+
+---
+
+### 10.6 Day 7 复审门控（预告）
+
+要求 A–C 落地后，Day 7 用**修正口径**重测，按下表复审 §10.3 的 D1：
+
+| 快路径 tap→mask（修正口径，p95） | Day 7 决定 |
+|---------------------------------|-----------|
+| ≤ 200 ms | ✅ D1 维持；脉冲确认动画可进一步简化为一次性波纹 |
+| 200–500 ms | ✅ D1 维持；保留持续脉冲确认 |
+| > 500 ms 且已排除排队因素 | ⚠️ 重开进度语义 UI 议题（此时才成立） |
+
+（门控语义按 §9.3 修订后的规则理解：批准取合取，撤销取析取。）
+
+---
+
+### 10.7 Deliverable 确认
+
+- [x] Encoder 分辨率最终封层：**1024**，768 撤销、512 维持拒绝（§9.1–9.4）
+- [x] §8.7 门控口径缺陷两则如实记录并给出修订规则（§9.3）
+- [x] 970.6 ms 的热态与会话条件标注完成，绝对基线改为 648 ms（§9.3 缺陷 2）
+- [x] Phase 3 冻结参数表最终封层（§9.5，取代 §8.5）
+- [x] tap 延迟展示策略裁决：**不设进度条**，保留脉冲确认动画（§10.3 D1/D2）
+- [x] 授权 Builder 快路径去队列化 + 计时口径修正 + 超时分级（§10.4 要求 A/B/C）
+- [x] 保留项 R1–R5 明确列出，慢路径 UI 不封层（§10.5）
+- [x] Day 7 复审门控预告（§10.6）
+
+**Phase 2 pipeline 保护状态：** 无变化。要求 A 只改 tap 快路径的队列归属，`.segmentation` 路径与 YOLO delegate 回调不受影响 ✅
+
+---
+
+END OF PHASE 3 DAY 5 ARCHITECT OUTPUT（§9–§10）
+
+
+---
+
+# Phase 3 — Day 5 追加 (Architect) per-instance mask 生命周期裁决
+
+日期：2026-08-09
+依据：Builder 上交的规格自相矛盾（`builder_progress.md` Day 5「交给 Architect 的未决问题」）+ 用户真机实测反馈 + Session A 人工评分方法论（`shared/phase3_day4_test_checklist.md` §3.4）+ Day 4 良品率基线（44/50 = 88%）
+触发方式：Builder 发现 §3.1 与 §3.4 冲突后**未擅自决定行为**，如实上交。此为正确处置，记录在案。
+
+---
+
+## 11) per-instance mask 生命周期裁决（TTL 撤销）
+
+### 11.1 裁决结论
+
+| 问题 | **裁决** |
+|------|---------|
+| **Q1 — per-instance mask TTL 在 Phase 3 的最终语义** | ❌ **取消**。时间型 mask TTL（2000 ms）整体撤销，不保留为「内部状态」，不延长到任何其它数值，**不改作他用**。`maskTimestamp` 保留但降级为纯遥测字段 |
+| **Q2 — mask 的正式清除条件** | **事件驱动，穷尽列表 = §3.2.1 的 C1–C6**：C1 双击 `clearAll()` / C2 第 4 次 tap 的 FIFO 淘汰 / C3 退出 `.tapToSegment` / C4 几何签名变化清空 / C5 同实例请求取代（替换非清除）/ C6 长按删除单实例（Day 6）。**时间流逝不是清除条件** |
+| **Q3 — §3.1 / §3.4 原文修订** | 已直接改写，见本文件 §3.1「Mask 生命周期」段、新增 §3.2.1、§3.4「修订说明」段。§9.5 冻结参数表同步：`Mask TTL` 行作废，新增 `Tap mask 生命周期 = 事件驱动，无时钟` 🔒 FINAL |
+| **Q4 — 与 embedding TTL 8000 ms 的关系** | 见 §11.6。**Phase 3 内只保留一个时间型 TTL：embedding TTL。** mask 侧不存在第二个时钟，术语「mask TTL」自 Day 5 起在本项目中**停用** |
+| **Q5 — 对 Day 5 Debugger 五条验收的影响** | 见 §11.7。第 1 条的**前提被修复**（原字面规格下不可能通过），第 4 条的**测量前提被改变**（mask 常驻 ⇒ 内存不再被 TTL 自动回收所掩盖）。第 2/3/5 条不受影响。**本裁决不代 Debugger 勾选、不改写其条目** |
+
+**Builder Day 5 的既有实现（TTL 状态维护但不接显示、`drawableInstances()` 不过滤过期）与本裁决的行为结论一致。因此 Day 5 内不需要任何行为改动，也不需要重新出包**——Debugger 可直接在当前构建上执行验收。命名与死代码清理归 Day 6（§11.8）。
+
+---
+
+### 11.2 冲突的根因：把「刷新驱动管线」的 TTL 复制到了「一次性用户产物」上
+
+原 §3.1 的写法是「**复用** Phase 2 mask TTL = 2000 ms」。复用二字暴露了问题所在——两个管线的 mask 有本质不同的生命周期性质：
+
+| 维度 | Phase 2（`.segmentation` 自动分割） | Phase 3（`.tapToSegment`） |
+|------|-----------------------------------|---------------------------|
+| mask 的来源 | 机器选择：YOLO 检出 → TemporalManager 调度 decode | **用户显式选择**：用户点了这个点 |
+| 是否有刷新源 | **有**。每帧 / 每 12 帧的持续调度会不断产生新 mask | **无**。tap 是一次性事件，没有任何机制会自动重新生成它 |
+| 过期的代价 | **短暂空窗**，下一轮调度即补上 | **永久丢失**，且用户无法「让它自己回来」，只能重新 tap |
+| 陈旧的危害 | 高。物体在动，旧 mask 会漂移到错误位置并误导 | 中。但真正的失效事实是**几何/坐标空间变化**，已由 C4 事件精确捕获 |
+
+> **根因判定：TTL 是一种「等下一次刷新」的兜底机制，它的正确性前提是「存在刷新循环」。Phase 3 的 tap 路径没有刷新循环，把 TTL 搬过来是一次类别错误（category error），不是参数选错。**
+> 因此正确处置是**撤销机制本身**，而不是把 2000 ms 调大。调大只是把「多久之后无理由地删掉用户的选择」这个问题推迟，性质不变。
+
+**代价的不对称性（本裁决的核心论据）：**
+- TTL 的收益：避免一段时间之后 mask 可能已经不贴合物体所带来的误导。
+- TTL 的代价：**删除用户显式产生的结果，且不可自动恢复**。
+- 用户**已经拥有**清除手段（双击，C1），而且是零成本、随时可用的。
+- 用户**没有**恢复手段。
+> 在「用户能自己清除」与「用户无法自己恢复」并存的情况下，把清除权交给墙钟是错误的权力分配。**清除权归用户，失效权归事件。**
+
+---
+
+### 11.3 原 2000 ms 设定的理由复核（逐条，不做简单删除）
+
+按要求，对当初设定 2000 ms 可能的三条理由逐一复核其在当前证据下是否仍成立：
+
+| 原理由 | 在 Phase 2 是否成立 | 在 Phase 3 tap 路径是否**仍**成立 | 结论 |
+|--------|-------------------|--------------------------------|------|
+| **R-a 避免陈旧 mask 误导**（物体已移动，旧 mask 贴错位置）| ✅ 成立。Phase 2 的目标是移动中的自动检出物，且有刷新循环兜底 | ⚠️ **部分成立，但工具选错**。真实失效事实是坐标空间变化（旋转 / 预览尺寸变化），已由 **C4 事件**精确、无延迟地捕获；墙钟 2000 ms 既**误杀**（机位不动时 mask 依然正确却被删）又**漏杀**（1.9 s 内快速甩动相机，mask 已经错了 TTL 却还没到）。**墙钟与失效事实不相关，是一个坏的代理变量** | 撤销 TTL，保留 C4 |
+| **R-b 限制内存**（不让 mask 无限堆积）| ✅ 在 Phase 2 成立（检出数无硬上限）| ❌ **不成立**。Phase 3 实例池有硬上限 **N=3**，FIFO（C2）已经封顶。量级：mask 256×256 Float32 = 256 KiB + alpha 256×256 UInt8 = 64 KiB，**3 实例合计 < 1 MB**，相对 Debugger 的 +30 MB 预算差 30 倍以上 | 该理由在 N=3 下失效 |
+| **R-c 与 Phase 2 保持参数一致性**（「复用」）| —— | ❌ **不成立**。一致性本身不是理由；两条管线的刷新性质不同（§11.2 表），强行对齐参数只会把一个管线的假设偷渡进另一个管线 | 术语与数值一并停用 |
+
+**新增的、当初未纳入考虑的约束（本次裁决的决定性输入）：**
+
+1. **用户真机实测反馈**：当前构建中 mask 在**双击之后才消失**，用户明确表示「这样很适合测试阶段」。这是对既有行为的直接确认。
+   - ⚠️ 如实记录措辞边界：用户说的是「**适合测试阶段**」，**不是**「永久正确」。因此本裁决对 Phase 3 封层，对 Phase 4 不封层（入口条件见 §11.9 R8）。
+2. **Session A 人工评分方法论依赖 mask 常驻**（`phase3_day4_test_checklist.md` §3.4 标准流程）：
+   ```
+   点击 → 等 mask 出现（约 1 秒）→ 停 2 秒（录屏拍清楚）→ 双击清除 → 再停 2 秒
+   ```
+   - 该流程要求单次 tap 的 mask 至少常驻 **≈3 秒**（出现 1 s + 停留 2 s），2000 ms TTL 会在录屏拍清楚之前把它删掉。
+   - 更严重的是：TTL 会让「**双击清除**」这个**受控动作失去意义**——mask 早已自行消失，观察者无法区分「双击生效了」与「TTL 到了」，采样流程的可控性被破坏。
+   - **已建立的基线**：Session A 用该流程产出 **50 次评分，良品率 44/50 = 88%**（基线 15/24 = 62%）。后续的 stability 定向复采、以及任何改动前后的 A/B 对照**仍将复用同一流程**。
+   > **裁决含义：mask 存续语义是评分方法论的一部分。改变它 = 使已建立的 88% 基线不可比。** 这条约束单独就足以否决 2000 ms TTL，与前述架构论证相互独立且方向一致。
+3. **相对 Day 4 的行为回退**：Day 4 已交付「tap mask 常驻直到双击清除」。TTL 上线属**用户可见的功能倒退**，且无任何用户价值支撑。
+
+---
+
+### 11.4 长期约定（写入架构原则，与 §9.2 的教训并列）
+
+> **约定 A-1（TTL 适用性判据）：**
+> **时间型 TTL 只允许作用于「过期后可被自动重建」的资源。** 对于「过期后无法自动重建的用户产物」，**禁止**使用时间型 TTL，只能使用**事件型失效**（有可观测的失效事实作为触发）。
+> 自检问法：*「它过期之后，谁会把它变回来？」* —— 答不出具体机制，就不该有 TTL。
+> - embedding：过期 → 下一次 encode 重建，代价是**延迟** ⇒ 允许 TTL ✅
+> - tap mask：过期 → **无人重建**，代价是**内容丢失** ⇒ 禁止 TTL ❌
+
+> **约定 A-2（跨模式参数复用）：**
+> 「复用 Phase N 的某参数」不构成设计理由。跨模式复用参数前必须先确认**两个模式的资源生命周期性质相同**（刷新源、过期代价、失效事实是否可观测）。性质不同则参数不可搬运，**术语也不应搬运**。
+
+（§9.2 的既有教训「跨硬件后端的比例外推不构成裁决依据」与本条并列；二者同属「相似不等于可迁移」这一类错误。）
+
+---
+
+### 11.5 §3.1 / §3.4 修订后原文（本次已直接改写，此处为索引）
+
+| 位置 | 原文 | 修订后 |
+|------|------|--------|
+| §3.1 | `**Mask TTL：** 复用 Phase 2 mask TTL = **2000 ms**（与 TemporalManager 独立计算，不共享状态）` | 改为「**Mask 生命周期**」段：per-instance mask **不设时间型 TTL**，已解码成功的 mask 常驻至被 §3.2 事件移除；原条款正式作废；`maskTimestamp` 保留为遥测时间戳，不得进入显示 / 过滤 / 有效性判定路径 |
+| §3.1 结构体注释 | `var maskTimestamp: Date? // mask 生成时间（用于 TTL 判断）` | `var maskTimestamp: Date? // mask 生成时间（遥测口径 maskAgeMs；不参与有效性判定，见 §11）` |
+| §3.2 | （无清除条件全集）| 新增 **§3.2.1 mask 移除条件全集**（C1–C6，穷尽列表；表外原因导致 mask 消失按 bug 处理）|
+| §3.4 | `无有效 mask：不显示 mask，保留 tap 位置波纹动画指示` | `实例已创建但 mask 尚未就位（mask == nil）：不显示该实例的 mask，在其 tap 位置显示等待指示（§10.3 D2 脉冲确认）`；并补「实例池为空 → maskImage = nil」；附修订说明：**「不显示」的唯一条件是 `mask == nil`；已解码成功的 mask 不存在「失效」状态** |
+| §9.5 | `\| Mask TTL \| 2000 ms \| ⚠️ 未封层 \| Day 6 \|` | 该行作废（删除线保留痕迹）；新增 `Tap mask 生命周期 \| 事件驱动，无时钟（= §3.2.1 C1–C6）\| 🔒 FINAL（Day 5）`；`Embedding TTL` 行补注「Phase 3 内唯一的时间型 TTL」|
+
+（§8.5 的 `Mask TTL | 2000ms` 行位于**已被 §9.5 取代**的历史表中，按既定处理方式不回改，历史文本保持原样。）
+
+---
+
+### 11.6 与 embedding TTL（8000 ms）的关系 —— 术语纪律
+
+本裁决**刻意避免**留下两个语义相近、数值不同的 TTL。处置如下：
+
+| 对象 | Phase 3 内的失效机制 | 数值 | 状态 | 过期后谁重建 | 过期代价 |
+|------|--------------------|------|------|------------|---------|
+| **embedding** | **时间型 TTL** + 几何签名事件（双重）| **8000 ms** | ⚠️ 未封层，数值复议留 Day 6（R2）| 下一次 encode（约 648 ms）| **延迟**，无内容丢失 |
+| **tap mask** | **纯事件型**（§3.2.1 C1–C6）| —— **无时钟** | 🔒 FINAL（Day 5）| **无人重建** | **内容丢失，不可恢复** |
+
+**术语纪律（自 Day 5 生效）：**
+
+1. **「Mask TTL」这一术语在 JudgeE2 项目中停用。** 后续文档、代码注释、日志字段名一律不得再出现。需要表达 mask 何时消失时，写「**mask 移除条件（§3.2.1 C1–C6）**」。
+2. **项目中「TTL」一词自此专指 embedding TTL**，单一所指，无需再加限定词。看到 TTL = 8000 ms，不存在第二个候选。
+3. `maskTimestamp` 派生量的命名必须是**年龄**而非**有效性**：允许 `maskAgeMs`（遥测），**不允许** `isMaskValid` / `maskTTL` / `maskExpiry` 这类**判定式**命名——一个休眠的 `isMaskValid(now:)` 是个地雷，早晚有人把它接到 `drawableInstances()` 上。命名即防呆。
+4. R2（embedding 复用过激，可能命中 8 秒前的 embedding）**不受本裁决影响，仍完整保留**，Day 6 复议。注意区分：R2 讨论的是「mask 是用**多旧的 embedding** 解出来的」（生成时刻的输入陈旧度），本裁决讨论的是「**mask 生成之后**能存活多久」（产物的存续期）。两者是不同的量，**不得**互相引用为依据。
+   - 顺带明确一条可能被误解的推论：mask 常驻**不会**加剧 R2。R2 的风险在解码那一刻就已经全部兑现，之后 mask 存续多久都不改变它的质量。
+
+---
+
+### 11.7 对 Day 5 Debugger 五条验收的影响（**不代勾选，不改写条目**）
+
+| # | Debugger 条目（原文，不动）| 本裁决的影响 | 需要注意什么 |
+|---|--------------------------|-------------|-------------|
+| **1** | 分别 tap 1、2、3 个不同位置，确认多 mask 同时显示 | ✅ **前提被修复**。在原字面规格（2000 ms TTL + 「无有效 mask 不显示」）下，该动作**在物理上不可能通过**——依次点三下必然超过 2 s，第一个在第三个出现前已过期。本裁决使该验收成为**可执行且有意义**的检验 | 无需刻意加快点击节奏；三次 tap 之间可以正常停顿。若仍出现「先点的 mask 自己消失」，那**不再有任何合规解释**，应按 bug 上报（唯一合法的自动全清是 C4 几何变化，需同时伴随构图/旋转变化）|
+| **2** | 确认插入第 4 个 tap 时最老实例被删除（FIFO）| ⚪ 不受影响，且**归因变干净了**：撤销 TTL 后 FIFO（C2）成为「最老的那个消失」的**唯一**解释。原设计下无法区分「FIFO 淘汰」与「TTL 过期」，验收结论会有歧义 | —— |
+| **3** | 确认同一 geometry 下各个实例共享 embedding，不重复 encode | ⚪ 不受影响（该条归 embedding TTL 8000 ms + `tapGeometryChanged` 管辖，与 mask 生命周期无关）| 前提澄清：三次 tap 的**间隔总和须在 8 s 内**，否则触发的 re-encode 是 embedding TTL 的正常行为、**不是** bug。测量时把 burst 控制在 8 s 内 |
+| **4** | 确认内存在 3 个实例同时活跃时无明显升高（< +30 MB）| ⚠️ **测量前提被本裁决改变**。mask 现在**常驻**，不会被 TTL 自动回收，因此这条从「顺带看看」变成了**真正的泄漏检验**——原设计下 TTL 会周期性释放 mask，可能**掩盖**实例池的泄漏 | 建议（不改条目，供 Debugger 自行取舍）：(a) 在「3 个实例都已持有 mask 且常驻」的稳态下读数，而非 tap 之后立即读；(b) 做 ≥12 次 tap（触发 ≥4 轮 FIFO）后再读一次，检验 FIFO 淘汰是否**真正释放**；(c) 量级预期：3 实例 mask+alpha 合计 **< 1 MB**，若实测接近 +30 MB，那**不是 mask 本身**（应是 CoreML / CIImage / 合成缓冲），属需要单独报告的发现，不应因为「仍在 30 MB 预算内」而放过 |
+| **5** | 确认对齐告警在当前测试中已消失或显著减少 | ⚪ 不受影响 | —— |
+
+**上述五条的勾选权、措辞与判定标准全部归 Debugger。本节只说明哪些条目的前提被本裁决改变，不构成对结果的预设。**
+
+---
+
+### 11.8 对 Builder 的处置要求
+
+| 项 | 要求 | 时点 |
+|----|------|------|
+| **B-1** | **Day 5 内不做任何代码改动。** 既有实现（TTL 不接显示）与本裁决行为一致；此刻改代码会作废 Debugger 即将验收的构建 | Day 5：**不动** |
+| **B-2** | 移除 `TapInstance.maskTTL` 派生字段与 `isMaskValid(now:)` **判定式** API（休眠谓词属防呆隐患，见 §11.6 纪律 3）；`maskTimestamp` **保留**，改提供 `maskAgeMs(now:)` 之类的**年龄**读数供日志使用 | Day 6（**非行为改动**，纯命名与死代码清理）|
+| **B-3** | tap 日志建议附带 `maskAgeMs`（与要求 B 的 `cacheAge` 并列，两者含义不同见 §11.6-4），为 Day 6 的「mask 年龄 × 质量」相关性分析留数据。**只打日志，不参与任何决策** | Day 6，随 R2 一并 |
+| **B-4** | 沿用 §10.5 R3 禁令：**Day 5/Day 6 期间不得在多实例逻辑中夹带 mask 质量过滤**。本裁决同样不得被当作引入「低质量 mask 自动消失」的授权——那是质量过滤，不是生命周期 | 持续 |
+
+**Builder 上交决策而非擅自决定的做法记录在案**：per-instance mask 是否自动消失属**用户可见行为**，行为语义的变更权归 Architect / 用户，实现方保留状态但不接显示是本次的正确处置。此模式作为后续遇到规格冲突时的推荐处理方式。
+
+---
+
+### 11.9 保留项与风险
+
+| 编号 | 保留项 | 处置 |
+|------|-------|------|
+| **R6** | **场景运动导致 mask 与物体脱节，当前无任何机制捕获**。C4 只覆盖几何/坐标空间变化（旋转、预览尺寸），不覆盖「机位不动但物体走了」或「手持缓慢平移」。撤销 TTL 后，这类脱节的 mask 会**一直显示**直到用户双击 | **Phase 3 不处理，明确接受。** 依据：(a) Session A 流程要求「手机架好后全程不动」，测试期该风险被设计消除；(b) 正确的解法是**事件型**的漂移检测（tap 点邻域光流 / detection box IoU 变化），而不是墙钟；(c) 引入漂移检测属新功能，需用户显式立项。Day 7 冻结时如实记录为已知限制 |
+| **R7** | **前后台切换 / camera session 中断恢复后是否应清空实例池**，当前未定义（不在 C1–C6 内）| Day 6 待议。倾向：若中断恢复会改变几何签名，则 C4 已自动覆盖；若不改变，则属 R6 的一个特例。**Day 5 不新增行为**，先由 Debugger/用户观察实际表现再定 |
+| **R8** | 用户反馈的措辞是「**适合测试阶段**」，不是「产品形态最终结论」 | Phase 3 封层常驻语义。**Phase 4 若重开「mask 自动消失」议题，入口条件为三条同时满足**：(1) 有客观的失效度量（不是墙钟）；(2) 先建立 tap mask 的**刷新循环**（让 mask 能自动重解码跟随目标），使「消失」的代价从「内容丢失」降为「短暂空窗」——即先补上 §11.4 A-1 缺的那个前提；(3) 评分方法论同步修订并**重建基线**（因 88% 不再可比）。仅凭「久了可能不准」不构成立项理由 |
+| **R9** | 本裁决未改变任何 mask **质量**相关逻辑（候选选择、stability、flood fill 全部原样）| 与 §10.5 R3 的三步走互不干扰；Day 4 的 88% 良品率基线在本裁决下**保持可比** |
+
+---
+
+### 11.10 Deliverable 确认
+
+- [x] Q1 裁决：per-instance mask **时间型 TTL 取消**，不延长、不改作他用；`maskTimestamp` 降级为遥测（§11.1）
+- [x] Q2 裁决：mask 清除条件正式定义为事件驱动穷尽列表 C1–C6（§3.2.1）
+- [x] Q3：§3.1 / §3.4 原文已直接改写并自洽；新增 §3.2.1；§9.5 冻结表同步（§11.5）
+- [x] Q4：与 embedding TTL 8000 ms 的关系厘清 + 术语纪律（「Mask TTL」停用，TTL 一词专指 embedding）（§11.6）
+- [x] Q5：对 Day 5 Debugger 五条验收的影响逐条说明，**未代勾选、未改写条目**（§11.7）
+- [x] 原 2000 ms 的三条理由（陈旧误导 / 内存 / 一致性）逐条复核，说明何者仍成立、何者失效（§11.3）
+- [x] 长期约定 A-1（TTL 适用性判据）/ A-2（跨模式参数复用）写入（§11.4）
+- [x] 保留项 R6–R9 明确列出（§11.9）
+
+**Phase 2 pipeline 保护状态：** 无变化。本裁决只作用于 `.tapToSegment` 的 per-instance mask 生命周期；Phase 2 的 mask TTL（isolate_phase2.md 冻结表，2000 ms）**原样保留、不受影响**——它有刷新循环，符合 §11.4 A-1 ✅
+
+**Day 5 构建状态：** 本裁决**不要求任何 Day 5 代码改动**，Debugger 可在当前构建上直接验收 ✅
+
+---
+
+END OF PHASE 3 DAY 5 ARCHITECT OUTPUT（§11 追加裁决）
+
+---
+---
+
+# Phase 3 — Day 5 追加二 (Architect) 呈现规格复议裁决
+# 2026-08-11
+# 触发：用户主诉「app 分割物体的精确度比 Day 4 下降很多」
+# 输入：debug_report.md §22（补测，Release）、§23、§25.1 的 A-2 / A-3；录像 shared/simu_record_0811.MP4
+# 范围：**只裁 §3.3/§3.4 呈现规格**。候选选择规则（A-1）不在本次范围，见 §12.8
+
+---
+
+## 12) 呈现规格复议裁决（撞色 / 亮度 / 描边缺席）
+
+### 12.1 裁决结论
+
+| # | 裁决 | 状态 |
+|---|---|---|
+| **Q1** | **`systemBlue / systemGreen / systemOrange` 三色板正式作废。** Phase 3 全部实例统一使用青 **(0,217,255)**，primary alpha **0.60**、secondary **0.40**（§3.3.3） | ✅ 封层 |
+| **Q2** | **建立呈现的三层职责模型 L1/L2/L3，并裁决「L1 可见性不得由色相承担」**（§3.3.1） | ✅ 封层，架构原则 |
+| **Q3** | **建立填充色约束原则 C-1…C-7**，含稀有色带 / 亮度下界 / 饱和度下界 / 描边强制 / 屏幕坐标系描边 / 单变量回退 / **换色准入程序**（§3.3.2） | ✅ 封层 |
+| **Q4** | **描边由「白色 1pt」升级为「双色轮廓（深外圈 + 浅内线）」**，且 **primary 与 secondary 都要有**（分档，§3.4） | ✅ 封层 |
+| **Q5** | **描边任务从 Day 6 提前到 Day 5**，定级 **P0**（§12.6） | ✅ 已改 tasks.md |
+| **Q6** | **按实例配色（per-instance hue）在 Phase 3 内撤销**，`TapInstance.color` 字段保留但语义降级为「呈现槽位」 | ✅ 封层 |
+| **Q7** | **R6（场景运动导致 mask 脱节）复议：维持「Phase 3 不做自动失效」的原裁决，但优先级从「已接受的功能限制」上调为「已确认的呈现风险」**，并给出两条不违反 §11 的呈现侧缓解（§12.7） | ✅ 复议完成，裁决未变、定级已变 |
+
+**一句话：** 用户看到的「变差」是**呈现层的三处叠加回退**，几何零变更（Debugger 已逐行核对）；而三处里最致命的一处（撞色）不是实现错误，是**我在 §3.3 写下那套色板时就已经注定的规格缺陷**——因为我把「看不看得见」押在了「用户拍的物体是什么颜色」上。
+
+---
+
+### 12.2 定性：这是一个规格缺陷，不是实现缺陷，也不是参数没调好
+
+Debugger 已用两条互相独立的方法（Builder 的留存基准文本比对、Debugger 的代码路径追踪 + 常量清点）确认：
+
+> `buildTapAlpha` 函数体只有一行，直接转调 `buildAlpha`；候选选择整段（`MaskRenderer.swift:402-483`）连同 `minComponentPx=30` / `minComponentSidePx=3` / `minComponentFill=0.05` / `maxPlausibleLogit=500` / cap60 / cap85 / `iou_pred>=0.1` 与 Day 4 逐项一致。
+> ⇒ **同一帧、同一 embedding 下，Day 5 与 Day 4 的二值 alpha 逐位相同。**
+
+且 2026-08-11 录像目视确认：mask 覆盖的是**完整物体**（保温杯、键盘、文件架、显示器文档区、瓶子），**不是碎片**。§22.5 提出的「并排录像决定性实验」至此**已执行完毕，落在「主诉 = 感知变化」分支**。
+
+所以问题的定性是清楚的：
+
+> **规格 §3.3 把「L1 可见性」这一必须无条件成立的性质，交给了「填充色与物体本色的对比度」这一不可控输入。**
+> 在这种规格下，撞色不是概率事件，而是**遍历事件**——只要用户拍的东西足够多，就一定会撞上。
+> systemBlue / systemGreen / systemOrange 恰恰是日常物体**最常见**的三个色系，于是「足够多」变成了「一个桌面」。
+
+**Builder 没有做错任何事**：他照着 §3.3/§3.4 实现，甚至保留了 `renderMask` 的青色字面量以求兼容。修复路径在规格侧。
+
+---
+
+### 12.3 三个叠加成因逐条复核（不做合并，逐条给结论）
+
+#### 成因 1 —— 亮度下降 2.7 倍：✅ 成立，已由 C-2 封堵
+
+sRGB 相对亮度：青 (0,217,255) **Y = 0.569** → systemBlue (0,122,255) **Y = 0.211**，降至 **37%**。
+叠加 alpha 0.60 → 0.55（着色强度 −8%），secondary 0.35 只剩 Day 4 的 **58%**。
+
+- 关键不只是「暗」，而是**方向反了**：Y=0.569 的青压在多数室内表面上是**提亮**，Y=0.211 的 systemBlue 在中等以上亮度的表面上是**压暗**。一个提亮的覆盖层与一个压暗的覆盖层，在「这块被选中了」的可读性上不是程度差别，是性质差别。
+- 处置：C-2 设 **Y ≥ 0.45** 硬下界。该下界同时判掉 systemGreen（0.428）与 systemOrange（0.425）——它们表面上「够亮」，实际都在线下。
+
+#### 成因 2 —— 调色板与物体本色撞色：✅ 成立，且**判定为本次的主成因**，已由 C-1 + C-4 + C-7 封堵
+
+这是本次新增的、此前分析未纳入的一条，也是唯一能解释「为什么是**很多**、而不是**有点**」的一条：
+
+| 物体 | 物体本色 | 被涂上的 mask 色 | 结果 |
+|---|---|---|---|
+| 保温杯 | 蓝 | systemBlue H=211° | 等于隐身 |
+| 键盘 | 绿 | systemGreen H=135° | 等于隐身 |
+| 文件架 | 橙 | systemOrange H=35° | 等于隐身 |
+
+**三块 mask 全部撞上物体自身颜色。** 用户看到的不是「mask 画歪了」，而是「点了没反应 / 只有一点点」——而这正是**几何完全正确**的三块 mask。
+
+- 为什么 Day 4 的青不会这样：(0,217,255) 是自然物体与常见工业配色里**几乎不出现**的信号色，压在任何物体上都跳得出来。
+- 为什么这不是「换一套更好的三色」能解决的：见 §3.3.3 的四条理由。核心是**允许色带装不下三个可区分色相**。
+- 处置：C-1 明确禁用带（把 systemBlue/Green/Orange 三者一次性判掉）+ C-7 换色准入程序（**必须在同色系真实物体上做撞色测试才能合入**）。C-7 是这条的防复发机制——没有它，下一次换色照样会撞。
+
+#### 成因 3 —— 白色 1pt 轮廓缺席：✅ 成立，且定性被**升级**
+
+原 §3.4 把描边写成「Day 6 实现」，隐含把它当作锦上添花。**本次裁决推翻这个定性：**
+
+> 描边不是装饰，它是 **L1 可见性的承重结构**，是整套呈现里**唯一**不依赖用户内容的可见性来源。
+> 把它推迟，等于让可见性预算**长期缺一块承重墙**，而缺口的大小由用户拍什么决定。
+
+同时，原规格的「白色 1pt」本身也不够：单色白在白墙 / 浅色桌面上消失。**升级为双色轮廓**（深外圈 + 浅内线），使其在亮度量程的两端都有对比（§3.4）。
+
+---
+
+### 12.4 修订后的 §3.3 / §3.4（本次已直接改写正文，此处仅索引）
+
+| 节 | 变更 |
+|---|---|
+| **§3.3** | 整节重写：新增 §3.3.1 三层职责模型、§3.3.2 约束原则 C-1…C-7、§3.3.3 Phase 3 封层色板。原三色板正式作废 |
+| **§3.4** | 整节重写：填充色/alpha 改为青 0.60 / 0.40；描边升级为双色轮廓并**扩展到 secondary**（分档）；补 primary/secondary 区分载体清单；绘制顺序不变；Day 5 的「`mask == nil` 是唯一不显示条件」条款**原样保留** |
+| **§9.5 冻结参数表** | 新增两行（见下） |
+
+**§9.5 冻结参数表增补（Day 5 追加二）：**
+
+| 参数 | 值 | 状态 |
+|---|---|---|
+| Tap mask 填充色 | 青 (0,217,255)，全实例统一 | **FINAL**（变更须过 §3.3.2 C-1…C-3 + C-7） |
+| Tap mask alpha | primary 0.60 / secondary 0.40 | **FINAL** |
+| Tap mask 描边 | 双色轮廓，primary 2.0/1.5 pt、secondary 1.5/1.0 pt，屏幕坐标系生成 | **FINAL**（实现 Day 5） |
+| 按实例配色 | Phase 3 内**撤销** | FINAL（Phase 4 可重开） |
+
+---
+
+### 12.5 与既有裁决的一致性检查（自检，避免架构漂移）
+
+| 既有裁决 | 是否受本次影响 | 说明 |
+|---|---|---|
+| §11 mask 无时间型 TTL | ❌ 不受影响 | 本次只改「怎么画」，不改「画多久」。C1–C6 清除条件全集不变 |
+| §11.9 R3「Day 5/6 禁止在多实例里夹带 mask 质量过滤」 | ❌ 不受影响 | 本次**没有**引入任何以 mask 质量为条件的显示分支；描边对所有 mask 无差别施加 |
+| §10 不设进度条 | ❌ 不受影响 | 等待指示语义不变 |
+| §11.9 R9「88% 基线保持可比」 | ✅ **被本次修复** | 填充恢复到与 Day 4 逐位一致；描边是**加法**（只增不减可辨识度）且按 C-6 可单点关闭，故仍能做单变量对照 |
+| §1.3 渲染层次（Z 轴） | ❌ 不受影响 | 描边与填充同属 mask 层，不新增层级 |
+| D-13（把光栅化交给 GPU，256×256 + `contentsRect`） | ⚠️ **有耦合，已前置约束** | C-5 要求描边在屏幕坐标系生成、线宽以 pt 计。若把描边烧进 256×256 位图，1px 会被放大成 4–8px 且随缩放抖动，同时锁死 D-13。**这条约束必须在实现描边之前就位，否则 Day 6/7 会返工** |
+
+---
+
+### 12.6 描边任务提前的裁决（Q5）
+
+**裁决：把「Mask 轮廓描边」从 Day 6 提前到 Day 5，定级 P0。**
+
+依据：
+
+1. 它是 §3.3.1 里 **L1 的唯一承载者**。在它就位之前，可见性仍然押在填充色上——即使换回青色，也只是把撞色概率从「很高」降到「较低」，**没有改变押注这一性质**。
+2. 用户主诉的三条成因里，成因 1 与成因 2 都只能靠「选一个更好的色」缓解，**只有成因 3 能从机制上消除**。
+3. 成本低、无算法风险：它不触碰 `buildAlpha` 的任何决策代码，因此**不威胁 §11.9 R3 的禁令，也不影响 88% 基线的几何可比性**。
+4. Day 6 的原条目本就存在，提前不是新增范围，是**改排期**。
+
+**tasks.md 的具体改动（本次已执行，改动范围见 §12.10）：**
+- **Day 5 / Builder** 新增一条 `- [ ] **Mask 呈现规格修订 + 轮廓描边（P0，从 Day 6 提前）**`，含 4 个子项（色板回退、alpha、双色描边分档、C-5/C-6 约束）。
+- **Day 6 / Builder** 原「Mask 高亮 + 轮廓描边」条目**保留但改写**：描边部分标注「已提前至 Day 5」，本条只余「点击已有实例 mask 内部 → 提升为 primary」；并在「Tap 指示动画」下增列 tap 锚点标记（L3 的编号载体）。
+- **不新增任何 Day 7 之后的范围。**
+
+---
+
+### 12.7 R6 复议：「mask 永不过期 + 同屏三张不同龄 mask」（Q7）
+
+用户要求显式复议，不要求改变裁决。**复议结论：裁决不变，定级改变。**
+
+#### 12.7.1 复议输入（本次新增，§11.9 写 R6 时尚不存在）
+
+- §16.3 / §23.3：同一 pool 内三个实例的 embedding 最多相差 **8 秒**（embedding TTL 上界）。
+- §11 撤销时间型 mask TTL 后，mask 存续时间**无上界**。
+- 2026-08-11 录像：屏幕上同时贴着 3 张锚定在不同时刻的 mask，其中部分已从物体上漂走。
+- Debugger §22.6 判断：这可能是「最可能被读成不准」的一条（标为推测）。
+
+#### 12.7.2 我在 §11.9 低估了什么（如实记录）
+
+低估的**不是** R6 的正确性风险，而是它的**感知放大效应**：
+
+> 一张漂走的 mask 只是「这一次不准」；**三张里有两张漂走，会被读成「这个功能不准」。**
+> 而且 Day 4 的组合（同屏恒为 1 张、每次 tap 整体替换）使陈旧度被**下一次 tap 自动截断**；
+> Day 5 的组合（N=3 + FIFO + 永不过期）第一次让**陈旧度变成无上界量**。
+> ⇒ R6 不是被 §11 引入的，但**是被 §11 与多实例的组合放大的**。我在 §11.9 只单独评估了 TTL 撤销，没有评估「TTL 撤销 × 多实例」的乘积效应。这是一处真实的分析缺口。
+
+#### 12.7.3 但裁决维持不变，理由四条（逐条独立）
+
+1. **不改变 §11 的核心论证。** mask 是「过期后无法重建的用户产物」这一事实不因漂移而改变；给它加回墙钟 TTL，仍然是用「误杀 + 漏杀」的工具去抓一个它抓不住的事实（机位不动时 mask 仍然正确却被删；1.9 s 内甩动相机已错却未到期）。**漂移的正确捕获器是事件型漂移检测，不是时钟。**
+2. **测量协议中漂移为零。** Session A 评分流程要求手机架好不动，88% 基线不受污染；本次主诉的实证材料（录像）也已定性为呈现问题而非漂移问题——录像里 mask 覆盖的是完整物体。
+3. **引入自动失效会撞上 §11.9 R8 的三条件**（需客观失效度量、需先建立刷新循环、需同步修订评分方法论并重建基线），三条一条都不满足。
+4. **它是新功能，需用户显式立项。** 我不在无指示的情况下扩大范围。
+
+#### 12.7.4 定级变更与呈现侧缓解（不违反 §11，本次即生效）
+
+R6 由「Phase 3 不处理、明确接受」调整为：**「Phase 3 不做自动失效；但按呈现风险处理，并在呈现侧做部分缓解」**。
+
+| 缓解 | 内容 | 是否违反 §11 | 何时 |
+|---|---|---|---|
+| **M1 陈旧性可见化** | secondary 的呈现权重进一步下压：填充 0.40（低于 primary 的 0.60）+ **减档描边**。语义从「我现在断言这就是物体」降为「这里曾经被选中过」。**旧 mask 不再冒充当前断言。** | ❌ 不违反——没有任何 mask 被自动移除，只是分层呈现 | 已写入 §3.4，**Day 5 生效** |
+| **M2 清除手段更易达** | C1 双击（已有）+ C6 长按删除单实例（Day 6 已在排期）。**清除权仍完全归用户**（§11 的核心原则） | ❌ 不违反 | Day 6 |
+
+#### 12.7.5 Phase 4 入口点（新增候选，写入 Day 7 的 Phase 4 定义）
+
+> **「mask 重锚定（re-anchor）」**：事件型漂移检测 + 用同一 `canonicalPoint` 在新帧上重新 decode。
+> 这条之所以值得记：**一旦存在 re-anchor 循环，tap mask 就从「一次性产物」变成「有刷新源的资源」，§11.4 A-1 的自检问法「它过期之后谁把它变回来？」第一次有了答案** ⇒ 那时时间型刷新重新变得合法。
+> **顺序不能颠倒：先有刷新循环，才谈得上过期。** 这正是 §11.9 R8 第二条件的具体形态。
+
+---
+
+### 12.8 对 Debugger §25.1 四条移交项的处置
+
+| 编号 | 事项 | 本次处置 |
+|---|---|---|
+| **A-1** 🔴 | 候选选择规则复议（「取最小」已退化为恒取 ch0 = SAM token 1 = 最细子部件，10/10） | ⏸ **不在本次范围，不裁决。** 但记录两条对它的定级修正：(a) §22.5 的并排录像**决定性实验已执行**，2026-08-11 录像显示 mask 覆盖完整物体 ⇒ **A-1 不是本次主诉的成因，不得作为主诉的修复路径**；(b) A-1 仍是独立且真实的质量议题（#3/#4 两例 ch1 的 iou/stability 同向大幅更优），但其裁决**依赖 §25.3-6 的 stability 定向复采**，该数据仍缺。**在数据到位前动候选规则，会重蹈「从太大荡到太小」的覆辙。** 归口 ML_Vision，Day 6 之后 。🆕 **2026-08-11 已由 §13.3 裁决方向**：候选集扩充（token 0 / 4 候选 / fallback）正式关闭，方向收敛为「在 token 1–3 内改进选择」；**规则本身仍不得改动**，须先满足 §13.3.4 的 E-1…E-4 |
+| **A-2** 🟠 | §3.3/§3.4 呈现规格复议 | ✅ **本次裁决完成**（§12.1–§12.6） |
+| **A-3** 🟠 | mask 永不过期 + 三张不同龄 mask | ✅ **本次复议完成**（§12.7）：裁决维持，定级上调，呈现侧缓解 M1 已写入 §3.4 并 Day 5 生效 |
+| **A-4** 🟡 | 双击失败窗口 ~300 ms 的口径裁决（D-8 提级至 P2） | ⏸ **本次不裁决，挂账。** 它是延迟口径议题，不是呈现议题；且它与「是否保留双击清除」这一**交互权衡**绑定（双击是 §3.2.1 C1 的唯一入口、也是 §11 的「清除权归用户」的实现）。归 Day 7 冻结前一并裁 |
+
+---
+
+### 12.9 长期约定 A-3（写入架构原则，与 §9.2 / §11.4 A-1、A-2 并列）
+
+> **A-3（覆盖层可见性判据）：任何叠加在用户内容之上的呈现元素，其「可见性」不得依赖它与用户内容的对比度。**
+> 用户内容是**不可控输入**；把可见性押在不可控输入上，等价于把正确性押在运气上——失败不是概率事件，是遍历事件。
+> 可见性必须由**呈现元素自带的对比**保证（双色描边 / 阴影 / 外发光 / 图案），色相与 alpha 只能承担**次级**职责（归属、区分、层次）。
+> **自检问法：「如果用户把镜头对准一块和我这个颜色一模一样的东西，会发生什么？」**——答案若是「看不见了」，规格就是错的。
+
+三条约定的共同母题（值得一并记住）：
+
+| 约定 | 出处 | 母题 |
+|---|---|---|
+| 跨硬件后端的比例外推不构成裁决依据 | §9.2 | **相似 ≠ 可迁移** |
+| A-1 时间型 TTL 只允许作用于可自动重建的资源 | §11.4 | **机制的适用前提必须随机制一起搬运** |
+| A-2「复用 Phase N 的参数」不构成设计理由 | §11.4 | 同上 |
+| **A-3 覆盖层可见性不得依赖不可控输入** | **§12.9** | **别把正确性押在你控制不了的量上** |
+
+---
+
+### 12.10 本次对 tasks.md 的改动范围（可 diff 核对）
+
+| 小节 | 改动 |
+|---|---|
+| **Day 5 / Debugger** | 条目 1–4 勾选 [x] 并补依据；条目 5 **保持 [ ]**，补根因说明 |
+| **Day 5 / Architect** | 新增 1 条已完成条目（本裁决） |
+| **Day 5 / Builder** | 新增 1 条未勾选条目：Mask 呈现规格修订 + 轮廓描边（P0，从 Day 6 提前） |
+| **Day 6 / Builder** | 「Mask 高亮 + 轮廓描边」改写（描边部分标注已提前）；「Tap 指示动画」增列锚点标记子项 |
+| **ML_Vision 任何小节** | ❌ **未改动**（本次约束） |
+| **Day 7 / Architect** | Phase 4 入口候选增列「mask 重锚定」1 行 |
+
+---
+
+### 12.11 保留项与风险（不封层，明确列出）
+
+| # | 保留项 | 性质 |
+|---|---|---|
+| **R10** | **单一青色的撞色风险未归零，只是变小。** 青色物体（青色马克杯、青绿封面、部分屏幕内容）仍会撞。这正是 C-4 双色描边必须落地的原因——**描边就位之后，撞色的后果从「隐身」降级为「填充看不清但轮廓仍在」**。若真机上仍出现「青物体上完全找不到 mask」，说明描边实现有问题，不是色板问题 | 已知残余，有兜底 |
+| **R11** | **Day 4 逐位可比性只在「描边关闭」时严格成立。** 描边是加法，理论上只增不减可辨识度，但它也可能轻微改变边界的主观判读（描边会让边缘看起来更"硬"）。Day 7 若要与 44/50 = 88% 严格对照，须用 C-6 的开关做单变量回退 | 方法学 |
+| **R12** | **描边的实现路径未指定，但其架构约束已封层（C-5）。** 矢量轮廓（marching squares → path → CAShapeLayer）与全分辨率上下文内描边都可接受，Builder 自选；**唯一不可接受的是把描边烧进 256×256 位图**（线宽失控 + 锁死 D-13） | 接口级约束 |
+| **R13** | **R6 的呈现侧缓解（M1）是缓解不是修复。** 相机大幅移动后，三张 mask 仍然全部锚定在旧帧上。Day 7 冻结时须**如实记为已知限制**（§11.9 原承诺不变），并把「mask 重锚定」列入 Phase 4 入口候选 | 已知限制 |
+| **R14** | **本次全部依据来自 2026-08-11 单次录像 + 代码/色度算术。** 色度检验（C-1/C-2/C-3）是确定性算术，不受样本量影响；但「撞色是主成因」这一**归因**目前只有一次录像的三个物体作为证据。修订后须复录一次同场景做确认——若换回青色 + 描边后主观质量未回到 Day 4 水平，则归因需重开 | 证据强度 |
+
+---
+
+### 12.12 Deliverable 确认
+
+- [x] Q1 三色板作废，青色单色板封层（§3.3.3）
+- [x] Q2 三层职责模型 L1/L2/L3 + 「L1 不得由色相承担」裁决（§3.3.1）
+- [x] Q3 填充色约束原则 C-1…C-7，**给出的是约束原则而不只是色值**，含换色准入程序 C-7（§3.3.2）
+- [x] Q4 描边升级为双色轮廓、扩展到 secondary、分档（§3.4）
+- [x] Q5 描边提前到 Day 5 定级 P0，tasks.md 已改（§12.6）
+- [x] Q6 按实例配色 Phase 3 撤销，字段保留（§3.3.3）
+- [x] Q7 R6 显式复议：裁决维持、定级上调、缓解 M1/M2、Phase 4 入口点（§12.7）
+- [x] 三个成因逐条复核，不合并、不美化（§12.3）
+- [x] 与既有裁决（§10 / §11 / §1.3 / D-13）的一致性自检（§12.5）
+- [x] Debugger A-1 / A-2 / A-3 / A-4 逐条处置，明确哪两条**不裁决**（§12.8）
+- [x] 长期约定 A-3 写入（§12.9）
+- [x] 保留项 R10–R14（§12.11）
+
+**Phase 2 pipeline 保护状态：** 无变化。`renderMask`（`MaskRenderer.swift:114-140`）是 Phase 2 box/segmentation 路径的唯一入口，青色字面量 (0,217,255,153) 原样保留，本裁决**不触碰该函数**。tap 路径的 alpha 0.60 与它的 153/255 = 0.600 一致，属巧合性一致，**不得因此把两条路径合并** ✅
+
+**几何保护状态：** 本裁决**不触碰** `buildAlpha` 的任何决策代码（阈值 / 候选选择 / cap60 / cap85 / flood fill / stability / 数值哨兵），§11.9 R3 禁令继续有效，88% 基线的几何可比性不受影响 ✅
+
+---
+
+（§12 追加二裁决结束 —— 后续见 §13 追加三）
+
+---
+
+# Phase 3 — Day 5 追加三 (Architect) 三项裁决
+# 2026-08-11
+# 触发：(1) Debugger 第 5 条的立项前提被对照实验证伪；(2) 用户要求恢复按实例配色，Builder 已实施并指出 §3.3.2 两处错误；(3) ML_Vision 的 token 0 离线评估完成（model_plan.md §D.0–D.7）
+# 输入：debug_report.md §16.5 / §20.1 / §23.4 / §25.1–25.2、builder_progress.md「Day 5（追加二）」、model_plan.md §D.0–D.7
+# 范围：本节裁三件事，**不触碰** §9 分辨率封层、§10 延迟策略、§11 mask 生命周期
+
+---
+
+## 13) Day 5 追加三裁决
+
+### 13.1 裁决一：Debugger 第 5 条重新表述 + 「Phase 3 优化入口点 1」处置
+
+#### 13.1.1 结论（先给判定）
+
+| 项 | 裁决 |
+|---|---|
+| **Day 5 Debugger 第 5 条** | **重新表述，保持未勾选 [ ]。** 验收目标由「对齐告警消失或显著减少」改为「**`.tapToSegment` 路径不加载用不到的模型**」；告警计数**降级为观测指标**，不再是目的 |
+| **「Phase 3 优化入口点 1：ANE 对齐修复」** | **重新界定（re-scope），不撤销、不移交 Phase 4。** 更名为「**模型加载卫生（model-load hygiene）**」；原目标「消除对齐告警」正式作废 |
+| **milfix encoder 本身** | **保留，冻结不动。** 作废的是它的**立项理由**，不是它的**部署** |
+| **decoder 的 channel-1 / 64-byte 对齐问题** | **降级为观测项，不立项。** 重开条件见 §13.1.5 |
+
+#### 13.1.2 为什么原表述从一开始就是错的
+
+原条目：「确认对齐告警在当前测试中已消失或显著减少（如 ANE 修复已应用）」。它有两处结构性缺陷，与 Debugger 判 FAIL 的字面结果无关：
+
+1. **它把一个观测指标写成了验收目标。** 告警计数是**日志文本的出现次数**，它同时受三个与正确性无关的量支配：某个模型被加载了几次（3 → 6 就是这么来的，`testMobileSAMLoad()` + `SAMDecoder.init` 各一次）、构建配置、SDK 版本。计数下降既可能是「问题解决了」，也可能是「触发路径没跑到」。**一个既不能证明成功也不能证明失败的判据，不是判据。**
+2. **它追错了组件。** Debugger 的两次孤立加载对照是决定性的：模式切换时孤立加载 milfix encoder ⇒ **0 条**；TAP#1 孤立加载 `MobileSAM_PromptMaskDecoder` ⇒ **3 条**。`Invalid layer … must be aligned on 64 bytes` **从来不是 encoder 发的**。`ModelLoader.swift:55-58` 的注释属误归因，而「优化入口点 1」正是照着那条注释立的项 ⇒ **该优化至今没有消除过任何一条告警，因为它压根不在告警的因果链上。**
+
+**误归因是怎么产生的（值得记，因为它会复发）：** 注释写在**被改动的组件旁边**（ModelLoader 里 encoder 换用那一段），于是「改了 X，日志里有 Y」被读成「X 产生 Y」。真正把它切开的是**隔离实验**——让两个模型在时间上分开加载，看告警跟着谁走。⇒ **归因必须由隔离实验建立；代码注释不是证据，时间上的相邻也不是证据。**
+
+#### 13.1.3 真正的架构缺陷（这才是应该验收的东西）
+
+`SAMDecoder.init` **无条件**用调用方传入的 `computeUnits`（真机为 `.all` ⇒ 允许 ANE）加载 **box decoder**，而在 `.tapToSegment` 下 box decoder **从头到尾不会被调用一次**（tap 路径走 `pointModel`，已显式强制 `.cpuAndGPU`）。这条的性质是：
+
+- **它是架构缺陷，不是噪声问题。** 代价落在用户的**第一次 tap 的关键路径**上（§17.4 超时的直接助推、§20.1 的 IMPACT），并额外占用内存与启动时间。
+- **告警只是它的副产品。** box decoder 是全工程**唯一**用 ANE-enabled compute units 加载的 decoder ⇒ 它一惰性化，tap 路径上那 3 条告警会自然归零。**修好架构，指标自己会动；反过来盯着指标修，就会去改 encoder（已经浪费过一轮了）。**
+
+⇒ 验收对象应当是**「不加载用不到的模型」这一行为断言**，告警计数只作为**旁证**记录。
+
+#### 13.1.4 修订后的验收标准与所需数据
+
+**条目新表述（写入 tasks.md，保持 `[ ]`）：**
+
+> 确认 `.tapToSegment` 路径不加载用不到的模型（box decoder 惰性加载生效）；对齐告警计数作为副产品指标一并记录
+
+**判定标准（P = 必过，S = 旁证，G = 回归护栏）：**
+
+| # | 类别 | 判据 | 判定方式 |
+|---|---|---|---|
+| **P-1** | 必过 | 从进入 `.tapToSegment` 到 TAP#N 全程，**box decoder 未被构造** | 真机日志：`SAMDecoder.init` 只打印 point decoder 加载；box decoder 的加载日志在整段 tap 会话中**零次** |
+| **P-2** | 必过 | box decoder 只在 **`.segmentation` 需要它时**才构造，且 Phase 2 行为无变化（仍走 ANE、仍能正常出 mask）| 切到 `.segmentation` 跑一段：出现**恰好一次** box decoder 加载 + mask 正常渲染 + box decode 延迟与 Day 4 同量级 |
+| **P-3** | 必过 | 冷加载成本被**移动**而不是被消除，必须被**测量**而不是被隐藏 | 记录 box decoder 首次构造耗时与它落在哪个阶段。Builder 的实现把它留在 **Phase 2 warmup 的排练 decode** 上（与改动前同一队列、同一时点）⇒ 预期**不落在用户可见路径**；**须实测确认这一点**，若它实际落到 `.segmentation` 首帧且用户可感（>1 s），作为新条目上报，**不得当作已解决** |
+| **P-4** | 必过 | **warmup 排练的必须是当前模式真正会用的那个 decoder** | `.tapToSegment` 下 warmup 日志须显示 **point prompt** 排练（`[SAM][warmup] … point prompt`）。若仍用 box prompt 排练，box decoder 会在 warmup 阶段被造出来 —— **告警只是从 TAP#1 挪到 warmup，一条都不会少，而惰性化等于白做**。这是本条最容易被「计数看起来没变」掩盖的失败模式 |
+| **S-1** | 旁证 | 告警计数：TAP#1 期间 **3 → 0**；全 session 6 → 3（仅惰性化）或 6 → 0（若 D-5 同时移除 `testMobileSAMLoad()` 的重复加载） | 与实测数不符时**必须解释差值**，不得只报「减少了」 |
+| **G-1** | 护栏 | decode 数值行为零变化：`Mask logits` 量级正常（参照 min=-9.74 / max=3.60）、`iou_pred` ⊂ [0,1]、数值哨兵触发 **0** 次 | 惰性化只应改变「什么时候加载」，**不应改变任何输出** |
+| **G-2** | 护栏 | `ModelLoader.swift:55-58` 的误归因注释已订正（D-4） | 代码审查；留着它下一个人还会照它立项 |
+
+**所需数据（缺一不可判定）：** 一份**惰性加载落地之后**的 **Release 构建**真机日志，含：① 启动段；② `MODE SWITCH → tapToSegment`；③ ≥3 次 tap（覆盖 TAP#1 冷路径）；④ 切回 `.segmentation` 跑若干帧；⑤ 全段的 `Invalid layer` 计数并**按阶段分列**（启动 / 模式切换 / warmup / TAP#1 / Phase 2 首次 box decode）；⑥ 两个模式各自的 `SAM decoder warmup latency` 行（含 `origin` 与 `point|box prompt` 标注）。
+
+**明确不要求的：** 不要求告警归零才能勾选。若 P-1…P-4 全过而 S-1 仍有残余（例如启动期 3 条来自其它加载点），**照勾**，把残余计数如实记为观测项。**这正是本次重新表述的意义：验收绑定行为，不绑定日志字面。**
+
+#### 13.1.5 「优化入口点 1」的处置理由（为什么是重新界定，不是撤销、不是移交）
+
+**不撤销的三条理由：**
+
+1. **撤销会丢掉教训。** 这个条目现在是项目里最有价值的**反面案例**：一个基于代码注释、未经隔离实验的归因，驱动了一整轮工作。删掉它，下一次还会有人照着某条注释立项。
+2. **撤销有被误读为「回滚 milfix」的实际风险。** milfix encoder 已在 §9.5 冻结为「Encoder 模型系列 = milfix fp16 单一模型 FINAL」，Day 4/Day 5 的全部延迟基线（648 ms / 970.6 ms 配对量）与 44/50 = 88% 的评分基线**都是在 milfix 上测的**。换回原 encoder 将使冻结参数表与全部基线一次性失效，而**没有任何证据表明原 encoder 更好**。⇒ **作废理由，保留部署。**
+3. 该入口点下真实存在的问题（§13.1.3）**就在 Phase 3 内、就在 Day 6 的可修范围内**，没有任何理由推到 Phase 4。
+
+**重新界定后的定义（取代 tasks.md 第 386 行的「1. ANE 对齐告警消解」）：**
+
+> **入口点 1 —— 模型加载卫生（model-load hygiene）**
+> (a) 不加载用不到的模型：box decoder 惰性化（D-5）、`testMobileSAMLoad()` 移除或限 DEBUG；
+> (b) 冷加载成本不落在用户的第一次交互上：warmup 归属修正（D-1 / D-2）；
+> (c) 订正 `ModelLoader.swift:55-58` 的误归因注释（D-4）。
+> **观测指标（非目标）：** `Invalid layer … 64 bytes` 的分阶段计数。
+
+**「真·ANE 对齐」议题的处置：降级为观测项，Phase 3 内不立项。** 依据两条：① 实质风险实测为零（logits 量级正常、`iou_pred` ⊂ [0,1]、哨兵 0 次）；② point decoder 已强制 `.cpuAndGPU`，**根本不上 ANE**，box decoder 惰性化后 tap 路径上无 ANE 加载 ⇒ 问题在当前配置下**不可达**。
+**重开三条件（合取，缺一不可）：** (i) 有明确的延迟收益目标（例如「把 point decoder 放回 ANE 以省 X ms」）；(ii) 目标设备真机配对实测（§9.2 约定：跨后端外推只构成立项理由，不构成裁决依据）；(iii) 数值哨兵 + logits 量级作为**验收门**而非事后检查——A13 fp16 LayerNorm 崩坏是这条路径的已知失败模式。
+
+#### 13.1.6 长期约定 A-4（写入架构原则）
+
+> **A-4（验收断言的绑定对象）：验收标准必须写成对*系统行为*的断言，不得写成对*日志文本*的断言。**
+> 日志计数受「触发路径跑没跑到」「加载了几次」「构建配置」共同支配，因此它既不能证明成功、也不能证明失败；把它当目标会导致**优化指标而不是优化系统**。
+> 日志只能作**旁证**，且引用时必须分阶段计数并解释差值。
+> **推论（归因纪律）：因果归因必须由*隔离实验*建立。** 代码注释不是证据，时间上的相邻不是证据，「我改了 X 之后 Y 变了」也不是证据——除非 X 能被单独开关。
+> **自检问法：「如果这条日志明天被人删掉，我的验收还成立吗？」** 答「不成立」⇒ 验收标准写错了对象。
+
+---
+
+### 13.2 裁决二：三槽色板追认（**条件性**）+ §3.3.2 两处勘误
+
+#### 13.2.1 结论（先给判定）
+
+| 项 | 裁决 |
+|---|---|
+| **三槽色板 slot0 (0,217,255) / slot1 (0,255,242) / slot2 (0,255,170)** | ✅ **条件性追认（PROVISIONAL）**，写入 §3.3.3 与 §9.5；转 FINAL 的唯一条件 = 完成 C-7 (b) |
+| **§12.1 Q6「按实例配色 Phase 3 撤销」** | ❌ **正式取代。** 撤销的前提（色相承担 L1）已被双色描边落地消灭 |
+| **§3.3.2 C-1 的品红备选带 [280°,330°]** | ❌ **删除**（在 C-2∩C-3 下是空集，Architect 独立复算确认 max Y = 0.2988） |
+| **§3.3.2 C-1 的允许带上界 200°** | ❌ **订正为 194.78°**（宽 34.8°） |
+| **§3.3.3 上一版理由 1「装不下三个色相」** | ❌ **撤回**（算术不成立） |
+| **§3.3.3 上一版理由 2「会混出第四种颜色」** | ⚠️ **对本色板不成立**，其成立条件提炼为新约束 **C-8 混合封闭性** |
+| **新增 C-1a（边界余量）/ C-8（混合封闭性）** | ✅ 写入 §3.3.2 |
+
+#### 13.2.2 前提变更的合法性检查（这不是反复横跳，理由要讲清楚）
+
+一个规格在 8 小时内被改了两次，必须先回答「你到底在按什么原则做事」。我的回答是：**两次改动推翻的不是同一个东西。**
+
+| 上一版的内容 | 本次处置 | 原因类型 |
+|---|---|---|
+| **结论**：Phase 3 内撤销按实例配色 | 取代 | **前提变更** —— 撤销的推导是「色相在承担 L1 ⇒ 色相必须与用户内容竞争 ⇒ 三个色相里必有一个输」。双色描边落地后 **L1 由描边独立承担**，色相退回 L3。前提没了，结论跟着没 |
+| **论据 1**：允许带装不下三个可区分色相 | 撤回 | **我算错了** —— 与前提变更无关，即使 L1 仍由色相承担，这条论据也是错的 |
+| **论据 2**：三色重叠混出第四色 | 限定 | **过度一般化** —— 对旧色板成立，对任何在混合下封闭的色板不成立 |
+| **原则**：L1 不得由色相承担（§3.3.1、A-3） | **完全不变** | 本次裁决恰恰是它的**正确应用**：正因为 L1 已被描边接管，色相才被允许回来 |
+
+**⇒ 判据是「L1 的承载者是谁」，不是「用几种颜色」。** 上一版之所以要撤销按实例配色，是因为当时描边还没落地、L1 无人承担；现在有人承担了。真机复录已确认呈现回退解决（R14 的复录要求已满足），前提变更是**实证的**，不是推测的。
+
+#### 13.2.3 §3.3.2 两处勘误（我的错误，已独立复算确认）
+
+Builder 指出的两处**全部成立**。我用独立实现（sRGB 线性化 + WCAG 相对亮度 + CIEDE2000）重算，逐项吻合：
+
+**勘误 1 —— 品红备选带 H ∈ [280°,330°] 在 C-2∩C-3 下是空集。**
+在 S ≥ 0.85 且 V ≥ 0.90 的约束内穷举该色带，相对亮度最大值 **Y = 0.2988**（H = 300.0°, S = 0.85, V = 1.00），距 C-2 的门槛 0.45 差 **0.15**，且**无论如何取值都够不到**。原因是物理的：品红 = 红 + 蓝，而 Y 的系数是 R 0.2126 / G 0.7152 / B 0.0722 —— **亮度几乎全在绿通道上**，一个绿分量被压到接近 0 的色相不可能同时高饱和与高亮度。
+⇒ **删除，且必须写明删除理由**。留着它，下一次换色的人会以为自己有两个色带可选，然后在品红里挑一个通不过 C-2 的色，重演一遍本次事故。
+
+**勘误 2 —— 首选带被 C-2 截断在 H = 194.78°。**
+在 S = 1.00 / V = 1.00 上做色相扫描，Y 在 **H = 194.78°** 处恰好穿过 0.45；H = 195° 时 Y = 0.4459 已越线，H = 200° 时只剩 0.3597。⇒ 可行弧段是 **H ∈ [160°, 194.78°]，宽 34.8°**，而不是原写的 [160°, 200°]。
+补充一处我在复算中发现、Builder 未提的细节：若把 S 放宽到 C-3 的下限 0.85，可行上界能延到 **H ≈ 197.6°**（掉饱和度 = 掺白 = 提亮）。**我判定这 2.8° 不计入可用余量**——用掉饱和度换亮度与 C-3「人造信号特征」的立意直接冲突，写进规格只会诱导下一个人去踩。已在 C-1 中明确标注。
+
+**由此，我上一版的判断「允许色带装不下三个可区分色相」经验算不成立：** 在 34.8° 弧内、slot 0 钉死 188.94° 的条件下，最优三元组 (160.0°, 177.5°, 188.94°) 的 ΔE00_min = 17.4，实际发布的 (160°, 176.94°, 188.94°) = **17.1**（我独立复算：三对分别为 18.0 / 35.3 / 17.1），高于「类别可辨识」常用的 10。
+**装不下的是「散布在整个色环上的三个」** —— 旧色板 ΔE00_min = 50.2，那种散布正是把两个色相拖进禁用带的原因。**我把「色相间距不够」和「色相位置越界」混成了一件事**：真实约束只作用在**位置**上，间距在剩下的弧段里是够用的。
+
+#### 13.2.4 新增 C-8（混合封闭性）—— 从被撤回的论据里救出来的东西
+
+上一版「三色重叠会混出第四种颜色」的错误在于把一个**依赖具体色板**的性质说成了普遍性质。正确的表述是一个**检验**而不是一个**结论**：
+
+> **C-8：多实例色板必须在 `compositeLayers` 的 source-over 叠放下封闭** —— 穷举全部叠放组合（N=3 ⇒ 12 种），每一种重叠产物**自身**都必须通过 C-1/C-2/C-3。
+
+本色板通过的机制值得记下来，因为它是可复用的构造技巧：**三色的 R 分量恒为 0** ⇒ 任意凸组合仍 R = 0 ⇒ **S 恒等于 1.000**，色相被锁在 G/B 两分量张成的一维子空间里。我独立复算 12 种组合：**H ∈ [163.57°, 186.48°]、S = 1.000、V ∈ [0.930, 1.000]、Y ∈ [0.5997, 0.7706]**，与 Builder 的数字逐位一致，**12/12 全部通过**。
+旧色板则是反例：蓝 + 橙的混合物掉出了整个约束集 —— 它失败的原因不是「三色」，而是**从来没有人检验过混合产物**。
+
+#### 13.2.5 两条削弱项（原样纳入裁决，不美化）
+
+**W-1 —— secondary 之间的可辨识度不足（已确认，非推测）。**
+
+上面那些 ΔE00 是**不透明色块**的值。在 7 种代表性背景上实算**合成之后**的最小两两 ΔE00（我独立复算，与 Builder 结论一致）：
+
+| alpha | 合成后 ΔE00_min 范围 | 判定 |
+|---|---|---|
+| **0.60（primary）** | **10.2 – 13.5**（全部背景 ≥ 10）| 可辨识 |
+| **0.40（secondary）** | **6.8 – 10.7**（多数背景 **< 10**）| ⚠️ **欠载** |
+
+**架构含义（这是本条真正的产出）：色相是 L3 的载体之一，但不是充分载体。** primary/secondary 的区分由描边分档承担，那是 **L2**；**两个 secondary 彼此之间**目前只有色相一个 L3 载体，而它在 0.40 alpha 下多数背景达不到可辨识门槛。
+⇒ **裁决：Day 6 的「tap 锚点常驻标记 + 实例编号」从增强项升格为 L3 的必需载体，定级 P1。** 在它落地之前，L3 处于**已知欠载状态**，Day 7 冻结时须如实记录。
+⚠️ 该条目已在 tasks.md Day 6 Builder 小节存在（§12 已增列），**本次不改写 Builder 小节**（本轮授权范围外）；定级要求记录在此与 Architect 小节，Day 6 排期时生效。
+⚠️ **不接受的两条"便宜解法"**：① 把 secondary alpha 提回 0.60 —— 会削弱 L2 的归属分级，也违背 §12.7.4 的 M1 缓解（旧 mask 不该冒充当前断言）；② 把三个色相拉得更开 —— 弧段只有 34.8°，17.1 已接近该弧内的上界 17.4，**没有空间可挖**。⇒ **只能靠增加一个新载体（编号），不能靠调参。**
+
+**W-2 —— C-7 (b) 真机目视撞色测试：✅ 已结案（2026-08-16）。**
+
+C-7 的字面要求是「两项缺一不得合入」，而代码**已经合入**。我不做追溯性否决（用户显式要求 + 描边兜底已把撞色后果从「隐身」降为「填充看不清但轮廓仍在」+ slot 0 保住了 Day 4 逐位一致），但**违例必须记录在案，否则 C-7 这条防复发机制第一次被援引就被架空了**。
+
+处置三条：
+1. **色板状态标记为 🟡 PROVISIONAL，不是 FINAL**（§3.3.3、§9.5 均已标注）。**C-7 (b) 完成前，不得在本色板基础上再做任何换色。**
+2. **补测是阻塞项，不是可选项。** 测试内容：三个测试物（一个青色物体、一个水青/蓝绿物体、一个薄荷或春绿物体，**slot 2 = 160° 是三者中风险最高的**——正压在允许带下沿、距绿色禁用带只有 5°、零余量），逐槽位各测一个；**外加一次同屏三实例**，判「能否看出这三块来自三次不同点击」（这一项直接检验 W-1）。
+3. **失败判据要写死，避免补测时口径漂移**：失败 = **连轮廓都找不到**。「填充看不清但轮廓仍在」**不算失败**——那正是 R10 预期的残余风险形态，也正是双色描边的设计目的。若出现「连轮廓都找不到」，问题在描边实现（R10），不在色板。
+
+#### 13.2.6 与既有裁决的一致性自检
+
+| 既有裁决 | 本次是否冲突 | 说明 |
+|---|---|---|
+| §3.3.1 三层职责 / A-3「L1 不得依赖不可控输入」 | ❌ 不冲突 | 本次是它的正确应用：L1 仍**只**由描边承担，色相只回到 L3 |
+| §3.4 alpha 分级 0.60/0.40、描边分档 | ❌ 不冲突 | **一个字未动** |
+| §11.9 R3 禁令 / 88% 几何基线 | ❌ 不冲突 | 本次只改色相；`compositeLayers` 的 `accA` 只由 `alpha[i]>0` 与 `opacity` 决定、**与颜色无关** ⇒ 二值覆盖与不透明度分布逐位不变 |
+| Day 4 逐位可比性（R11） | ⚠️ 收窄但保住 | 现在只在 **N=1（slot 0）且描边关闭** 时严格成立。多实例场景本就不在 44/50 基线的采样协议内 |
+| Phase 2 `renderMask` 保护 | ❌ 不冲突 | 未触碰；其青色字面量与 slot 0 的一致仍属巧合性一致，**不得据此合并两条路径** |
+
+---
+
+### 13.3 裁决三：A-1 方向收敛 —— 候选集扩充关闭，只在 token 1–3 内改进选择
+
+#### 13.3.1 结论（先给判定）
+
+| 项 | 裁决 |
+|---|---|
+| **是否导出 token 0 / 改为 4 候选 / token 0 作 fallback** | ❌ **正式关闭。** 采纳 ML_Vision（§D.5）的推荐 |
+| **是否退回 Day 3 的纯 token 0** | ❌ **正式关闭。** 这条退路此前一直隐含存在，本次被数据切断 |
+| **A-1 的方向** | ✅ **收敛为「在现有 token 1–3 内改进选择」** |
+| **是否现在就可以动选择规则** | ❌ **否。R3 禁令继续有效。** 动规则需先满足 §13.3.4 的 E-1…E-4（**合取**）|
+| **「改为取 iou_pred 最大」** | ❌ **不批准**，即使 §D.6 的数据表面上支持它（理由见 §13.3.3）|
+
+#### 13.3.2 依据
+
+四条理由互相独立（D.2–D.4），其中 **D.3 是决定性的**：
+
+- **D.3（零影响）：** A4 vs 现状 20 次中 19 次选择完全相同，唯一"差异"两者面积/bbox/fill 全同；FB vs 现状 **20/20 相同**，fallback **从未触发**。机制清楚：token 0 面积在 19/20 上 ≥ token 1，而规则取最小 ⇒ **token 0 永远选不上**。⇒ 导出 4 候选要付出模型重导出 + decoder 输出契约变更（通道数）+ 全链路 shape 变更的成本，**换来一个已被观测为 ≤ 1/20 的效应**。
+- **D.2（不是新粒度档）：** token 0 ↔ token 2 中位 mask IoU ≈ 0.94（vs token 1 的 0.70、token 3 的 0.44）⇒ 它落在「部件」档，与 token 2 高度重合，**不提供新的粒度层级**。候选集的价值在于覆盖不同粒度，一个重复档没有覆盖价值。
+- **D.4（自评量上也不占优）：** 四个 token 的 iou_pred 最大者分布为 token 2 占 10/20、token 1 占 5、token 3 占 4、**token 0 占 0**。
+- **D.4（退路被切断）：** 纯 token 0 替换在**退化提示**上明显更差 —— 点裸大理石溢出 8.4% → **26%** 内容区，点裸泡沫 16% → **25%**。⇒ 「Day 3 那时候更准」这个一直悬着的假说，现在有了反证。结合 §12 的结论（用户主诉是呈现问题，不是几何问题），**两条独立证据同时指向「不要回滚几何/候选集」**。
+
+**一条方法学上的说明（它让 n=20 的结论仍然可用）：**
+> **证明一个改动*无效*所需的证据强度，低于证明它*有效*。** 前者的效应量上界已被直接观测到（19/20 或 20/20 相同 ⇒ 效应 ≤ 1/20）；后者要求估计一个未知的正效应，需要的样本量高得多。
+> ⇒ D.7 的 R-T3（n=20、集中于 4 场景）**足以支撑「关闭一个方向」，不足以支撑「开启一个方向」，更不足以支撑任何阈值设定**。本裁决严格停在前者。
+
+#### 13.3.3 明确不批准的路径：「改为取 iou_pred 最大」
+
+§D.6 指出 token 2 在 10/20 上 iou_pred 最高、且常 iou 与 stability 双高，而现行规则（取最小）几乎从不选它。这是**真实且有价值的观察**，但它**不构成一个可以直接实施的规则**，理由三条：
+
+1. **iou_pred 是未经验证的代理量。** 全部指标（iou_pred / stability / fill）都是模型自评量，且 Debugger 已证三者共线（stab~iou 0.945、iou~fill 0.924）——**三个共线的自评量提供的是一个维度的信息，不是三个**。「哪个 token 更接近用户意图」**从来没有被测量过**（D.7 R-T2）。照着一个未验证的代理量重排序，等于把选择规则从一个有已知缺陷的锚（面积）换到另一个**缺陷未知**的锚。
+2. **它是「选择式」改动，会让 88% 基线整体不可比。** 取最大 iou_pred 会在**几乎每个样本上**改变输出（现行规则 ≈ 恒取 token 1，而 token 1 只在 5/20 上 iou_pred 最高）⇒ 直接撞 §11.9 R3 与 R9。
+3. **Debugger §19.4 的既有结论仍然有效：** stability **只能否决、不能选择**；高 stability ≠ 好 mask。iou_pred 与 stability 共线 ⇒ 该结论顺延到 iou_pred。
+
+#### 13.3.4 动选择规则所需的证据（E-1…E-4，**合取**；沿用 §9.3 修订后的门控口径：批准取合取、撤销取析取）
+
+| # | 要求 | 为什么必需 |
+|---|---|---|
+| **E-1** | **人工评分配对数据（最高优先）。** 对同一批 tap 点做**盲评强制选择**：呈现候选 mask（顺序随机化、**不显示** iou/stability/面积），由人标注「哪一个最接近我点这一下时想选的东西」。**设计必须是配对的**：离线重放两条规则，**只对「两条规则选择不同」的样本子集做人工评分**（McNemar 设计）。判据：discordant 子集上新规则更优的次数 b 与更差的次数 c 满足 b > c 且在 b+c ≥ 10 上显著 | 这是**唯一**能把模型自评量与用户意图挂钩的数据。D.7 R-T2 明说该量未被测量。配对 + 只评 discordant 子集能把样本需求压到极低（D.3 显示多数样本两规则同选），**成本不是借口** |
+| **E-2** | **设备端定向复采**，能**复现**那三个灾难性失败（S3 电脑盖 / S5 插头 / S2 显示器底座），并同时导出四个候选的 candidates 日志 | D.7 R-T1：重建帧**没能复现**设备端的灾难性失败（四个 token 面积均在 0.3%–3%，无一是「整张桌子」）。如果规则改动的主要卖点是「修掉灾难性溢出」，而灾难性溢出在离线介质上根本不出现，那**离线重放无法证明改动有效** |
+| **E-3** | **规则改动的形式必须是「否决式」而非「选择式」** —— 须能写成「先用阈值否决掉部分候选，再在剩余候选里**沿用现行的『面积最小且 ≤cap60』**」 | 三个好处：① 承接 §19.4「stability 只能否决不能选择」；② 改动**单调收缩**，可用单开关回退（C-6 同款）；③ **在「无候选被否决」的样本上输出逐位不变** ⇒ 88% 基线的可比性由**构造**保证，而不是靠事后统计辩护 |
+| **E-4** | **副作用指标必须一并采集**：退化提示（点裸大理石 / 裸泡沫等裸表面）上的溢出率**不得上升** | D.4 给出的最有价值的副作用指标。选择规则一旦"变松"（倾向更大的候选），第一个坏掉的就是裸表面点击 —— 这正是把 mask 荡回「整张桌子」的机制。**没有这一项，就会重演"从太大荡到太小再荡回太大"** |
+
+**未满足 E-1…E-4 之前：** ML_Vision 可以继续采数据、继续离线重放、继续打日志；**不得改动 `MaskRenderer` 中任何参与选择的代码**（§11.9 R3 禁令原样有效）。
+
+#### 13.3.5 三条保留项如何限制结论 + 一个必须命名的分叉点
+
+D.7 的三条保留项**原样纳入本裁决**，并逐条给出它限制了什么：
+
+| 保留项 | 限制了什么 |
+|---|---|
+| **R-T1** 重建帧未复现设备端灾难性失败 | 「不导出 token 0」的结论对**整体趋势**成立；对**那三个失败案例**结论强度低。⇒ 本裁决只关闭候选集方向，**不声称三个失败案例已被解释** |
+| **R-T2** 无人工评分配对 | 「token 2 更好」严格来说**未被测量**。⇒ §D.6 只能作为 E-1 的**假设来源**，不能作为规则改动的依据 |
+| **R-T3** n=20、集中于 4 场景 | 不得用于任何**阈值级**结论（cap 值、stability 门槛、面积比 K、Δiou δ 一律不得由本批数据定）|
+
+**必须命名的分叉点（这决定了 A-1 到底是什么问题）：**
+
+> 若 E-2 的设备端定向复采显示：灾难性失败发生时**四个 token 全部不可用**（都是「整张桌子」或都是碎片），
+> 则问题**既不在选择规则、也不在候选集**，而在**提示/embedding 本身**（低对比度下 logit 场变平 —— 与 Day 4 归因「局部对比度是唯一失败预测因子」同源）。
+> ⇒ 那时 **A-1 应被重新界定为「提示质量问题」**，候选方向变成 detect→crop→re-encode / 多点提示，而不是在三个都坏的候选里挑一个。
+> **顺序不可颠倒：先确认『存在一个好候选』，再谈『怎么把它选出来』。** 现行 A-1 的全部提法都默认了前者，而那个默认**至今未被验证**。
+
+#### 13.3.6 长期约定 A-5（写入架构原则）
+
+> **A-5（代理量禁令）：当一个决策规则的全部输入都是模型自评量、且这些自评量彼此共线时，不得在没有外部标注的情况下改变该规则的判据。**
+> 共线的 k 个自评量提供的是**一个**维度的信息，不是 k 个；用其中一个替换另一个，只是换了个投影方向，不增加任何关于「用户想要什么」的信息。
+> **自检问法：「这个量被验证过与我真正关心的东西相关吗？」** —— 答不出验证在哪，就说明你在优化一个从未被校准过的仪表。
+> 与 §12.9 A-3 的关系：A-3 管「别把正确性押在你控制不了的量上」，A-5 管「别把正确性押在你没校准过的量上」。
+
+**五条长期约定汇总：**
+
+| 约定 | 出处 | 母题 |
+|---|---|---|
+| 跨硬件后端的比例外推不构成裁决依据 | §9.2 | 相似 ≠ 可迁移 |
+| A-1 时间型 TTL 只允许作用于可自动重建的资源 | §11.4 | 机制的适用前提必须随机制一起搬运 |
+| A-2「复用 Phase N 的参数」不构成设计理由 | §11.4 | 同上 |
+| A-3 覆盖层可见性不得依赖不可控输入 | §12.9 | 别把正确性押在你控制不了的量上 |
+| **A-4 验收断言绑定行为、不绑定日志字面；归因须由隔离实验建立** | **§13.1.6** | **别把指标当目的** |
+| **A-5 代理量禁令：未经外部标注校准的自评量不得驱动规则变更** | **§13.3.6** | **别把正确性押在你没校准过的量上** |
+
+---
+
+### 13.4 保留项与风险（不封层，明确列出）
+
+| # | 保留项 | 性质 |
+|---|---|---|
+| **R15** | **色板 C-7 (a)+(b) 均通过，状态升 FINAL（2026-08-16）。** slot 2 的 160.00° 零余量已在真机测试中以绿色物体验证（「填充看不清但轮廓仍在」PASS）。今后任何换色仍须过完整 C-7 (a)+(b) 程序 | 已结案 |
+| **R16** | **L3 欠载已确认：** 两个 secondary 之间合成 ΔE00 只有 6.8–10.6（多数背景 < 10），且**没有调参空间**（弧段 34.8°、17.1 已近上界 17.4）。唯一解法是 Day 6 的锚点编号 | 已知限制，有明确解法 |
+| **R17** | **Debugger 第 5 条的新判据尚无数据。** 惰性加载正在由 Builder 并行实施，判定须等修订后的 Release 真机日志（§13.1.4 五项）。**在此之前该条保持 [ ]，且不得因「告警变少了」被勾选** | 待数据 |
+| **R18** | **box decoder 的冷加载成本是被*移动*而不是被*消除*的。** 按 Builder 的实现它落在 Phase 2 warmup 的排练 decode 上（与改前同队列同时点）⇒ 预期不可见，但**未经真机确认**。另有两处需一并观察：① `setMode` 复位 `decoderWarmupDecodeDone` 会带来至多一次多余排练 decode；② `.tapToSegment` 的 warmup 现在改排练 point decoder（P-4），这是新路径 | 已知副作用，须测量 |
+| **R19** | **A-1 的三个灾难性失败案例至今没有被任何介质复现过**（设备端有、重建帧无）。在 E-2 复现之前，**任何声称"修好了失败案例"的改动都无法被验证**；且 §13.3.5 的分叉点意味着 A-1 有可能根本不是选择规则问题 | 证据缺口，含方向性风险 |
+
+---
+
+### 13.5 本次对 tasks.md 的改动范围（可 diff 核对）
+
+| 小节 | 改动 |
+|---|---|
+| **Day 5 / Debugger 条目 5** | **仅表述修订 + 追加裁决说明，保持 `[ ]` 未勾选**（本轮授权范围内的唯一例外）|
+| **Day 5 / Architect** | 新增 1 条已完成条目（本次三项裁决）|
+| **Phase 3 优化入口点列表（第 386 行）** | 第 1 项重新界定为「模型加载卫生」，并标注原目标作废 |
+| **Day 5 / Builder** | ❌ **未改动** |
+| **Day 6 / Builder、Day 7 / *、ML_Vision 任何小节** | ❌ **未改动**（W-1 对锚点编号的 P1 定级记录在 Architect 小节与 §13.2.5，Day 6 排期时生效）|
+
+### 13.6 Deliverable 确认
+
+- [x] 任务一 (1) Debugger 第 5 条重新表述，验收目标从「告警减少」改为「不加载用不到的模型」，**保持未勾选**（§13.1.4）
+- [x] 任务一 (2)「优化入口点 1」处置裁决：**重新界定为「模型加载卫生」**，不撤销、不移交，理由三条；milfix 部署保留、立项理由作废（§13.1.5）
+- [x] 任务一 (3) 修订后的验收标准 P-1/P-2/P-3 + S-1 + G-1/G-2 与所需数据清单（§13.1.4）
+- [x] 任务二 追认三槽色板（**条件性 PROVISIONAL**），§3.3.3 / §9.5 已改写（§13.2.1）
+- [x] 任务二 §3.3.2 两处错误已核实并修订：品红带删除、上界订正 194.78°；**Architect 独立复算确认**（§13.2.3）
+- [x] 任务二 上一版理由 1 撤回、理由 2 限定并提炼为新约束 C-8；新增 C-1a（§13.2.4、§3.3.2）
+- [x] 任务二 两条削弱项 W-1（secondary 可辨识度欠载）/ W-2（C-7 (b) 程序违例）**原样写入，未美化**（§13.2.5）
+- [x] 任务三 A-1 方向收敛为「在 token 1–3 内改进选择」，候选集扩充与"退回 Day 3"双双关闭（§13.3.1）
+- [x] 任务三 明确**不批准**「取 iou_pred 最大」，理由三条（§13.3.3）
+- [x] 任务三 动规则所需证据 E-1…E-4（合取）+ 门控口径（§13.3.4）
+- [x] 任务三 三条保留项逐条纳入并说明其限制 + 命名分叉点「A-1 可能根本是提示质量问题」（§13.3.5）
+- [x] 长期约定 A-4 / A-5 写入，五条汇总（§13.1.6、§13.3.6）
+- [x] 保留项 R15–R19（§13.4）
+
+**几何保护状态：** 本裁决**不触碰** `buildAlpha` 的任何决策代码。§11.9 R3 禁令继续有效；A-1 的裁决明确**不授权**任何选择规则改动 ✅
+**Phase 2 pipeline 保护状态：** 无变化。`renderMask` 未触碰；box decoder 惰性化要求 P-2 明确把「Phase 2 仍能正常出 mask」写成必过项 ✅
+
+---
+
+END OF PHASE 3 DAY 5 ARCHITECT OUTPUT（§13 追加三裁决）
+
+---
+
+# Phase 3 — Day 7 (Architect) 架构冻结 + Phase 4 规划
+
+日期：2026-08-15
+依据：debug_report.md §26（静态分析）+ §27（真机测量）+ tasks.md Phase 3 Day 7 Debugger/Builder 交付物 + architect_output.md §9.5/§10.6/§11.6/§12.8/§13
+
+---
+
+## §14 Phase 3 架构冻结 + Phase 4 规划（Day 7，2026-08-15）
+
+---
+
+### 14.1 Day 7 Debugger 结果审阅
+
+#### 14.1.1 已通过项（全部来自 §27 真机实测）
+
+| 项目 | 结果 | 数据 |
+|------|------|------|
+| 构建（Release，零 warning）| ✅ PASS | §26.1 |
+| 快路径 tap-to-mask mean | ✅ 73.9 ms | n=17，decode-only |
+| 快路径 tap-to-mask p95 | ✅ **94.7 ms** | §10.6 门控 ≤200 ms，通过 |
+| FIFO 压力测试（快速连点 5 个）| ✅ PASS | 6 次 eviction，pool 恒定 n=3 |
+| Encoder 忙碌期间 tap（进度动画）| ✅ PASS | 脉冲动画持续至 mask 出现 |
+| 旋转 90° 后 tap（几何传递）| ✅ PASS（修复后，§27.10）| 旋转时 mask 立即清除 |
+| 边缘/角落 tap（8 个位置）| ✅ PASS | 无崩溃，clamp 正常 |
+| Phase 2/3 切换 ×5 内存 | ✅ PASS | ~590 MB ±15 MB，无单调增长 |
+| 多实例内存 N=0→3 | ✅ +31 MB | 略超 +30 MB 设计预期，有合理解释（见 §14.1.2）|
+
+**ISSUE-D7-3 修复（已验收）：** 旋转后旧 mask 不自动消失的问题由 Builder 在 `applyCaptureRotation(_:)` 中修复（sessionQueue 调用，三条件门控：角度变化 + `.tapToSegment` 模式 + 实例池非空）。用户真机验证通过（"解决了"）。此修复归档为 Phase 3 最终变更，不影响任何冻结参数。
+
+#### 14.1.2 仍为开放项（不阻塞冻结，明确记录）
+
+| 项目 | 状态 | 处置 |
+|------|------|------|
+| **慢路径（encode+decode）样本** | n=0（R1 保留）| 用户协议，不阻塞冻结；纳入 Phase 4 首批任务 |
+| **ISSUE-D7-1**（P2）：`maskTTL`/`isMaskValid` 死代码 | Builder B-2 未完成 | 纯清理，行为零变化；不阻塞冻结，作为 Phase 4 进入前清单项 |
+| **ISSUE-D7-2**（P3）：`cacheLogKey` 日志标注 | 低优先级 | 可在 Phase 4 任意时点修正 |
+| **C-7(b) 撞色目视测试** | ✅ FINAL（2026-08-16） | 三色板已升 FINAL；Phase 4 进入条件已满足 |
+
+**多实例内存 +31 MB 的可接受性判定：**
++31 MB 略超 Day 5 验收门控 +30 MB，但测量条件偏高（本 session 共 7 次冷启动使 CoreML 运行时缓存累积；基线 484 MB 而非 Day 5 的约 304 MB）。增量结构符合架构预期（每实例约 10 MB，3 实例共 31 MB），无泄漏信号（FIFO 7 轮淘汰后内存无增长）。**判定：可接受；+31 MB 作为 Phase 3 实测值记录，不触发架构复议。**
+
+---
+
+### 14.2 A-4 裁决：手势识别延迟口径
+
+#### 14.2.1 问题定义
+
+`TouchHandler` 中 `singleTap.require(toFail: doubleTap)` 导致单击手势在手指抬起后**等待约 300 ms** 确认无双击后才触发 `handleTap` 回调。当前 `tapStartMs` 在 `handleTap` 内取，因此 `e2eMs` **不含**这 300 ms 系统等待。
+
+**问题：** 是否应将约 300 ms 手势识别等待纳入 `e2eMs` 口径定义？
+
+#### 14.2.2 裁决结论
+
+> **裁决：~300 ms 手势识别等待不纳入 `e2eMs`（pipeline metric）。`e2eMs` 口径维持现定义：手势回调触发（`handleTap` 入口）→ 主线程 `maskImage` 赋值完成。**
+
+#### 14.2.3 裁决依据（逐条独立）
+
+1. **性质不同，不可混入同一口径。** `e2eMs` 度量的是「系统知道有一次有效 tap 后，到 mask 出现需要多长时间」——即计算管线延迟。~300 ms 等待是 OS 手势消歧窗口（让系统区分单击与双击），是**手势识别层的输入延迟**，不是管线的计算开销。混入会使 `e2eMs` 无法反映任何管线优化的实际收益。
+
+2. **不可消除，不应被优化目标覆盖。** 双击是 §3.2.1 C1「清除全部实例」的**唯一**入口，也是 §11 裁决「清除权归用户」原则的实现形态。要消除 ~300 ms 等待，唯一路径是放弃双击手势语义。这是交互权衡，不是性能优化。**不应把一个设计决策的固定成本计入性能 SLO。**
+
+3. **§10.6 门控对 pipeline metric 成立。** `e2eMs p95 = 94.7 ms`，远低于 ≤200 ms 的门控值。如果把 ~300 ms 纳入，数字变为约 395 ms，§10.6 设计时的 ≤200 ms 目标与「快路径本来很快」的论据（§10.3 D1）全部失效——但两者的原始立意是「pipeline 计算本来只有 61 ms，别让 UI 框架把它说成慢」，与手势层无关。口径改变会扭曲论据与结论之间的因果。
+
+4. **与行业惯例一致。** 手势识别延迟（tap-to-callback）与 CPU/GPU 渲染延迟（callback-to-pixel）在 Apple 的性能分析工具（Instruments / MetricKit）中分属不同层级，不合并计量。本项目遵循同一分层原则。
+
+#### 14.2.4 口径规范（封层，Day 7 起生效）
+
+| 口径 | 定义 | 引用时标注要求 |
+|------|------|--------------|
+| `e2eMs`（pipeline metric）| `handleTap` 入口 → 主线程 `maskImage = composed` 赋值完成 | 必须标注「不含手势识别等待」|
+| `userPerceivedMs`（感知延迟参考）| ~300 ms 手势等待 + `e2eMs` | 仅作为用户体验参考值，不作为架构 SLO |
+
+**实测数据（Day 7）：**
+- `e2eMs` mean = 73.9 ms，p95 = 94.7 ms（n=17，快路径）
+- `userPerceivedMs` 参考估算 = ~374 ms median，~395 ms p95
+
+**§10.6 门控继续以 `e2eMs` 为基准。** Phase 4 若引入替代手势（无双击等待，例如长按替代双击清除），可在新条件下重新建立 `userPerceivedMs` 基线，但不得追溯修改本次封层的 pipeline metric。
+
+---
+
+### 14.3 Phase 3 冻结决定
+
+#### 14.3.1 结论
+
+> **Phase 3 正式冻结（有条件冻结，R1 以显式保留项形式进入 Phase 4）。**
+
+**冻结即刻生效（2026-08-15）。**
+
+#### 14.3.2 冻结的充分条件
+
+| 条件 | 满足状态 |
+|------|---------|
+| 快路径 e2e p95 ≤ 200 ms（§10.6 门控）| ✅ 实测 94.7 ms |
+| 所有压力测试通过 | ✅ FIFO / encoder 忙碌 tap / 旋转 / 边缘 / 切换内存 |
+| 几何正确性 | ✅ ISSUE-D7-3 修复，旋转后 tap 位置准确 |
+| 无已知正确性 bug | ✅（死代码不影响行为，ISSUE-D7-1/D7-2 均非正确性问题）|
+| Phase 2 pipeline 保护 | ✅ 所有改动均保护了 Phase 2 路径 |
+| R3 禁令参数未被修改 | ✅ `minComponentPx=30` 等全部未动 |
+
+#### 14.3.3 接受零慢路径样本的依据（如实记录，不美化）
+
+R1（慢路径无样本）是已记录的已知缺口。接受它的理由有三，**三条相互独立，任意一条单独不足以支撑接受，合取则足够：**
+
+1. **无慢路径证据 ≠ 有问题。** 慢路径难以触发（embedding TTL=8000 ms，background refresh 持续刷新）在正常使用中意味着该路径稀少，不意味着它有缺陷。Architecture 理解是完整的：慢路径 = encode(~648 ms) + decode(~61 ms)，UI 策略为脉冲动画 + 12 s 超时（§10.4 C Tier 1）。
+
+2. **UI 策略「临时规则」的含义是「不封层」而非「不安全」。** §10.5 R1 的「临时规则」标注意味着：若日后数据揭示慢路径体验不可接受，才触发 UI 策略复议。它不预设问题存在。**「临时」修饰的是封层状态，不是正确性。**
+
+3. **慢路径是 Phase 4 首批任务之一。** 接受 R1 的前提是 Phase 4 第一天即把慢路径采样列为强制任务（见 §14.5）。如果 Phase 4 数据揭示问题，Phase 4 架构文档写入复议结论；Phase 3 不需要因此推迟冻结。
+
+#### 14.3.4 不阻塞冻结的开放项（承诺处置）
+
+| 开放项 | 为何不阻塞 | Phase 4 承诺 |
+|--------|----------|-------------|
+| R1 慢路径 n=0 | 无正确性问题，见 §14.3.3 | Phase 4 首批任务强制采样 ≥10 次 |
+| C-7(b) 色板 | ✅ FINAL（2026-08-16）| Phase 4 进入条件已满足 |
+| ISSUE-D7-1 死代码 | 纯清理，行为零变化，无运行期影响 | Phase 4 进入前必须完成（Builder B-2）|
+| ISSUE-D7-2 日志标注 | P3，无分析影响 | Phase 4 任意时点 |
+
+---
+
+### 14.4 Phase 3 最终封层表（FINAL）
+
+本表取代 §9.5 作为 Phase 3 最终基准，并纳入 Day 7 新增实测数据。§9.5 内容仍有效，本表在其基础上补充 Day 7 条目。
+
+**引用本表时，以本表为准（§9.5 同值行不重复引用）。**
+
+| 参数 | 封层值 | 状态 | 依据 |
+|------|--------|------|------|
+| Encoder 输入分辨率 | **1024×1024** | 🔒 FINAL（Day 5）| §9.1–9.3 |
+| Encoder 模型系列 | **milfix fp16 单一模型** | 🔒 FINAL（Day 5）| 768 撤销后唯一 encoder |
+| Decoder 输入 embedding | `[1, 256, 64, 64]` | 🔒 FINAL（Day 5）| 与 1024 encoder 原生匹配 |
+| Point prompt 坐标空间 | **恒为 1024 空间** | 🔒 FINAL（Day 5）| C-2 永成立 |
+| Encoder 绝对延迟基线 | **648 ms（warm / 单模型稳态 / n=14）** | 🔒 FINAL（Day 5）| §9.3 口径标注 |
+| Decode 延迟基线 | **61 ms（warm，n=24）** | 🔒 FINAL（Day 5）| Day 4 Session B |
+| Embedding TTL | **8000 ms** | 🔒 **FINAL（Day 7）** | Day 6 日志（8 次 background refresh 均走 `ttl_approaching`，数值无需修订）|
+| Tap mask 生命周期 | **事件驱动，无时钟（§3.2.1 C1–C6）** | 🔒 FINAL（Day 5）| §11 |
+| 最大实例数 N | **3** | 🔒 FINAL（Day 1）| FIFO 上限 |
+| Tap 延迟展示策略（快路径）| **脉冲确认动画，无进度条** | 🔒 FINAL（Day 5 + Day 7 复审通过）| §10.3 D1/D2；p95=94.7ms |
+| Tap 延迟展示策略（慢路径）| **持续脉冲 + 12 s 超时（§10.4 C Tier 1）** | ⚠️ 临时规则（R1 保留）| 0 慢路径样本，Phase 4 补测 |
+| `e2eMs` 口径定义 | `handleTap` 入口 → 主线程 `maskImage` 赋值完成 | 🔒 **FINAL（Day 7）**（A-4 裁决，§14.2）| 不含 ~300 ms 手势等待 |
+| 手势识别等待 | **~300 ms，固定系统开销，不纳入 `e2eMs`** | 🔒 **FINAL（Day 7）** | §14.2；双击 C1 不可撤销 |
+| 快路径 e2e p95（修正口径）| **94.7 ms**（n=17，iPhone 11，Release）| 🔒 **FINAL（Day 7）** | §27.1；通过 §10.6 ≤200 ms 门控 |
+| 快路径 e2e mean（修正口径）| **73.9 ms**（n=17）| 🔒 **FINAL（Day 7）** | §27.1 |
+| 多实例内存 delta（N=0→3）| **+31 MB**（tapToSegment 稳态，本 session）| ✅ **FINAL（Day 7 实测）** | §27.5；略超 +30 MB 预期，可接受 |
+| Phase 2/3 切换内存平台 | **~590 MB ±15 MB，无单调增长** | ✅ **FINAL（Day 7 实测）** | §27.6 ×5 切换 |
+| Tap mask 填充色 | **三槽色板** slot0 青(0,217,255) / slot1 水青(0,255,242) / slot2 春青(0,255,170) | 🔒 **FINAL**（C-7(b) 通过，2026-08-16）| §3.3.3 |
+| Tap mask alpha | **primary 0.60 / secondary 0.40** | 🔒 FINAL（Day 5）| §3.4 |
+| Tap mask 描边 | **双色轮廓**（primary 2.0/1.5 pt，secondary 1.5/1.0 pt，屏幕坐标系）| 🔒 FINAL（Day 5）| §3.4 L1 唯一承载者 |
+| 按实例配色（per-instance hue）| **Phase 3 内恢复**（L3，仅区分用途）| 🔒 **FINAL**（与色板同步升级，2026-08-16）| §3.3.3 / §13.2 |
+| R3 禁令参数 | `minComponentPx=30` / `minComponentSidePx=3` / `minComponentFill=0.05` / `maxPlausibleLogit=500.0` / `stabilityDelta=1.0` / `cap60` / `cap85` / 候选选择规则 | 🔒 FINAL（**INVIOLABLE**）| Phase 3 全程未动，§11.9 R3 |
+| Fine-tuning | Phase 4 范畴 | 不变 | §8.4 |
+
+**冻结参数修改禁令（持续到 Phase 4 明确决定）：** 上表所有 🔒 FINAL 行不得被任何 PR 修改，包括「小调参」。PROVISIONAL 行的变更须过 §3.3.2 C-7 完整准入程序。SAMDecoder.swift 与 MaskRenderer.swift 继续作为不可触碰文件。
+
+---
+
+### 14.5 Phase 4 规划
+
+#### 14.5.1 Phase 4 进入条件（前置阻塞项，缺一不可进入）
+
+| 条件 | 负责人 | 说明 |
+|------|--------|------|
+| **ISSUE-D7-1 清理完成**（`maskTTL`/`isMaskValid` 删除）| Builder | 纯死代码，行为零变化。留着是防呆隐患（§11.6 纪律 3）|
+| **C-7(b) 撞色目视测试完成** | Builder + Debugger | 三槽位各测一个同色系真实物体 + 一次同屏三实例。通过后 §9.5 色板行由 PROVISIONAL 改 FINAL |
+
+#### 14.5.2 Phase 4 目标
+
+Phase 4 的核心主题是**从「功能正确」到「体验精良」**：mask 不再是一次性静态叠加，而是能跟随场景、支持更丰富交互、且可导出的活动对象。
+
+#### 14.5.3 Phase 4 入口点（候选，按优先级排序）
+
+**入口点 1 — 慢路径基线补全 + UI 策略封层（P0，Phase 4 首批任务）**
+
+- 强制触发 ≥10 次 encode+decode 慢路径（方法：在 tapToSegment 模式下静止 ≥9 s 使 TTL 超时，或旋转设备触发 geometryChanged）
+- 采集 mean + p95（修正口径 `e2eMs`）
+- 根据数据决定：慢路径 UI 策略是否需要不同于快路径的语义（§10.5 R1 最终处置）
+- 如数据显示慢路径 UX 可接受（e2eMs ≤ 800 ms p95），Tier 1（持续脉冲 + 12 s 超时）转 FINAL；否则触发 UI 策略复议
+
+**入口点 2 — mask 重锚定（re-anchor）（P1）**
+
+来源：§12.7.5（R6 呈现侧缓解的根本修复路径）。
+
+> 事件型漂移检测 + 用同一 `canonicalPoint` 在新帧上重新 decode。
+
+这是 Phase 3 的所有已知限制（R6 场景运动 mask 脱节、R13 三张不同龄 mask 同屏）的根本修复路径。它的架构价值超出视觉质量：**一旦有了 re-anchor 循环，tap mask 从「一次性产物」变成「有刷新源的资源」**，§11.4 A-1 的「自检问法」首次有了答案，时间型刷新机制才在逻辑上重新成立。顺序不可颠倒：先有刷新循环，再谈时间型刷新语义。
+
+实现条件：(1) embedding TTL 刷新已工作（✅ Phase 3 已验证）；(2) 旋转检测 C4 已工作（✅ ISSUE-D7-3 修复）；(3) re-anchor 循环独立于 embedding TTL，使用同一 `canonicalPoint` 在新 embedding 可用后触发 decode。
+
+**入口点 3 — C-7(b) 转 FINAL 后的 tap anchor 编号优化（P2）**
+
+- Day 6 的 tap 锚点编号（① ② ③）是 §13.2.5 W-1 的唯一解法（两个 secondary 之间 ΔE00 < 10，色相不是充分 L3 载体）
+- Phase 4 可在此基础上优化：编号的字体/对比度/动画，以及长按单实例删除（C6，已在 §3.2.1 中定义但 Day 6 只实现了框架）
+
+**入口点 4 — A-1 候选选择规则改进（P2，须满足 §13.3.4 E-1…E-4 全部前置条件）**
+
+- 方向已收敛：在 token 1–3 内改进选择（§13.3）
+- 第一步必须是 E-2 设备端定向复采（复现三个灾难性失败案例）
+- R3 禁令（INVIOLABLE）在 E-1…E-4 全部满足前持续有效
+- 注意 §13.3.5 分叉点：若复采显示灾难性失败时四个 token 全部不可用，则问题在提示/embedding 层而非候选选择，须重新界定 A-1
+
+**入口点 5 — 交互模式扩展（P3）**
+
+- 双指拉框选区（替代 point prompt，使用 box prompt，可复用 Phase 2 box decoder）
+- 长按单实例删除（C6 已定义，需完整手势实现）
+- 模式 UI 改进（tap/box/segmentation 三模式切换，更清晰的视觉状态）
+
+**入口点 6 — 分割结果导出（P3）**
+
+- 屏幕截图 + mask 抠图（合成透明 PNG 或分层图）
+- 实例池状态导出（坐标、mask、实例编号）
+- 设计约束：导出不得持有 CVPixelBuffer（相机帧生命周期短），须在 decoderQueue 完成时即时复制 mask 数据
+
+**入口点 7 — 模型升级评估（P3，后期）**
+
+- SAM 2（比 MobileSAM 精度更高，但 iPhone 11 上资源需求须先评估）
+- 512×512 fine-tuning 重评（Phase 3 已拒绝 zero-shot，fine-tuning 后可重测；入口条件：先取 ANE 逐层 profile 确认计算量是瓶颈，见 §9.4）
+
+#### 14.5.4 Phase 4 首批任务（Day 1 启动）
+
+| Agent | 任务 | 优先级 |
+|-------|------|--------|
+| **Builder** | 完成 ISSUE-D7-1（maskTTL 死代码清理）| P0（进入条件）|
+| **Builder + Debugger** | 完成 C-7(b) 撞色目视测试，转 FINAL 或触发色板复议 | P0（进入条件）|
+| **Debugger** | 采集 ≥10 次慢路径样本（mean + p95），写入 debug_report | P0（入口点 1）|
+| **Architect** | 根据慢路径数据裁决慢路径 UI 策略（R1 最终处置）| P0（入口点 1）|
+| **Architect** | 定义 Phase 4 模块边界（re-anchor 新模块 vs TapInstanceManager 扩展）| P1（入口点 2 前置）|
+| **ML_Vision** | 启动 E-2 设备端定向复采（三个灾难性失败案例）| P2（入口点 4 前置）|
+
+#### 14.5.5 Phase 4 架构约束（继承自 Phase 3，不得更改）
+
+1. **SAMDecoder.swift 和 MaskRenderer.swift 不得修改**（现有方法签名和方法体均冻结）。
+2. **R3 禁令参数（见 §14.4 最后一行）不得修改**，直到 §13.3.4 E-1…E-4 全部满足。
+3. **几何链（CanonicalFrame / FrameGeometry / LetterboxTransform）不得引入第二条变换路径**，所有坐标变换仍通过 `FrameGeometry.invertViewPoint` 唯一入口。
+4. **encoderQueue 和 SAMEncoder 实例单一**，Phase 4 的任何新模块不得加载第二份 encoder。
+5. **Phase 2（.segmentation）路径保护**：Phase 4 改动须维持 Phase 2 bbox→mask 行为不变（TemporalManager、box decoder、renderMask 路径均受保护）。
+6. **§11.4 A-1（TTL 适用性判据）在 re-anchor 循环落地之前继续有效**：Phase 4 的 mask 生命周期改动须先证明刷新源存在，再引入时间型失效。
+
+---
+
+### 14.6 Deliverable 确认
+
+- [x] Day 7 Debugger 结果审阅：已通过项、仍开放项、ISSUE-D7-3 修复确认（§14.1）
+- [x] A-4 裁决：手势识别 ~300 ms 不纳入 `e2eMs`，口径封层 FINAL（§14.2）
+- [x] Phase 3 冻结决定：正式冻结，R1 以显式保留项进入 Phase 4（§14.3）
+- [x] 接受零慢路径样本的三条独立依据（§14.3.3）
+- [x] Phase 3 最终封层表（§14.4），含 Day 7 新增实测数据
+- [x] Embedding TTL 8000 ms 封层为 FINAL（Day 6 数据无修订触发）
+- [x] Phase 4 进入条件（两项，§14.5.1）
+- [x] Phase 4 七个入口点（含优先级和前置条件，§14.5.3）
+- [x] Phase 4 首批任务表（§14.5.4）
+- [x] Phase 4 架构约束（§14.5.5）
+
+**Phase 2 pipeline 保护状态：** 无变化。本节所有裁决和规划均未触碰 Phase 2 路径。✅
+**R3 禁令状态：** 全部六项参数（minComponentPx/minComponentSidePx/minComponentFill/maxPlausibleLogit/stabilityDelta/cap 系列/候选选择规则）在本文件自 Phase 3 Day 1 至 Day 7 全程未被任何裁决授权修改。✅
+
+---
+
+END OF PHASE 3 DAY 7 ARCHITECT OUTPUT（§14 架构冻结 + Phase 4 规划）

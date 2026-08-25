@@ -7,13 +7,25 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D3A100302F600030000000A1 /* Pin.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3A100202F600020000000A1 /* Pin.swift */; };
+		D3A100312F600031000000A1 /* PinRecordV1.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3A100212F600021000000A1 /* PinRecordV1.swift */; };
+		D3A100322F600032000000A1 /* MaskPNGCodec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3A100222F600022000000A1 /* MaskPNGCodec.swift */; };
+		D3A100332F600033000000A1 /* FilePinStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3A100232F600023000000A1 /* FilePinStore.swift */; };
+		D3A100342F600034000000A1 /* PinInterfaces.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3A100242F600024000000A1 /* PinInterfaces.swift */; };
+		D3A100352F600035000000A1 /* PinDebugFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3A100252F600025000000A1 /* PinDebugFixture.swift */; };
+		D3A100362F600036000000A1 /* PinCreationSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3A100262F600026000000A1 /* PinCreationSheet.swift */; };
+		D3A100372F600037000000A1 /* AnnotationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3A100272F600027000000A1 /* AnnotationView.swift */; };
+		D3A100382F600038000000A1 /* PinListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3A100282F600028000000A1 /* PinListView.swift */; };
+		D3A100392F600039000000A1 /* PinRevisitStaticViewerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3A100292F600029000000A1 /* PinRevisitStaticViewerView.swift */; };
+		D3A100512F600051000000A1 /* BottomControlBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3A100502F600050000000A1 /* BottomControlBar.swift */; };
+		D3A100532F600053000000A1 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3A100522F600052000000A1 /* SettingsView.swift */; };
+		D3A100552F600055000000A1 /* BrandMark.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3A100542F600054000000A1 /* BrandMark.swift */; };
 		C40280CB2F53B55E0024A7FC /* AppMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = C40280CA2F53B55E0024A7FC /* AppMode.swift */; };
 		C42976342F555CBB00F98305 /* SAMEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = C45C68482F555B2300BB5AE6 /* SAMEncoder.swift */; };
 		C48C53BB2F54CE2100321235 /* PerfLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = C48C53BA2F54CE2100321235 /* PerfLogger.swift */; };
 		C4E5830A2F53A21F00023CFC /* CameraManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E583032F53A21F00023CFC /* CameraManager.swift */; };
 		C4E5830B2F53A21F00023CFC /* CameraPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E583042F53A21F00023CFC /* CameraPreview.swift */; };
 		C4E5830C2F53A21F00023CFC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E583052F53A21F00023CFC /* ContentView.swift */; };
-		C4E5830D2F53A21F00023CFC /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E583062F53A21F00023CFC /* Item.swift */; };
 		C4E5830E2F53A21F00023CFC /* JudgeE2App.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E583072F53A21F00023CFC /* JudgeE2App.swift */; };
 		C4E5830F2F53A21F00023CFC /* ModelLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E583082F53A21F00023CFC /* ModelLoader.swift */; };
 		C4E583102F53A21F00023CFC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C4E583022F53A21F00023CFC /* Assets.xcassets */; };
@@ -21,6 +33,17 @@
 		C4E583322F53A99900023CFC /* SAMDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E583202F53A33E00023CFC /* SAMDecoder.swift */; };
 		C4E583332F53A99900023CFC /* TemporalManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E583212F53A34700023CFC /* TemporalManager.swift */; };
 		C4FAC84A2F55F0B4001D6545 /* MaskRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E583222F53A35000023CFC /* MaskRenderer.swift */; };
+		D3A100012F600001000000A1 /* TouchHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4525850300D2F8F00AB94DA /* TouchHandler.swift */; };
+		D3A100022F600002000000A1 /* FrameGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3A1000A2F60000A000000A1 /* FrameGeometry.swift */; };
+		D3A100032F600003000000A1 /* PointPromptBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3A1000B2F60000B000000A1 /* PointPromptBuilder.swift */; };
+		D3A100042F600004000000A1 /* TapInstanceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3A100102F600010000000A1 /* TapInstanceManager.swift */; };
+		D3A100052F600005000000A1 /* MaskOutline.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3A100112F600011000000A1 /* MaskOutline.swift */; };
+		D3A100062F600006000000A1 /* DriftDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3A100122F600012000000A1 /* DriftDetector.swift */; };
+		D3A100072F600007000000A1 /* ReAnchorLoop.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3A100132F600013000000A1 /* ReAnchorLoop.swift */; };
+		D3A1000C2F60000C000000A1 /* SAMConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3A1000D2F60000D000000A1 /* SAMConfiguration.swift */; };
+		D3A1000E2F60000E000000A1 /* PerfLogging.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3A1000F2F60000F000000A1 /* PerfLogging.swift */; };
+		D3A100152F600015000000A1 /* AnchorTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3A100142F600014000000A1 /* AnchorTracker.swift */; };
+		D3A1003B2F60003B000000A1 /* CameraMotionGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3A1003A2F60003A000000A1 /* CameraMotionGate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,6 +64,19 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D3A100202F600020000000A1 /* Pin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pin.swift; sourceTree = "<group>"; };
+		D3A100212F600021000000A1 /* PinRecordV1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinRecordV1.swift; sourceTree = "<group>"; };
+		D3A100222F600022000000A1 /* MaskPNGCodec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaskPNGCodec.swift; sourceTree = "<group>"; };
+		D3A100232F600023000000A1 /* FilePinStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilePinStore.swift; sourceTree = "<group>"; };
+		D3A100242F600024000000A1 /* PinInterfaces.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinInterfaces.swift; sourceTree = "<group>"; };
+		D3A100252F600025000000A1 /* PinDebugFixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinDebugFixture.swift; sourceTree = "<group>"; };
+		D3A100262F600026000000A1 /* PinCreationSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinCreationSheet.swift; sourceTree = "<group>"; };
+		D3A100272F600027000000A1 /* AnnotationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationView.swift; sourceTree = "<group>"; };
+		D3A100282F600028000000A1 /* PinListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinListView.swift; sourceTree = "<group>"; };
+		D3A100292F600029000000A1 /* PinRevisitStaticViewerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinRevisitStaticViewerView.swift; sourceTree = "<group>"; };
+		D3A100502F600050000000A1 /* BottomControlBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomControlBar.swift; sourceTree = "<group>"; };
+		D3A100522F600052000000A1 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		D3A100542F600054000000A1 /* BrandMark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandMark.swift; sourceTree = "<group>"; };
 		C40280CA2F53B55E0024A7FC /* AppMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMode.swift; sourceTree = "<group>"; };
 		C40813992F51598F00926897 /* JudgeE2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JudgeE2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C40813A82F51599200926897 /* JudgeE2Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = JudgeE2Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -53,20 +89,33 @@
 		C4E583032F53A21F00023CFC /* CameraManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraManager.swift; sourceTree = "<group>"; };
 		C4E583042F53A21F00023CFC /* CameraPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreview.swift; sourceTree = "<group>"; };
 		C4E583052F53A21F00023CFC /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		C4E583062F53A21F00023CFC /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
 		C4E583072F53A21F00023CFC /* JudgeE2App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JudgeE2App.swift; sourceTree = "<group>"; };
 		C4E583082F53A21F00023CFC /* ModelLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelLoader.swift; sourceTree = "<group>"; };
 		C4E5831E2F53A31800023CFC /* PromptBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptBuilder.swift; sourceTree = "<group>"; };
 		C4E583202F53A33E00023CFC /* SAMDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SAMDecoder.swift; sourceTree = "<group>"; };
 		C4E583212F53A34700023CFC /* TemporalManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemporalManager.swift; sourceTree = "<group>"; };
 		C4E583222F53A35000023CFC /* MaskRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaskRenderer.swift; sourceTree = "<group>"; };
+		D3A1000A2F60000A000000A1 /* FrameGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameGeometry.swift; sourceTree = "<group>"; };
+		D3A1000B2F60000B000000A1 /* PointPromptBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PointPromptBuilder.swift; sourceTree = "<group>"; };
+		D3A1000D2F60000D000000A1 /* SAMConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SAMConfiguration.swift; sourceTree = "<group>"; };
+		D3A1000F2F60000F000000A1 /* PerfLogging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerfLogging.swift; sourceTree = "<group>"; };
+		D3A100102F600010000000A1 /* TapInstanceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TapInstanceManager.swift; sourceTree = "<group>"; };
+		D3A100112F600011000000A1 /* MaskOutline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaskOutline.swift; sourceTree = "<group>"; };
+		D3A100122F600012000000A1 /* DriftDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DriftDetector.swift; sourceTree = "<group>"; };
+		D3A100132F600013000000A1 /* ReAnchorLoop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReAnchorLoop.swift; sourceTree = "<group>"; };
+		D3A100142F600014000000A1 /* AnchorTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnchorTracker.swift; sourceTree = "<group>"; };
+		D3A1003A2F60003A000000A1 /* CameraMotionGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraMotionGate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
 		C47073C22F550C41005DB74E /* Exceptions for "Models" folder in "JudgeE2" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				MobileSAM_ImageEncoder_fp16_milfix_768.mlpackage,
+				MobileSAM_ImageEncoder_fp16_milfix.mlpackage,
+				MobileSAM_ImageEncoder_fp32.mlpackage,
 				MobileSAM_ImageEncoder.mlpackage,
+				MobileSAM_PromptMaskDecoder_multi.mlpackage,
 				MobileSAM_PromptMaskDecoder.mlpackage,
 			);
 			target = C40813982F51598F00926897 /* JudgeE2 */;
@@ -129,17 +178,30 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D3A100402F600040000000A1 /* Persistence */ = {
+			isa = PBXGroup;
+			children = (
+				D3A100202F600020000000A1 /* Pin.swift */,
+				D3A100212F600021000000A1 /* PinRecordV1.swift */,
+				D3A100222F600022000000A1 /* MaskPNGCodec.swift */,
+				D3A100232F600023000000A1 /* FilePinStore.swift */,
+				D3A100242F600024000000A1 /* PinInterfaces.swift */,
+				D3A100252F600025000000A1 /* PinDebugFixture.swift */,
+			);
+			path = Persistence;
+			sourceTree = "<group>";
+		};
 		C40813902F51598F00926897 = {
 			isa = PBXGroup;
 			children = (
 				C452584F300D2F6D00AB94DA /* Interaction */,
+				D3A100402F600040000000A1 /* Persistence */,
 				C4E5831A2F53A25600023CFC /* UI */,
 				C4E583192F53A24E00023CFC /* Segmentation */,
 				C4E583182F53A24700023CFC /* Shared */,
 				C4E583172F53A24000023CFC /* Detection */,
 				C4A41E1B2F519B0A00D0B7F1 /* Info.plist */,
 				C4E583022F53A21F00023CFC /* Assets.xcassets */,
-				C4E583062F53A21F00023CFC /* Item.swift */,
 				C408139B2F51598F00926897 /* JudgeE2 */,
 				C40813AB2F51599200926897 /* JudgeE2Tests */,
 				C40813B52F51599200926897 /* JudgeE2UITests */,
@@ -161,6 +223,13 @@
 			isa = PBXGroup;
 			children = (
 				C4525850300D2F8F00AB94DA /* TouchHandler.swift */,
+				D3A1000A2F60000A000000A1 /* FrameGeometry.swift */,
+				D3A1000B2F60000B000000A1 /* PointPromptBuilder.swift */,
+				D3A100102F600010000000A1 /* TapInstanceManager.swift */,
+				D3A100122F600012000000A1 /* DriftDetector.swift */,
+				D3A100132F600013000000A1 /* ReAnchorLoop.swift */,
+				D3A100142F600014000000A1 /* AnchorTracker.swift */,
+				D3A1003A2F60003A000000A1 /* CameraMotionGate.swift */,
 			);
 			path = Interaction;
 			sourceTree = "<group>";
@@ -181,6 +250,8 @@
 			isa = PBXGroup;
 			children = (
 				C40280CA2F53B55E0024A7FC /* AppMode.swift */,
+				D3A1000D2F60000D000000A1 /* SAMConfiguration.swift */,
+				D3A1000F2F60000F000000A1 /* PerfLogging.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -190,6 +261,7 @@
 			children = (
 				C47073C12F550C30005DB74E /* Models */,
 				C4E583222F53A35000023CFC /* MaskRenderer.swift */,
+				D3A100112F600011000000A1 /* MaskOutline.swift */,
 				C4E583212F53A34700023CFC /* TemporalManager.swift */,
 				C45C68482F555B2300BB5AE6 /* SAMEncoder.swift */,
 				C4E583202F53A33E00023CFC /* SAMDecoder.swift */,
@@ -203,6 +275,13 @@
 			children = (
 				C4E583052F53A21F00023CFC /* ContentView.swift */,
 				C4E583072F53A21F00023CFC /* JudgeE2App.swift */,
+				D3A100262F600026000000A1 /* PinCreationSheet.swift */,
+				D3A100272F600027000000A1 /* AnnotationView.swift */,
+				D3A100282F600028000000A1 /* PinListView.swift */,
+				D3A100292F600029000000A1 /* PinRevisitStaticViewerView.swift */,
+				D3A100502F600050000000A1 /* BottomControlBar.swift */,
+				D3A100522F600052000000A1 /* SettingsView.swift */,
+				D3A100542F600054000000A1 /* BrandMark.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -358,14 +437,37 @@
 				C42976342F555CBB00F98305 /* SAMEncoder.swift in Sources */,
 				C48C53BB2F54CE2100321235 /* PerfLogger.swift in Sources */,
 				C4FAC84A2F55F0B4001D6545 /* MaskRenderer.swift in Sources */,
+				D3A100052F600005000000A1 /* MaskOutline.swift in Sources */,
 				C4E583332F53A99900023CFC /* TemporalManager.swift in Sources */,
 				C4E5830A2F53A21F00023CFC /* CameraManager.swift in Sources */,
 				C4E5830B2F53A21F00023CFC /* CameraPreview.swift in Sources */,
 				C4E5830C2F53A21F00023CFC /* ContentView.swift in Sources */,
-				C4E5830D2F53A21F00023CFC /* Item.swift in Sources */,
 				C4E5830E2F53A21F00023CFC /* JudgeE2App.swift in Sources */,
 				C40280CB2F53B55E0024A7FC /* AppMode.swift in Sources */,
+				D3A1000C2F60000C000000A1 /* SAMConfiguration.swift in Sources */,
+				D3A1000E2F60000E000000A1 /* PerfLogging.swift in Sources */,
 				C4E5830F2F53A21F00023CFC /* ModelLoader.swift in Sources */,
+				D3A100012F600001000000A1 /* TouchHandler.swift in Sources */,
+				D3A100302F600030000000A1 /* Pin.swift in Sources */,
+				D3A100312F600031000000A1 /* PinRecordV1.swift in Sources */,
+				D3A100322F600032000000A1 /* MaskPNGCodec.swift in Sources */,
+				D3A100332F600033000000A1 /* FilePinStore.swift in Sources */,
+				D3A100342F600034000000A1 /* PinInterfaces.swift in Sources */,
+				D3A100352F600035000000A1 /* PinDebugFixture.swift in Sources */,
+				D3A100362F600036000000A1 /* PinCreationSheet.swift in Sources */,
+				D3A100372F600037000000A1 /* AnnotationView.swift in Sources */,
+				D3A100382F600038000000A1 /* PinListView.swift in Sources */,
+				D3A100392F600039000000A1 /* PinRevisitStaticViewerView.swift in Sources */,
+				D3A100512F600051000000A1 /* BottomControlBar.swift in Sources */,
+				D3A100532F600053000000A1 /* SettingsView.swift in Sources */,
+				D3A100552F600055000000A1 /* BrandMark.swift in Sources */,
+				D3A100022F600002000000A1 /* FrameGeometry.swift in Sources */,
+				D3A100032F600003000000A1 /* PointPromptBuilder.swift in Sources */,
+				D3A100042F600004000000A1 /* TapInstanceManager.swift in Sources */,
+				D3A100062F600006000000A1 /* DriftDetector.swift in Sources */,
+				D3A100072F600007000000A1 /* ReAnchorLoop.swift in Sources */,
+				D3A100152F600015000000A1 /* AnchorTracker.swift in Sources */,
+				D3A1003B2F60003B000000A1 /* CameraMotionGate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

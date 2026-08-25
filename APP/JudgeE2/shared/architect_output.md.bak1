@@ -1,0 +1,695 @@
+# Architect Output — Phase 3
+
+Project: JudgeE2 (Phase 3: Tap-to-Segment)
+Target: iPhone 11
+Phase 2 Frozen Baseline: shared_v2/architect_output.md §5
+
+---
+
+# Phase 3 — Day 1 (Architect) Interaction Contract
+
+日期：2026-07-19
+依据：tasks.md Phase 3 Day 1 Architect 任务 + Phase 2 冻结契约 + 代码审查（SAMDecoder.swift / PromptBuilder.swift / TemporalManager.swift）
+
+---
+
+## 1) Tap-to-Segment 模式插入点（锁定）
+
+### 1.1 模式并存规则
+
+```
+AppMode.detectionOnly   → Phase 1 路径（YOLO bbox-only）
+AppMode.segmentation    → Phase 2 路径（YOLO + SAM 自动分割）
+AppMode.tapToSegment    → Phase 3 路径（YOLO 保持运行，SAM 由用户 tap 驱动）
+```
+
+**关键规则：**
+- YOLO Detection Pipeline **永远运行**（三种模式均如此）
+- `.tapToSegment` 模式下，YOLO 输出仅用于维持 FrameGeometry 元数据，**不用于驱动 SAM**
+- Phase 2 `.segmentation` 路径的调度代码（TemporalManager 主目标选择 + 每 12 帧 encode）在 `.tapToSegment` 模式下**必须静默**（不触发）
+- 两种模式**不得同时激活**；模式切换时清空当前模式的所有 mask 实例
+
+### 1.2 插入点位置
+
+```
+[Camera Capture] → [Preprocess] → [YOLO Detection]
+                                        │
+                          ┌─────────────┴──────────────┐
+                          │ .segmentation               │ .tapToSegment
+                          ▼                             ▼
+               [TemporalManager]              [TouchHandler]
+               [SAMEncoder (auto)]            [TapInstanceManager]
+               [SAMDecoder (bbox)]            [SAMEncoder (on-tap)]
+               [MaskRenderer (Phase 2)]       [SAMDecoder (point)]
+                                              [TapMaskRenderer]
+```
+
+- 插入点：Camera Capture 完成后，两条路径共享同一个 `CVPixelBuffer` 和 `FrameGeometry`
+- Phase 3 路径**不接触** TemporalManager；TapInstanceManager 是独立新模块
+- Phase 3 有独立的渲染层（`TapMaskRenderer` 或在 MaskRenderer 内新增 tap 渲染分支），位于 Phase 2 mask layer **之上**
+
+### 1.3 渲染层次（Z 轴）
+
+```
+最上层：TouchHandler 手势识别层（透明，仅捕获手势）
+       ↑
+       TapMaskRenderer（tap 实例 mask 叠加，多色）
+       ↑
+       Phase 2 MaskRenderer（YOLO 驱动 mask，.segmentation 模式独用）
+       ↑
+       BBox Overlay（Phase 1，始终显示）
+       ↑
+最底层：AVCaptureVideoPreviewLayer（相机预览）
+```
+
+**约束：** TouchHandler 的手势识别层不得拦截 Phase 2 渲染层的触摸事件；两者使用不同的 `UIGestureRecognizer` 实例，不共享 target-action。
+
+---
+
+## 2) Tap 坐标变换契约（锁定）
+
+### 2.1 完整变换链
+
+```
+UIKit tap point
+(CGPoint in UIView.bounds, points)
+        │
+        ▼ Step 1: AspectFill 逆映射
+AVCaptureVideoPreviewLayer
+  .captureDevicePointConverted(fromLayerPoint: tapPoint)
+        │ → CGPoint 归一化传感器坐标 [0,1]×[0,1]
+        │   （此 API 内部处理 aspectFill 裁剪偏移，Apple 官方支持）
+        ▼ Step 2: 传感器坐标 → Canonical 像素坐标
+  normalizedPoint.x × FrameGeometry.origW
+  normalizedPoint.y × FrameGeometry.origH
+        │ → CGPoint in Canonical pixel space (origW × origH)
+        ▼ Step 3: 方向 & 镜像修正
+  复用 Phase 1/2 orientation + mirror 变换逻辑
+  （与 CameraManager.preprocessFrame 中使用的同一逻辑）
+        │ → CGPoint in corrected Canonical pixel space ✅
+        ▼ Step 4: 越界裁剪
+  x = clamp(x, 0, origW - 1)
+  y = clamp(y, 0, origH - 1)
+        │ → 最终 Canonical 像素坐标，送入 PointPromptBuilder
+```
+
+### 2.2 实现要求
+
+- **Builder 新增方法**：`FrameGeometry.invertViewPoint(_ point: CGPoint, viewSize: CGSize, previewLayer: AVCaptureVideoPreviewLayer) -> CGPoint`
+  - 封装上述 Step 1–4
+  - 内部调用 `captureDevicePointConverted` + orientation/mirror 修正 + clamp
+  - **不得**在此方法外重复以上任何步骤
+- **验证 Log（Builder 必须输出）**：
+  `[TAP] view=(x,y) normalized=(nx,ny) canonical=(cx,cy) orientation=N mirrored=B`
+- **禁止**：TouchHandler 内部独立计算坐标变换；所有变换必须通过 `FrameGeometry.invertViewPoint`
+
+### 2.3 不变式
+
+| 不变式 | 说明 |
+|--------|------|
+| 坐标系唯一 | Canonical = 原始 camera px（origW × origH），与 Phase 1/2 YOLO 输出坐标系完全一致 |
+| 归一化位置 | 归一化（÷ 1024.0）**仅在 PointPromptBuilder 内部**执行，不在调用层 |
+| 变换路径唯一 | 只允许 `FrameGeometry.invertViewPoint` 一条路径，禁止多处各自实现 |
+| 越界不排除 | tap 越界后裁剪到边界内继续处理，不丢弃 tap |
+
+---
+
+## 3) Multi-Mask 管理模型（锁定）
+
+### 3.1 TapInstance 数据结构契约
+
+```swift
+struct TapInstance {
+    let id: UUID
+    let canonicalPoint: CGPoint         // Canonical 像素坐标
+    let createdAt: Date                 // FIFO 排序依据
+    var mask: MLMultiArray?             // 解码后的 mask（256×256 Float32）
+    var maskTimestamp: Date?            // mask 生成时间（用于 TTL 判断）
+    var iouPred: Float                  // 上次解码的 iou_pred（0 = 尚未解码）
+    let color: UIColor                  // 实例颜色（从色板分配，固定不变）
+    var isPrimary: Bool                 // true = 最近一次 tap
+}
+```
+
+**Mask TTL：** 复用 Phase 2 mask TTL = **2000 ms**（与 TemporalManager 独立计算，不共享状态）
+
+### 3.2 实例池管理规则
+
+| 操作 | 规则 |
+|------|------|
+| 新 tap | 创建新 TapInstance，设为 primary，旧 primary 降为 secondary |
+| 超出 N=3 | FIFO 删除 `createdAt` 最早的实例（不论是否 primary）|
+| 双击已有 mask | 清空全部实例（`clearAll()`） |
+| 点击已有 mask 内部 | 将该实例提升为 primary（不重新 decode） |
+| 模式切换 | 退出 `.tapToSegment` 时清空全部实例 |
+
+### 3.3 颜色色板（固定顺序，循环分配）
+
+```
+实例 1：systemBlue   (alpha 0.55 primary / 0.35 secondary)
+实例 2：systemGreen
+实例 3：systemOrange
+（超出 N=3 时 FIFO 回收，颜色随实例一同释放）
+```
+
+### 3.4 Primary 渲染规则
+
+```
+Primary 实例：  alpha = 0.55，白色轮廓线（1pt）
+Secondary 实例：alpha = 0.35，无轮廓线
+无有效 mask：   不显示 mask，保留 tap 位置波纹动画指示
+```
+
+---
+
+## 4) Encoder 触发逻辑（锁定）
+
+### 4.1 encoderQueue 共享规则
+
+```
+encoderQueue = 单一 serial DispatchQueue（Phase 2 已有，Phase 3 复用）
+SAMEncoder   = 单一实例（Phase 2 已有，Phase 3 复用，禁止加载第二份）
+isEncoding   = 已有 Bool flag（Phase 2 已有，Phase 3 共用，不得新建独立 flag）
+```
+
+### 4.2 Tap 模式触发逻辑
+
+```
+用户 tap
+    │
+    ▼
+embedding 是否有效？
+（TTL 未过期 AND geometry 未变化）
+    │
+    ├── YES → 直接进入 decode（point prompt）
+    │          显示短暂波纹动画，mask 通常在 ~61 ms 内出现
+    │
+    └── NO →
+          isEncoding == true？
+              ├── YES → 显示持续脉冲动画（等待 encode 完成）
+              │          encode 完成后自动触发 decode（point prompt）
+              │
+              └── NO → 立即触发 encode
+                        encode 完成 → 触发 decode（point prompt）
+                        decode 完成 → 更新 TapInstance.mask，刷新渲染
+```
+
+### 4.3 Phase 2 与 Phase 3 模式交互规则
+
+| 场景 | 行为 |
+|------|------|
+| `.segmentation` 模式下 encode 进行中，用户切换到 `.tapToSegment` | 等待当前 encode 完成后 Phase 2 回调被忽略（mode check），下一次 tap 触发新 encode |
+| `.tapToSegment` 模式下，Phase 2 每 12 帧调度 encode | **Phase 2 调度必须 no-op**（mode != .segmentation 时 TemporalManager 不得触发 encode）|
+| 两模式均需 encode，encoderQueue 有任务 | 串行排队，后者等待，不并发 |
+| encode 失败（任何原因） | `isEncoding = false` 复位，tap 实例保持 iouPred=0，显示 fallback 状态 |
+
+### 4.4 Phase 2 TemporalManager 静默规则（重要）
+
+在 `.tapToSegment` 模式下，`CameraManager` 必须在调用 TemporalManager 前检查 `currentMode`：
+
+```swift
+// CameraManager 中的检查（伪代码）
+if currentMode == .segmentation {
+    temporalManager.update(detections: detections, ...)
+    // 后续 encode/decode 调度由 TemporalManager 驱动
+}
+// .tapToSegment 模式：TemporalManager 静默，不调用
+```
+
+---
+
+## 5) SAMDecoder 加法重载设计（审批）
+
+### 5.1 现有 API（冻结，不得修改）
+
+```swift
+// SAMDecoder.swift — 现有方法，Phase 2 使用，不得改动签名或方法体
+func decode(embedding: MLMultiArray,
+            prompt: PromptBuilder.BoxPrompt) -> MLMultiArray?
+```
+
+### 5.2 新增重载（Phase 3 — 加法 ONLY）
+
+```swift
+// 新增：点提示重载，与上方方法并存
+// 文件：SAMDecoder.swift（在现有 decode 方法之后追加）
+func decode(embedding: MLMultiArray,
+            pointPrompt: PointPromptBuilder.PointPrompt) -> (mask: MLMultiArray, iouPred: Float)?
+```
+
+**约束：**
+- 此重载**不得修改**现有 `decode(embedding:prompt:)` 的任何一行
+- 内部仅调用 `model.prediction(from:)`，输入 tensor 来自 `PointPromptBuilder.PointPrompt`
+- 输出增加 `iouPred`（点提示质量评估依赖 iou_pred，bbox 路径不返回此值是已知遗留，Phase 3 新增）
+- 返回可选 tuple：decode 失败时返回 `nil`，调用方必须处理 nil
+
+### 5.3 PointPromptBuilder.PointPrompt 契约
+
+```swift
+// 新文件：Interaction/PointPromptBuilder.swift
+struct PointPromptBuilder {
+    struct PointPrompt {
+        let pointCoords: MLMultiArray    // shape 由 ML_Vision Day 1 确认（[1,1,2] 或 padding 到 [1,2,2]）
+        let pointLabels: MLMultiArray    // 对应 shape，foreground label = 1
+        let maskInput: MLMultiArray      // shape [1,1,256,256]，全零
+        let hasMaskInput: MLMultiArray   // shape [1]，值 0.0
+    }
+
+    /// 将 Canonical 像素坐标转为 SAM 点提示 tensor
+    /// - canonicalPoint: CGPoint in original camera px space
+    /// - origSize: CGSize(width: origW, height: origH)
+    /// - inputSize: SAM encoder input size（default 1024，Phase 3 优化后可改）
+    static func buildPointPrompt(canonicalPoint: CGPoint,
+                                 origSize: CGSize,
+                                 inputSize: Int = 1024) -> PointPrompt?
+}
+```
+
+**归一化规则（与 PromptBuilder 一致）：**
+1. Apply ResizeLongestSide(inputSize) + centered padding（与 PromptBuilder.buildBoxPrompt 相同的变换）
+2. 结果：SAM 空间坐标（0 ~ inputSize）
+3. **不得**在此函数外部预先归一化
+
+> ⚠️ tensor shape（[1,1,2] vs [1,2,2]）待 ML_Vision Day 1 确认模型实际接受的 point_coords 形状后，Builder Day 2 方可实现。
+
+---
+
+## 6) isolate_phase2.md 剩余 Checklist 裁决
+
+| 项 | 裁决 | 说明 |
+|----|------|------|
+| SAMDecoder 加法重载设计 Architect 审批 | ✅ **批准** | 见 §5，加法设计符合冻结契约，现有方法不受影响 |
+| 坐标变换链契约确认 | ✅ **锁定** | 见 §2，完整变换链已定义，Builder 按此实现 |
+| Agent 分工对齐 | ✅ **确认** | 见下表 |
+
+### Agent 分工（Phase 3 Day 2 起生效）
+
+| Agent | Phase 3 职责 |
+|-------|-------------|
+| **Architect** | 契约冻结、SAMDecoder 重载审批（已完成）、Day 4 分辨率裁决、Day 7 架构冻结 |
+| **ML_Vision** | 点提示 tensor shape 确认、ANE 修复方案（Day 1）、分辨率评估（Day 3） |
+| **Builder** | Interaction/ 全部模块实现、FrameGeometry.invertViewPoint、PointPromptBuilder、TapInstanceManager |
+| **Debugger** | tap 坐标误差验证（Day 2）、端到端延迟测量（Day 4）、多实例内存压测（Day 5）、性能回归监控 |
+
+---
+
+## 7) Deliverable 确认
+
+Phase 3 Day 1 Architect 契约已锁定，以下内容均已定义：
+
+- [x] Tap-to-Segment 插入点（§1）
+- [x] 坐标变换契约（§2）
+- [x] Multi-Mask 管理模型（§3）
+- [x] Encoder 触发逻辑（§4）
+- [x] SAMDecoder 加法重载设计审批（§5）
+- [x] Agent 分工对齐（§6）
+
+**Phase 2 pipeline 保护状态：**
+- YOLO 路径不受影响 ✅
+- TemporalManager 不被 Phase 3 代码调用 ✅（mode check 保护）
+- SAMEncoder / SAMDecoder 实例不重复加载 ✅
+- encoderQueue 共享但串行，无并发风险 ✅
+
+可进入 Day 2（ML_Vision ANE 修复交付 + Builder TouchHandler 实现）。
+
+---
+
+END OF PHASE 3 DAY 1 ARCHITECT OUTPUT
+
+---
+
+# Phase 3 — Day 4 (Architect) 降编码分辨率裁决
+
+日期：2026-07-23  
+依据：ML_Vision Day 3 评估报告（shared/resolution_eval_report.md）+ 原始 JSON 数据（shared/resolution_eval_results.json）+ model_plan.md §C + Phase 3 冻结契约  
+
+---
+
+## 8) 降编码分辨率裁决（Day 4）
+
+### 8.1 裁决结论
+
+| 分辨率 | 裁决 | 说明 |
+|--------|------|------|
+| **1024×1024** | ✅ 保留为当前默认 | Phase 3 主路径，质量基准，不变 |
+| **768×768** | ✅ **批准 Builder 展开 AB 测试** | 有条件接受；AB 人工评审是主门控 |
+| **512×512** | ❌ **Phase 3 拒绝** | 保留给 Phase 4 fine-tuning 后评估 |
+
+---
+
+### 8.2 评估数据质量审查（⚠️ 重要）
+
+在审阅 ML_Vision Day 3 评估报告时，Architect 发现报告结论与原始 JSON 数据之间存在**关键不一致**，须在裁决前正式记录：
+
+| 数据项 | 报告声称 | JSON 原始数据 | 差异 |
+|--------|---------|--------------|------|
+| 768 IoU vs 1024（均值） | 0.581 | **0.0（所有样本）** | ⚠️ 完全矛盾 |
+| 512 IoU vs 1024（均值） | 0.592 | **0.0（所有样本）** | ⚠️ 完全矛盾 |
+| 有效测试样本数 | 「20 样本（4 图×5 点）」 | **2 张图像（n_images=2）** | ⚠️ 样本不足 |
+| 768 iou_pred（内部评分） | — | 0.664 / 0.697（两图均值 ~0.68） | ✅ 与报告相符 |
+| 512 iou_pred（内部评分） | — | 0.716 / 0.850（两图均值 ~0.78） | ✅ 与报告相符 |
+
+**根因分析（Architect 判断）：**
+
+- `iou_vs_1024 = 0.0` 意味着 768/512 encoder 产生的 mask 与 1024 mask 在像素层面**完全不重叠**
+- 像素数对比支持这一结论：good1.PNG 中 1024 mask 有 8319 px，而 768 mask 仅 1186 px（14%）
+- 根本原因：TinyViT-5M 从未在 768/512 上训练，降分辨率后模型在不同语义尺度上产生分割，与 1024 输出在空间上不对齐
+- 报告中的 IoU=0.581 数字来源不明（可能为理论估算或脚本 bug），**不应作为裁决依据**
+- 模型内部的 `iou_pred` (~0.68–0.78) 表明模型仍在分割某个有意义的区域，但不保证与 1024 语义一致
+
+**裁决影响：** 上述发现使 768 的批准条件更为严格。AB 测试中的**人工视觉评估**成为唯一可信的质量门控（不可依赖 iou_vs_1024 数字）。
+
+---
+
+### 8.3 768×768 批准依据与约束条件
+
+**批准理由：**
+1. **延迟收益显著且数据可靠**：Mac 实测比例法预测 iPhone 11 encoder 从 857ms 降至 ~555ms（×1.54），该数字来自可重复的 Mac CPU 计时，具有参考价值
+2. **实现可逆**：通过 `encoderInputSize` 配置项控制，1024 路径不受任何修改，失败时立即回退
+3. **内部 iou_pred 尚可**：~0.68，高于 Phase 3 质量门控下限（0.5），说明模型在低分辨率下仍在有效分割，但语义可能与 1024 有偏差
+4. **AB 测试可验证**：真机上的人工评审将给出最终答案；Phase 3 尚有时间在 Day 5 撤销
+
+**批准约束（Builder 必须严格遵守）：**
+
+| 约束编号 | 约束内容 | 理由 |
+|---------|---------|------|
+| C-1 | Phase 3 **默认分辨率保持 1024**；768 仅通过 `SAMConfiguration.encoderInputSize = 768` 显式启用 | 1024 为质量基准，768 为待验证优化 |
+| C-2 | `PointPromptBuilder` 中点坐标**永远在 1024 空间计算**，不随 encoderInputSize 变化 | Decoder 固定以 1024 归一化，坐标混用会导致 mask 完全错位（见 model_plan §C.4）|
+| C-3 | 768 encoder 输出 `[1,256,48,48]`，**必须**在 Swift 层双线性上采样至 `[1,256,64,64]` 后再传入 Decoder | Decoder 固定接受 64×64 embedding |
+| C-4 | 768 模型导出**必须**同步应用 milfix（`export_encoder_fp16_milfix.py` + trace 尺寸改为 768）| 保持 ANE 对齐修复，维持与 1024-milfix 相同的性能基线 |
+| C-5 | AB 测试**必须包含人工视觉评分**（1–5 分，5=视觉上与 1024 无区别）| iou_vs_1024 数值不可信，人工评审是唯一可靠质量门控 |
+| C-6 | AB 测试数据（延迟 + iou_pred + 人工评分）必须写入 `builder_progress.md` | 供 Day 5 Architect 审批 |
+
+---
+
+### 8.4 512×512 拒绝依据
+
+| 拒绝理由 | 具体数据 |
+|---------|--------|
+| 质量无优于 768 | iou_pred ~0.78，与 768 (~0.68) 接近；iou_vs_1024 同样为 0.0 |
+| 极端退化风险更高 | 512 时 1 特征单元对应 32px，tap 精度粗糙；mask 极端失真风险更大 |
+| 强依赖 fine-tuning | zero-shot 可用性无法保证；需专项训练才有意义 |
+| Phase 3 范畴外 | Phase 3 聚焦 UX 正确性与流水线稳定性；精度优化属 Phase 4 |
+
+**保留入口点（Phase 4）：** 512 fine-tuning 后可重新评估；导出脚本与 768 相同，仅修改 trace 尺寸为 `(1,3,512,512)`。
+
+---
+
+### 8.5 Phase 3 冻结参数表（Day 4 中间态 — **已被 §9.5 取代，勿引用**）
+
+| 参数 | 当前状态 | Day 5 目标 |
+|------|---------|----------|
+| Encoder 输入分辨率 | ~~**1024（默认）；768（AB 测试中）**~~ | ✅ 已裁决 — **封层 1024，撤销 768**（见 §9.1）|
+| Decoder 输入 embedding | `[1, 256, 64, 64]`（固定） | 不变 |
+| Point prompt 坐标空间 | **永远 1024 空间**（锁定） | 不变 |
+| Encoder 模型系列 | milfix fp16（已锁定）| ✅ 已裁决 — 768 变体撤销，milfix fp16 单模型封层（见 §9.5）|
+| Embedding TTL | 8000ms（Phase 2 继承）| 不变（Tap 路径 TTL 修复在 Day 6）|
+| Mask TTL | 2000ms（Phase 2 继承）| 不变 |
+| 最大实例数 N | 3（Day 1 锁定）| 不变 |
+| fine-tuning | Phase 4 范畴 | 不变 |
+
+---
+
+### 8.6 Builder Day 4 AB 测试规格（正式授权）
+
+Builder 按以下规格展开，结果写入 `builder_progress.md`：
+
+**模型导出（如未完成）：**
+1. 修改 `shared/export_encoder_fp16_milfix.py`：将 dummy_trace 改为 `torch.randn(1, 3, 768, 768)` + monkeypatch `forward_features` 动态化（`feat_size = img_size // 16`）
+2. 输出 `MobileSAM_ImageEncoder_fp16_milfix_768.mlpackage`（~14 MB）
+3. Decoder mlpackage 不变
+
+**Swift 适配（3 处）：**
+1. `SAMConfiguration.encoderInputSize: Int`（default=1024，AB 测试时设为 768）
+2. Encoder 预处理 resize 适配 encoderInputSize
+3. Encoder 输出上采样桥接（`[1,256,48,48]` → `[1,256,64,64]`，双线性插值）
+
+**AB 采样要求：**
+- 同场景同目标，分别运行 1024 和 768 各 5 次
+- 记录：encoder latency mean + p95、iou_pred 均值、人工视觉评分（1–5）
+- 人工评分标准：5=mask 完整覆盖目标对象；3=大致覆盖但有缺口；1=mask 完全错位或无意义
+
+---
+
+### 8.7 Day 5 Architect 最终封层条件（预告）
+
+| AB 结果 | Day 5 决定 |
+|---------|----------|
+| 768 latency 降幅 ≥ **150ms** 且人工评分均值 ≥ **3.5** | ✅ 封层 768 为 Phase 3 默认 encoder 分辨率 |
+| 768 latency 降幅 < 100ms 或人工评分均值 < 3.0 | ❌ 撤销 768，封层 1024 为唯一分辨率 |
+| 介于两者之间（降幅 100–150ms 或评分 3.0–3.5）| Architect 主观裁量，可能封层为可选「速度模式」 |
+
+---
+
+### 8.8 Deliverable 确认
+
+- [x] 768×768 批准 Builder AB 测试（见 §8.3，含严格约束）
+- [x] 512×512 Phase 3 拒绝（见 §8.4）
+- [x] 评估数据质量差异正式记录（见 §8.2）
+- [x] Phase 3 冻结参数表部分更新（见 §8.5）
+- [x] Builder AB 测试规格授权（见 §8.6）
+- [x] Day 5 封层条件预告（见 §8.7）
+
+**Phase 2 pipeline 保护状态：** 无变化，所有 Phase 2 路径不受影响 ✅
+
+---
+
+END OF PHASE 3 DAY 4 ARCHITECT OUTPUT
+
+---
+
+# Phase 3 — Day 5 (Architect) 分辨率封层 + 延迟展示策略裁决
+
+日期：2026-08-09
+依据：Debugger Day 4 真机实测（`shared/debug_report.md` §10.1–10.4、§13）+ Session A 良品率评测（`shared/phase3_day4_test_checklist.md` §2–§3）+ Day 4 tap 延迟全量采样（24 次）+ §8.7 预告的封层条件
+适用设备：iPhone 11 / A13（唯一实测平台）
+
+---
+
+## 9) Encoder 分辨率最终封层裁决
+
+### 9.1 裁决结论
+
+| 分辨率 | Day 4 状态 | **Day 5 最终裁决** |
+|--------|-----------|-------------------|
+| **1024×1024** | 默认 | ✅ **封层为 Phase 3 唯一 encoder 分辨率** |
+| **768×768** | AB 测试中 | ❌ **撤销**（§8.3 的批准正式作废，约束 C-1…C-6 随之失效）|
+| **512×512** | Phase 3 拒绝 | ❌ 维持拒绝（不变，Phase 4 重评入口保留）|
+
+**该行落入 §8.7 门控表的第二行（撤销分支）。裁决即刻生效，Day 5 起 `encoderInputSize` 不再作为可调优化项进入任何后续排期。**
+
+---
+
+### 9.2 撤销依据（实测，同 session 配对设计）
+
+| 指标 | 1024（n=3 warm） | 768（n=4 warm） | 差值 |
+|------|-----------------|-----------------|------|
+| mean | **970.6 ms** | **1036.0 ms** | **+65.4 ms（768 更慢）** |
+| p95 | 1006.1 ms | 1126.5 ms | +120.4 ms |
+
+§8.7 要求「降幅 ≥150 ms」。实测不仅无降幅，方向相反。差距达 215 ms（门控线 −150 与实测 +65 之间），**不在测量噪声可解释的范围内**，无需补采即可裁决。
+
+**理论预测被证伪的原因**（采纳 debug_report §10.3 的机制解释）：
+
+1. ML_Vision Day 3 的 ×1.54 加速预测建立在 **Mac CPU 线性缩放假设**上。A13 的 ANE 并非按像素数线性计费：768 与 1024 两份权重文件同为 14.1 MB，ANE 的图编译与调度开销占比高，计算量下降 44% 并未按比例转化为墙钟时间下降。
+2. 768 路径**额外**背负 C-3 要求的 Swift 层 48×48 → 64×64 双线性上采样，把节省的一部分又还了回去，并推迟了 decoderQueue 的入队时刻。
+
+**架构层教训（写入长期约定）：** 跨硬件后端（Mac CPU → iPhone ANE）的比例外推**不得**作为架构裁决的充分依据，只能作为「值得做 AB」的立项依据。今后任何涉及 ANE 的性能提案，门控必须绑定目标设备真机配对实测。
+
+---
+
+### 9.3 门控口径缺陷两则（如实记录，不得美化）
+
+#### 缺陷 1：人工评分维度**从未在 768 上采集**
+
+- §8.7 门控的撤销分支写法为「降幅 <100 ms **或** 评分 <3.0」，而批准分支为「降幅 ≥150 ms **且** 评分 ≥3.5」。
+- 事实：C-5/C-6 要求的 768 人工评分表**未产出**。Session A 的 50 次评分**全部在 1024 上**完成（良品率 44/50 = 88%），与 768 无关。debug_report §13 记为「无法评分（mask 滞后不可见）」。
+- **对本次裁决的影响：无。** 撤销分支的两个条件是**析取**关系，延迟维度单独越线（+65 ms，远差于 <100 ms 的触发线）已足以触发撤销。评分维度缺失不改变结论。
+- **但门控表述必须修订，供未来复用：**
+
+> **门控语义修订（自 Day 5 生效）**
+> 「批准」需**全部**条件满足（合取）；「撤销」**任一**条件触发即可（析取）；仅当所有条件均落在中间带时才进入主观裁量。
+> 推论：一旦某一维度已单独触发撤销，**不要求**补齐其余维度的数据。反之，若仅有部分维度数据且这些维度全部指向「批准」，**不得**据此封层——缺失维度视为未通过。
+
+#### 缺陷 2：热态口径未标注，970.6 ms 曾有被误用为绝对指标的风险
+
+同一份 1024 encoder，在两轮不同会话中给出显著不同的绝对数值：
+
+| 数据来源 | 会话条件 | 实测 | n |
+|---------|---------|------|---|
+| debug_report §10.1（2026-07-23）| **AB 交替会话**：同一进程内先后加载 1024 与 768 两份 encoder，反复切换分辨率触发 counter 重置；warm 样本取自冷启动之后 | mean **970.6** ms / p95 1006.1 ms | 3 |
+| Day 4 Session B（2026-08-01/02）| **单模型稳态会话**：仅 1024 一份 encoder，tapToSegment 空闲态 background refresh，无模型切换 | **573–755 ms，mean ≈648 ms** | 14 |
+
+两者相差约 33%。
+
+> **封层文本标注（必须随 1024 一起引用）**
+> **970.6 ms 是 AB 配对比较量，不是 Phase 3 的 encoder 绝对性能指标。** 它仅在其采集会话内部有效（1024 与 768 共处同一热态与同一模型切换负载，配对设计保证了**内部效度**，因此 §9.2 的相对结论稳健），但**不具备跨会话的外部效度**。
+> **Phase 3 引用 encoder 绝对延迟时，一律使用 648 ms（n=14, warm, 单模型稳态, tapToSegment 空闲 background refresh, iPhone 11）。**
+> 任何后续文档、验收指标、Phase 4 对比基线若引用 970.6 ms 作绝对值，视为口径错误。
+
+**附带要求：** 自 Day 5 起，任何写入 debug_report / builder_progress 的延迟数字**必须**同时标注：(a) 冷/热态及 warm 样本的判定方式；(b) 同会话内是否发生过模型切换；(c) 并发负载（YOLO 是否在跑、模式为何）；(d) n。缺任一项的数字不得进入封层裁决。
+
+---
+
+### 9.4 768 资产处置
+
+- 已导出的 `MobileSAM_ImageEncoder_fp16_milfix_768.mlpackage` **不删除**，归档保留，作为「ANE 非线性缩放」这一结论的实证物。
+- `SAMConfiguration.encoderInputSize` 配置项**保留但冻结**为常量语义：Phase 3 内不得再被任何代码路径设为 1024 以外的值；C-3 要求的 48→64 上采样桥接代码若已实现，允许保留为死代码，但**不得**在主路径被调用。是否物理删除交由 Day 7 冻结时一并处理（属清理，不属功能）。
+- Phase 4 若重启低分辨率议题，**入口条件**为：先在目标设备上取得 ANE 逐层 profile（证明计算量确实是瓶颈），再谈导出与 AB。仅有 FLOPs 下降不构成立项理由。
+
+---
+
+### 9.5 Phase 3 冻结参数表（**Day 5 最终封层**）
+
+本表取代 §8.5。Day 7 架构冻结时直接继承，除非有新的真机数据触发复议。
+
+| 参数 | **封层值** | 状态 | 依据 |
+|------|-----------|------|------|
+| Encoder 输入分辨率 | **1024×1024** | 🔒 **FINAL（Day 5）** | §9.1–9.3；768 撤销、512 拒绝 |
+| Encoder 模型系列 | **milfix fp16 单一模型** | 🔒 FINAL | 768 变体撤销后不再有第二份 encoder |
+| Decoder 输入 embedding | `[1, 256, 64, 64]` | 🔒 FINAL | 与 1024 encoder 原生匹配，无桥接层 |
+| Point prompt 坐标空间 | **恒为 1024 空间** | 🔒 FINAL | C-2 保留；768 撤销后该约束自动恒成立 |
+| Encoder 绝对延迟基线 | **≈648 ms**（warm / 单模型稳态 / n=14）| 🔒 FINAL（口径见 §9.3 缺陷 2）| Day 4 Session B |
+| Decode 延迟基线 | **≈61 ms**（warm, n=24）| 🔒 FINAL | Day 4 Session B 全量 tap 采样 |
+| Embedding TTL | 8000 ms | ⚠️ 未封层 | Tap 路径 TTL 复议留到 Day 6（见 §10.5 风险 R2）|
+| Mask TTL | 2000 ms | ⚠️ 未封层 | Day 6 |
+| 最大实例数 N | **3** | 🔒 FINAL | Day 1 锁定，Day 5 多实例照此实现 |
+| Tap 延迟展示策略 | **脉冲确认动画，不设进度条** | 🔒 FINAL（快路径）/ ⚠️ 慢路径待 Day 7 数据 | §10 |
+| fine-tuning | Phase 4 范畴 | 不变 | §8.4 |
+
+---
+
+## 10) tap-to-mask 延迟展示策略裁决
+
+### 10.1 数据审查
+
+**Day 4 实测（24 次全量采样，iPhone 11，全部为 decode-only 快路径）：**
+
+| 分量 | 实测 |
+|------|------|
+| tap → mask 端到端 | **429–1030 ms，中位 ≈620 ms** |
+| 其中 decode 计算 | **48.9–75.6 ms，mean ≈61 ms** |
+| **无法解释的差值** | **约 400–960 ms** |
+
+**差值已定位，且不是计算开销：** `handleTap` 把 tap 派发到 `videoQueue`，而 `videoQueue` 同时是 `AVCaptureVideoDataOutput` 的 delegate 队列，正在跑 YOLO（单帧占用 400–670 ms）。tap 排在当前帧之后。差值区间 400–960 ms 与 YOLO 单帧区间 400–670 ms 高度吻合（上界处叠加了排队中的第二帧），**归因成立**。
+
+**结论性判断：快路径 620 ms 的中位延迟里，约 90% 是调度排队，只有约 10%（61 ms）是真实计算。**
+
+### 10.2 三个口径缺陷（裁决必须带着走，不得当作干净数据）
+
+| 编号 | 缺陷 | 对裁决的影响 |
+|------|------|-------------|
+| **G-1** | `e2eMs` 计时终点落在**主线程发布 mask 之前**（`CameraManager.swift:761`），不满足「手指离开 → 看到 mask」的定义 | 429–1030 ms 是**下界估计**，真实感知延迟更高。因此本裁决的方向（延迟确实需要治理）**更强**而非更弱；但任何「已达标」的判断不得基于该口径 |
+| **G-2** | 本轮**零个** encode+decode 慢路径样本（唯一一次 parked tap 被丢弃）| 慢路径**无实测基线**。慢路径的 UI 策略**不予封层**，只给临时规则（见 §10.4 Tier 1）|
+| **G-3** | encoder 冷启动 warmup 实测 **1283 ms ~ 8605 ms**（跨度 6.7 倍），而 `scheduleTapBusyTimeout` 兜底仅 **3 秒** | 8.6 秒那一次：超时先清掉加载指示，用户看到「点了没反应」。**这是当前 tap 路径最严重的用户可见失败模式**，且是纯逻辑不一致（兜底值与实测分布不相容），不是调参问题 |
+
+---
+
+### 10.3 裁决结论
+
+> **D1 —— 不引入进度条，不引入「裁剪 / 分段等待」UI。**
+>
+> 理由：快路径的真实计算量是 61 ms。用 UI 去粉饰一个 90% 由错误队列归属造成的排队延迟，是把架构缺陷转译成永久性 UI 债；同时进度条会向用户植入「这个功能本来就慢」的错误心智模型，而事实是它本来很快。**先修调度，再谈 UI。**
+
+> **D2 —— 保留 `TapLoadingIndicator`（脉冲圆环）作为唯一等待反馈，并明确其语义为「已收到点击」的确认，而非进度指示。**
+>
+> 它不表达剩余时间，不分段，不带百分比。`@Published tapProcessing` 保持为布尔量，**不得**扩展为进度值 —— 一旦有了进度数值，就会有人去画进度条。
+
+> **D3 —— 授权并要求 Builder 将 tap 快路径从 `videoQueue` 上摘除（架构级，Day 5 内完成）。**
+>
+> 这是本次裁决的**主要交付物**，UI 策略只是其推论。
+
+> **D4 —— `scheduleTapBusyTimeout` 的 3 秒固定兜底作废，改为按分支分级，且超时必须显式告知失败。**
+
+> **D5 —— `e2eMs` 计时口径修正为架构级验收定义；Day 4 的 429–1030 ms 降级为「下界参考」，不得作为 Day 7 验收基线。**
+
+---
+
+### 10.4 对 Builder 的具体要求（接口级，不含实现）
+
+#### 要求 A（对应 D3）— 快路径去队列化
+
+**契约：** tap 的**快路径不需要 camera pixel buffer**，只需要 letterbox 几何 + 已缓存的 embedding 引用。因此它没有任何理由排在 YOLO 帧后面。
+
+```
+现状（错误）:
+  手势线程 → videoQueue.async { handleTap }      ← 排在 YOLO 帧后（400–670 ms）
+              ├─ stateLock 读 embedding / geometry
+              └─ decoderQueue.async { decode }    ← 61 ms
+
+要求（Day 5）:
+  手势线程 → stateLock 快照 { FrameGeometry, embedding 引用, TTL/geoChanged 判定 }
+              ├─ 判定 = 快路径 → decoderQueue.async { decode }   ← 直达，不经 videoQueue
+              └─ 判定 = 慢路径 → videoQueue.async { 取 pixelBuffer → encode → decode }
+```
+
+- 快照必须在 `stateLock` 保护下完成，且**只做读取与判定**，不做任何模型调用（锁内不得跨队列等待）。
+- 慢路径（`canReuse == false`）路径**不变**，仍需最新 pixel buffer，仍走 videoQueue。
+- §4.2 的触发逻辑语义**不变**（TTL + geometry 判定、encode/decode 顺序、`isEncoding` 共享 flag 全部保持）。本要求只改**判定发生在哪个队列**，属调度层细化，不构成契约变更。
+- 不得为快路径新建第三个队列；`decoderQueue` 仍为唯一 serial decode 队列。
+
+**目标：** 快路径 tap→mask（修正口径）**p95 ≤ 200 ms**。
+
+#### 要求 B（对应 D5）— 计时口径修正
+
+- `e2eMs` 终点必须移到**主线程 mask 实际提交渲染之后**（`maskImage` 赋值 / layer contents 更新所在的 main-thread 块尾）。
+- 起点保持在手势 `.ended`。
+- 日志必须区分快/慢路径标签，并附带 `cacheAge`（见 R2）。
+- Day 7 的 tap→mask 指标**必须**用修正口径重采；Day 4 数字在 Day 7 报告中只能以「旧口径下界」形式出现。
+
+#### 要求 C（对应 D4）— 超时分级与失败可见化
+
+| 分支 | 兜底超时 | 超时后行为 |
+|------|---------|-----------|
+| 快路径（decode-only）| **1.5 s** | 清指示 + 显式失败提示（tap 无效） |
+| 慢路径（encode 在途，encoder 已 warm）| **12 s**（覆盖实测 8605 ms 上界 + 余量）| 清指示 + 显式失败提示 |
+| **冷启动 warmup 未完成期间的 tap** | 不适用 —— 见下 | —— |
+
+- **静默清除加载指示是被禁止的行为。** 任何超时路径都必须给用户一个可见的失败信号（文案 / toast / 指示环变色皆可，由 Builder 选形式），否则失败模式退化为「点了没反应」，这是最坏的一种。
+- **冷启动（1283–8605 ms）的正解不是加长超时，而是不让 tap 掉进一个会超时的等待。** 要求：warmup 未完成时，UI 呈现明确的「初始化中」状态（可复用脉冲指示但语义不同），tap 要么被显式排队一次（parked tap，warmup 完成后立即执行），要么被明确拒绝并提示。**不得**沉默丢弃 —— Day 4 唯一一次 parked tap 就是被丢弃的（G-2 的成因）。
+- `.tapToSegment` 模式**必须**触发 warmup（debug_report §254 记录 `warmupSegmentationIfPossible()` 当前只在 `.segmentation` 下调用）。修复后冷启动窗口应从「首次 tap 时」前移到「进入模式时」，用户可见延迟随之消失。此项归 Builder，Day 5 内完成。
+
+---
+
+### 10.5 保留项与风险（不封层，明确列出）
+
+| 编号 | 保留项 | 处置 |
+|------|-------|------|
+| **R1** | **慢路径延迟无基线**（G-2）。Tier 1（持续脉冲）目前是**临时规则**，不是封层决定 | Day 7 必须构造慢路径样本 ≥10 次（强制 TTL 失效或旋转设备触发 geometryChanged），拿到 mean/p95 后再由 Architect 决定慢路径是否需要不同于快路径的 UI 语义 |
+| **R2** | **embedding 复用过于激进**：TTL 8000 ms + 刷新阈值 5000 ms，tap 可能命中最长 8 秒前的 embedding；手持抖动下 tap 点与 embedding 语义错位，**可能是过分割的隐藏贡献者** | 当前日志不打 cache age，**无法证实也无法排除**。要求 Builder 在要求 B 的日志中补 `cacheAge` 字段（只打日志，不改行为）；TTL 数值本身留在 Day 6 复议（故 §9.5 中 TTL 标为未封层）|
+| **R3** | **低对比失败率约 12%（6/50）在 Day 5 多实例下可见度被放大**：最多 3 个实例并存，单次会话中至少出现一个坏 mask 的概率由 12% 升至约 1−0.88³ ≈ **32%** | 不改 Day 5 范围。按 Day 4 保留项的三步走执行：(1) Builder 打 stability score 日志、**不参与决策**（保护 88% 基线）；(2) 定向复采带 `candidates` 日志；(3) ML_Vision 裁决。Day 5 期间**禁止**在多实例逻辑里夹带任何 mask 质量过滤——两个变量同时动会毁掉归因 |
+| **R4** | 要求 A 落地后，多个实例的 decode 请求会更密集地进入 `decoderQueue`（serial）| Day 5 的 TapInstanceManager 必须按 §3.2 顺序入队、不并发；若出现 decode 排队堆积（debug_report §264 记录 `tapDecodeWithPoint` 无 `isDecoding` 检查），按「同一实例的新 tap 取代旧请求」处理，不做无界排队 |
+| **R5** | 本裁决全部数据来自 iPhone 11 / A13 单一设备 | A16/A17 上排队占比与 encoder 绝对值都会变。§9.5 的绝对值列为 A13 专属；跨设备结论不得外推（同 §9.2 教训）|
+
+---
+
+### 10.6 Day 7 复审门控（预告）
+
+要求 A–C 落地后，Day 7 用**修正口径**重测，按下表复审 §10.3 的 D1：
+
+| 快路径 tap→mask（修正口径，p95） | Day 7 决定 |
+|---------------------------------|-----------|
+| ≤ 200 ms | ✅ D1 维持；脉冲确认动画可进一步简化为一次性波纹 |
+| 200–500 ms | ✅ D1 维持；保留持续脉冲确认 |
+| > 500 ms 且已排除排队因素 | ⚠️ 重开进度语义 UI 议题（此时才成立） |
+
+（门控语义按 §9.3 修订后的规则理解：批准取合取，撤销取析取。）
+
+---
+
+### 10.7 Deliverable 确认
+
+- [x] Encoder 分辨率最终封层：**1024**，768 撤销、512 维持拒绝（§9.1–9.4）
+- [x] §8.7 门控口径缺陷两则如实记录并给出修订规则（§9.3）
+- [x] 970.6 ms 的热态与会话条件标注完成，绝对基线改为 648 ms（§9.3 缺陷 2）
+- [x] Phase 3 冻结参数表最终封层（§9.5，取代 §8.5）
+- [x] tap 延迟展示策略裁决：**不设进度条**，保留脉冲确认动画（§10.3 D1/D2）
+- [x] 授权 Builder 快路径去队列化 + 计时口径修正 + 超时分级（§10.4 要求 A/B/C）
+- [x] 保留项 R1–R5 明确列出，慢路径 UI 不封层（§10.5）
+- [x] Day 7 复审门控预告（§10.6）
+
+**Phase 2 pipeline 保护状态：** 无变化。要求 A 只改 tap 快路径的队列归属，`.segmentation` 路径与 YOLO delegate 回调不受影响 ✅
+
+---
+
+END OF PHASE 3 DAY 5 ARCHITECT OUTPUT

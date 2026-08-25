@@ -1,0 +1,9 @@
+Captured via:
+  simctl spawn "iPhone 17" log show --last 2m --style compact --info --debug | grep -E "com.judgeeverything.app:(GoldenYOLO|ContentView)"
+
+2026-02-17 15:44:16.780 I  JudgeEverythingApp[15673:83d7ee] [com.judgeeverything.app:ContentView] ContentView.task fired
+2026-02-17 15:44:16.780 I  JudgeEverythingApp[15673:83d7fd] [com.judgeeverything.app:GoldenYOLO] starting
+2026-02-17 15:44:18.618 I  JudgeEverythingApp[15673:83d7fd] [com.judgeeverything.app:GoldenYOLO] model load OK in 170.655012 ms
+2026-02-17 15:44:18.618 I  JudgeEverythingApp[15673:83d7fd] [com.judgeeverything.app:GoldenYOLO] prediction OK in 1621.206999 ms
+2026-02-17 15:44:18.629 I  JudgeEverythingApp[15673:83d7fd] [com.judgeeverything.app:GoldenYOLO] output var_3019: dtype=MLMultiArrayDataType(rawValue: 65568) shape=[1, 84, 8400]
+2026-02-17 15:44:18.629 I  JudgeEverythingApp[15673:83d7fd] [com.judgeeverything.app:GoldenYOLO] output var_3022: dtype=MLMultiArrayDataType(rawValue: 65568) shape=[1, 84, 8400]

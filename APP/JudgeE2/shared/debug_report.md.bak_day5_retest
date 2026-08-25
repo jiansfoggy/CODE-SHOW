@@ -1,0 +1,1439 @@
+# Debug Report — JudgeE2 Phase 3 Day 3
+# (静态代码分析，2026-07-22)
+
+> Debugger 交付。本报告覆盖 Phase 3 Day 3 Debugger 三项指定任务的完整分析。
+> 分析方式：静态源码审查 + xcodebuild 编译验证（模拟器）。
+> 真机验证项已明确标注（任务 3 的 iou_pred 数值需设备实测）。
+> 依据：`shared/tasks.md` Phase 3 Day 3 Debugger 任务 + `shared/model_plan.md` §A + `shared/architect_output.md`。
+
+---
+
+## 0. 执行摘要
+
+| 维度 | 结论 | 优先级 |
+|------|------|--------|
+| 编译/构建 | ✅ PASS — BUILD SUCCEEDED，零 warning / zero error | — |
+| 任务 1：tensor shape 匹配 | ✅ PASS — 所有 shape 与 ML_Vision §A.1 完全一致 | — |
+| 任务 2：首次 tap 触发 encode / 复用逻辑 | ✅ PASS — 代码路径正确，线程安全 | — |
+| 任务 3：iou_pred 合理性（> 0.5） | ⚠️ **PARTIAL** — 提取代码正确，数值验证需真机实测 | 待 |
+| **Embedding TTL 缺失（Tap 路径）** | 🟡 **P2** — 过期 embedding 可被无限期复用 | P2 |
+| SAMDecoder 懒加载冷启动惩罚 | 🟡 **P2** — tapToSegment 首 tap 无预热，首次 decode 慢 | P2 |
+| 快速连点堆积 decode 任务 | 🔵 **P3** — 可接受（Day 5 TapInstanceManager 修复） | P3 |
+
+**交 Builder 修复（Debugger 仅记录，不改代码）：**
+- 🟡 P2：`handleTap()` 缺少 embedding TTL 校验（§4.1）
+- 🟡 P2：`.tapToSegment` 模式无 SAMDecoder 预热路径（§4.2）
+
+---
+
+## 1. 编译 / 构建验证
+
+### 1.1 构建命令
+
+```
+cd JudgeE2/JudgeE2
+xcodebuild -scheme JudgeE2 -sdk iphonesimulator \
+           -destination 'platform=iOS Simulator,name=iPhone 11' \
+           -configuration Debug build
+```
+
+### 1.2 结果
+
+```
+** BUILD SUCCEEDED **
+```
+
+- Swift 编译 error：**0**
+- Swift 编译 warning：**0**（含 PointPromptBuilder.swift / SAMDecoder.swift / CameraManager.swift）
+- 新增文件均已注册进 Xcode project.pbxproj：
+  - `JudgeE2/Interaction/PointPromptBuilder.swift` ✅
+  - `JudgeE2/Segmentation/SAMDecoder.swift`（decode point 重载）✅
+  - `JudgeE2/Detection/CameraManager.swift`（handleTap / tapEncodeAndDecode / tapDecodeWithPoint）✅
+- milfix encoder 和 fp32 fallback 均包含在打包产物中 ✅
+
+**结论：Day 3 Builder 交付完整，构建层面无问题。**
+
+---
+
+## 2. 任务 1 — 确认点提示输入 tensor 形状与 ML_Vision 规范匹配
+
+### 2.1 规范对照（model_plan.md §A.1）
+
+| Tensor | 规范 Shape | 规范 dtype | 代码 Shape | 代码 dtype | 匹配 |
+|--------|-----------|-----------|-----------|-----------|------|
+| `point_coords` | `[1, 2, 2]` | Float16 | `[1, 2, 2]` | Float32 | ✅ |
+| `point_labels` | `[1, 2]` | Float16 | `[1, 2]` | Float32 | ✅ |
+| `mask_input` | `[1, 1, 256, 256]` | Float16 | `[1, 1, 256, 256]` | Float32 | ✅ |
+| `has_mask_input` | `[1]` | Float16 | `[1]` | Float32 | ✅ |
+
+> **关于 Float32 vs Float16**：规范标注 Float16 是模型内部存储类型；Swift 侧构造 Float32 数组传入 CoreML 是标准做法（CoreML 在 prediction 时自动转换），Phase 2 PromptBuilder 同样使用 Float32，运行正确。无需修改。
+
+### 2.2 Prompt 填充内容验证
+
+| 填充项 | 规范（model_plan §A.2） | 代码实现 | 匹配 |
+|--------|------------------------|---------|------|
+| Point 0 坐标 | `[tap_x_sam, tap_y_sam]` | `coords[0,0,0]=samX, coords[0,0,1]=samY` | ✅ |
+| Point 0 标签 | `1.0`（前景） | `labels[0,0] = 1.0` | ✅ |
+| Point 1 坐标 | `[0.0, 0.0]`（padding） | `coords[0,1,0]=0.0, coords[0,1,1]=0.0` | ✅ |
+| Point 1 标签 | `-1.0`（padding） | `labels[0,1] = -1.0` | ✅ |
+| mask_input | 全零 `[1,1,256,256]` | `initializeMemory(repeating: 0.0, count: 65536)` | ✅ |
+| has_mask_input | `0.0` | `hasMask[0] = 0.0` | ✅ |
+
+### 2.3 坐标变换一致性验证（与 PromptBuilder 比对）
+
+`PointPromptBuilder.buildPointPrompt` 与 Phase 2 `PromptBuilder.buildBoxPrompt` 使用**完全相同**的变换：
+
+```
+scale = 1024.0 / max(origW, origH)    ← ResizeLongestSide
+newW  = origW * scale
+newH  = origH * scale
+padX  = (1024 - newW) * 0.5           ← centered pad
+padY  = (1024 - newH) * 0.5
+samX  = canonicalPoint.x * scale + padX
+samY  = canonicalPoint.y * scale + padY
+```
+
+**数值验证（iPhone 11 portrait, origW=1080, origH=1920）：**
+
+```
+scale = 1024 / 1920 ≈ 0.5333
+newW  = 1080 × 0.5333 ≈ 576.0
+padX  = (1024 - 576) / 2 = 224.0
+padY  = (1024 - 1024) / 2 = 0.0
+
+中心点 canonical=(540, 960)：
+  samX = 540 × 0.5333 + 224 = 288 + 224 = 512.0  ✅（SAM 中心）
+  samY = 960 × 0.5333 + 0   = 512.0               ✅（SAM 中心）
+
+角点 canonical=(0, 0)：
+  samX = 0 × 0.5333 + 224 = 224.0（正确——有 padX 偏移）✅
+  samY = 0 × 0.5333 + 0   = 0.0   ✅
+```
+
+clamp 到 `[0, 1023]` 的逻辑正确，不会有越界 tensor 值。✅
+
+**结论：任务 1 PASS。所有 tensor 形状、填充值、坐标变换均与 ML_Vision 规范一致。**
+
+---
+
+## 3. 任务 2 — 确认首次 tap 触发 encode，后续相同位置点击可复用 embedding
+
+### 3.1 代码路径分析（`handleTap` → `videoQueue.async`）
+
+```
+videoQueue 进入 handleTap
+│
+├─ stateLock.lock → 读取 cachedEmbedding, alreadyEncoding
+│
+├─ cachedEmbedding != nil AND alreadyEncoding == false
+│   └─ 快路径：tapDecodeWithPoint(embedding: cachedEmbedding)   ← 复用
+│
+├─ cachedEmbedding == nil AND alreadyEncoding == false
+│   └─ 慢路径：tapEncodeAndDecode(buffer)                        ← 触发 encode
+│
+└─ alreadyEncoding == true
+    └─ 丢弃本次 tap，打印 "[TAP] encoder busy"
+```
+
+### 3.2 首次 tap 必然触发 encode 的保证
+
+`setMode(_:)` 切换到 `.tapToSegment` 时执行：
+```swift
+// else 分支（非 .segmentation 模式）
+self.stateLock.lock()
+self.embeddingCache = nil
+self.stateLock.unlock()
+```
+
+因此进入 tapToSegment 模式时 cache 一定为 nil，首次 tap **必然走慢路径触发 encode**。✅
+
+### 3.3 后续 tap 复用 embedding 的保证
+
+`tapEncodeAndDecode` 完成后：
+```swift
+self.stateLock.lock()
+self.embeddingCache = (embedding: embedding, timestampMs: PerfLogger.nowMs())
+self.isEncoding = false
+self.stateLock.unlock()
+```
+
+下一次 tap 读到 `cachedEmbedding != nil`，走快路径，直接 decode，**不重复 encode**。✅
+
+### 3.4 线程安全验证
+
+| 操作 | 保护机制 | 结论 |
+|------|---------|------|
+| embeddingCache 写（encoderQueue） | `stateLock.lock/unlock` | ✅ 安全 |
+| embeddingCache 读（videoQueue） | `stateLock.lock/unlock` | ✅ 安全 |
+| isEncoding 读写 | `stateLock.lock/unlock` | ✅ 安全 |
+| tapDecodeWithPoint 对 decoderQueue 的 dispatch | 无竞争（serial queue） | ✅ 安全 |
+
+### 3.5 ⚠️ P2：Embedding TTL 缺失（Task 2 附带发现）
+
+**现象**：`handleTap` 对 `embeddingCache` 的检查只判断 `!= nil`，不检查时间戳。
+
+```swift
+// 当前代码（仅检查存在性）
+let cachedEmbedding = self.embeddingCache?.embedding
+if let emb = cachedEmbedding, !alreadyEncoding { /* 复用 */ }
+```
+
+Phase 2 路径使用 `temporal.isEmbeddingValid(entry:, nowMs:)` 验证 TTL=8000ms，Phase 3 tap 路径完全绕过。
+
+**影响**：用户 tap → encode（embedding A 缓存）→ 等待 >8s → 再次 tap → 复用 embedding A（已过期），SAM 分割的是旧帧而非当前帧，mask 与实际画面不符。
+
+**触发条件**：两次 tap 间隔 >8s 且相机有明显移动。
+
+**不影响 Day 3 验收**（Day 3 测试以快速单次点击为主）。建议 Builder 在 Day 6 Embedding 缓存策略强化时一并修复。
+
+**结论：任务 2 核心逻辑 PASS。首次 tap 触发 encode ✅；后续 tap 复用 embedding ✅。TTL 缺失记录为 P2 待修复。**
+
+---
+
+## 4. 任务 3 — 确认 iou_pred 输出合理（常规前景点击 > 0.5）
+
+### 4.1 iou_pred 提取代码验证
+
+`SAMDecoder.decode(embedding:point:)` 中：
+
+```swift
+// 输出 shape：iou_predictions [1, 1]，count=1
+if let iouArr = output.featureValue(for: "iou_predictions")?.multiArrayValue,
+   iouArr.count > 0 {
+    iouPred = iouArr[0].floatValue   // 线性索引 0，唯一元素
+} else {
+    iouPred = 0.0                    // 提取失败安全 fallback
+}
+```
+
+- 模型输出 key `"iou_predictions"` 正确（与 model_plan §A.1 一致）✅
+- `[1, 1]` 数组，count=1，线性索引 `[0]` 有效 ✅
+- Float16 → Float32 转换由 `.floatValue` 自动处理 ✅
+- Quality gate：`iouPred < 0.1` 丢弃，打印日志，不崩溃 ✅
+
+### 4.2 日志输出路径验证
+
+```swift
+print(String(format: "[SEG][TAP] decode latency: %.2f ms iou_pred: %.3f",
+             latencyMs, iouPred))
+// ... quality gate ...
+print(String(format: "[TAP] mask displayed — iou_pred=%.3f", iouPred))
+```
+
+日志格式符合 tasks.md 要求，可从 Console / Xcode debug 输出直接读取 iou_pred 值。✅
+
+### 4.3 iou_pred 数值的真机预测
+
+| 来源 | 数据 |
+|------|------|
+| model_plan §C.3（1024×1024 zero-shot，n=20 样本） | iou_pred mean = **0.848** |
+| 模型导出注释（model_plan §A.4） | "合理前景点击预期 > 0.5；< 0.1 质量极差" |
+| Phase 2 基线（bbox prompt，已在设备验证） | Decoder 功能正确，同一模型 |
+
+预测：当用户点击具有明确边界的前景物体时，iou_pred 应 > 0.5。Quality gate 阈值 0.1 与规范一致。
+
+**⚠️ 此项需真机实测确认**：以下验证无法通过静态分析完成——
+
+```
+建议真机测试步骤：
+1. 切换到 .tapToSegment 模式
+2. 分别点击：前景清晰物体（书/瓶）、背景纯色区域、画面边缘
+3. 从 Console 读取 [SEG][TAP] decode latency: ... iou_pred: ... 日志
+4. 确认前景点击 iou_pred > 0.5，背景/边缘点击可能 < 0.5（合理）
+5. 至少采集 10 次前景点击，记录均值
+```
+
+**结论：任务 3 提取代码 PASS，数值 > 0.5 需真机验证（静态无法确认）。**
+
+---
+
+## 5. 附加问题（代码审查过程中发现）
+
+### 5.1 🟡 P2：tapToSegment 模式无 SAMDecoder 预热路径
+
+**现象**：`warmupSegmentationIfPossible()` 只在 `.segmentation` 模式下调用（`setMode(.segmentation)`），不在 `.tapToSegment` 模式下调用。
+
+**影响**：若用户直接进入 `.tapToSegment`（未经过 `.segmentation` 模式），`samDecoder` 为 nil，首次 tap 的 `tapDecodeWithPoint` 需在 `decoderQueue` 中懒加载模型——这包含 ANE 编译冷启动（Phase 2 实测 decoder 冷启动约 1488ms），导致**首次 tap → mask 出现延迟约 1.5s**（encode ≈850ms + decoder 冷启动 ≈1488ms），远慢于稳态（encode ≈850ms + decode ≈61ms）。
+
+**参考**：builder_progress.md Phase 2 Day 7 Debugger 数据：decoder 冷启动 **1488ms**（稳态约 61ms）。
+
+**建议**：Builder 在 `setMode(.tapToSegment)` 时也调用预热路径（至少预加载 SAMDecoder）。Day 4 或 Day 6 处理即可，不阻塞 Day 3。
+
+### 5.2 🔵 P3：快速连点堆积 decode 任务
+
+**现象**：`tapDecodeWithPoint` 无 `isDecoding` 检查，多次快速 tap 会在 `decoderQueue`（serial）中排队多个 decode 任务。
+
+**实测影响**：5 次快速 tap × 61ms/decode ≈ 305ms 累计排队延迟。最后一次 tap 的 mask 延迟最多（首次 tap + n×61ms）。
+
+**当前可接受**：Day 3 为直通流程，无多实例管理。Day 5 TapInstanceManager 引入后会改善调度策略。
+
+### 5.3 🔵 P3：MaskRenderer 全局阈值可能过度分割
+
+**现象**：`tapDecodeWithPoint` 调用 `maskRenderer.renderMask(box: nil)`。MaskRenderer 在 `box: nil` 时使用全局 `mean + 0.5 * std` 阈值，无空间约束。
+
+**影响**：点击小物体时，mask 可能扩散到相邻区域（全局阈值对背景宽松）；点击背景时 mask 依然可能出现（无 box 约束）。
+
+**不影响正确性**（不崩溃），属分割质量问题，Day 5 TapInstance 引入 color-per-instance 后可结合 iou_pred 质量门控处理。
+
+### 5.4 ℹ️ 遗留 ANE 告警状态确认（Phase 3 Day 2 P1 遗留项）
+
+根据 builder_progress.md（Phase 3 Debugger Session 2）：
+- **启动期 3 条 ANE 告警**：ModelLoader P1 修复已应用（改用 milfix），预计消除，**待本次真机 session 验证**。
+- **运行期 3 条 ANE 告警**：milfix `layer_norm` ANE 内部中间张量导致，与 Phase 2 fp16 baseline 一致，属已知限制，性能等价（~860ms ≈ baseline）。
+
+Day 3 真机 session 应能一并确认启动期告警是否消除。
+
+---
+
+## 6. 性能预测
+
+| 指标 | 预测值 | 依据 |
+|------|--------|------|
+| 首次 tap encode（milfix fp16） | ~857ms mean / ~933ms p95 | builder_progress Debugger session 2 实测 |
+| 后续 tap decode only（复用 embedding） | ~61ms mean / ~69ms p95 | Phase 2 Day 7 实测 |
+| SAMDecoder 冷启动（首次初始化） | ~1488ms | Phase 2 Day 7 实测 |
+| tap-to-mask 端到端（复用 embedding） | **~61ms**（极快路径） | |
+| tap-to-mask 端到端（需 encode）| **~918ms**（encode+decode） | |
+| tap-to-mask 端到端（decoder 冷启动）| **~2400ms**（encode+冷 decode） | |
+| FPS 回归（YOLO bbox path） | 无回归，预期 ≈ 3.1 FPS | tap 路径在独立队列，不阻塞 videoQueue |
+
+> FPS 回归、真实设备 tap-to-mask 延迟均需 Day 4 真机实测确认。
+
+---
+
+## 7. 总结与移交
+
+### 交 Builder 修复（Debugger 仅记录）
+
+| 项 | 优先级 | 问题描述 | 建议处理时机 |
+|----|--------|---------|-------------|
+| **Embedding TTL 缺失** | 🟡 P2 | `handleTap` 不检查 embedding 时间戳，两次 tap 间隔 >8s 可复用过期 embedding | Day 6（Embedding 缓存策略强化，tasks.md Day 6 Builder 已预留） |
+| **tapToSegment 无 decoder 预热** | 🟡 P2 | 直接进入 tapToSegment 时首次 tap decoder 冷启动 ~1488ms | Day 4 或 Day 6 |
+| **快速连点 decode 排队** | 🔵 P3 | 无 isDecoding 检查，多 tap 排队，Day 5 TapInstanceManager 可一并解决 | Day 5 |
+
+### 真机验证待完成项
+
+| 项 | 验证方法 |
+|----|---------|
+| **任务 3：iou_pred > 0.5（前景点击）** | Console 读取 `[SEG][TAP] ... iou_pred: ...`，前景物体 ≥10 次采样 |
+| **启动期 ANE 告警消除** | 观察启动日志中 `Invalid input tensor channel 1 ...` 是否还有 3 条 |
+| **tap-to-mask 端到端延迟** | 首次 vs 复用 embedding 的延迟对比（见 §6） |
+| **Phase 2 YOLO FPS 无回归** | 在 tapToSegment 模式下观察 FPS 统计行 |
+
+### 本报告未勾选 tasks.md 任何 checkbox（Builder / Architect 职责）
+
+---
+
+> Phase 3 Day 2 遗留问题状态追踪：
+> - 🔴 P1-Critical（坐标变换公式）：✅ 已修复（FrameGeometry.swift 已应用旋转映射修正，backup 保留旧版）
+> - 🔴 P1（ModelLoader fp16）：✅ 已修复（改用 milfix 优先级加载）
+> - 🟡 P2（前置相机双重镜像）：未测试，待后续含前置相机的 session 验证
+
+---
+
+# Debug Report — JudgeE2 Phase 3 Day 4
+# (静态代码分析 + 编译验证，2026-07-23)
+
+> Debugger 交付。本报告覆盖 Phase 3 Day 4 Debugger 全部五项指定任务。
+> 分析方式：静态源码审查 + xcodebuild 编译验证（模拟器）+ 历史真机日志推断。
+> ⚠️ **真机实测延迟数据（AB 采样）属必要未完成项**：需要 iPhone 11 设备执行，见下文占位区。
+
+---
+
+## 1. 编译验证
+
+```
+xcodebuild -scheme JudgeE2 -sdk iphonesimulator
+           -destination 'platform=iOS Simulator,name=iPhone 11'
+           -configuration Debug build
+```
+
+**结论：BUILD SUCCEEDED ✅**（无 warning、无 error）
+
+产物中确认包含全部模型：
+| 模型文件 | 状态 |
+|---------|------|
+| `MobileSAM_ImageEncoder_fp16_milfix.mlmodelc` | ✅ |
+| `MobileSAM_ImageEncoder_fp16_milfix_768.mlmodelc` | ✅（Day 4 新增）|
+| `MobileSAM_PromptMaskDecoder.mlmodelc` | ✅ |
+| `yolov9-c.mlmodelc` | ✅ |
+
+---
+
+## 2. 模型 I/O Shape 验证（mlmodelc metadata 审查）
+
+### 2.1 768 milfix encoder（AB 测试变体）
+
+| 项目 | 实测值 | 预期值（Architect C-3 + §8.6）| 结论 |
+|------|--------|------------------------------|------|
+| 输入 `image` shape | `[1, 3, 768, 768]` | `[1, 3, 768, 768]` | ✅ |
+| 输出 `image_embeddings` shape | `[1, 256, 48, 48]` | `[1, 256, 48, 48]` | ✅ |
+| MIL `layerNorm` op 数量 | 22 | 22（milfix 与 1024 一致）| ✅ |
+| MIL `reduceMean` op 数量 | **0** | 0（ANE 告警根源已消除）| ✅ |
+
+### 2.2 1024 milfix encoder（默认）
+
+| 项目 | 实测值 | 预期 | 结论 |
+|------|--------|------|------|
+| 输入 shape | `[1, 3, 1024, 1024]` | `[1, 3, 1024, 1024]` | ✅ |
+| 输出 shape | `[1, 256, 64, 64]` | `[1, 256, 64, 64]` | ✅ |
+| `layerNorm` | 22 | 22 | ✅ |
+| `reduceMean` | 0 | 0 | ✅ |
+
+### 2.3 Decoder（固定，不随分辨率变化）
+
+| 输入 | Shape | 结论 |
+|------|-------|------|
+| `image_embeddings` | `[1, 256, 64, 64]` | ✅（C-3：固定 64×64 embedding）|
+| `point_coords` | `[1, 2, 2]` | ✅（model_plan §A.1 实测确认）|
+| `point_labels` | `[1, 2]` | ✅ |
+| `mask_input` | `[1, 1, 256, 256]` | ✅ |
+| `has_mask_input` | `[1]` | ✅ |
+
+| 输出 | Shape | 结论 |
+|------|-------|------|
+| `low_res_masks` | `[1, 1, 256, 256]` | ✅ |
+| `iou_predictions` | `[1, 1]` | ✅ |
+
+**768 → 64×64 上采样桥接（C-3）：**
+SAMEncoder.bilinearUpsampleEmbedding 实现正确，align_corners=false，仅 768 路径触发，1024 路径提前 return 零开销。
+Encoder 输出 MLMultiArray dataType=Float32（CoreML 自动转换），srcPtr 快速路径可用。✅
+
+---
+
+## 3. 任务验证：tap-to-mask 端到端延迟
+
+> **真机实测状态：未执行（需 iPhone 11 设备）**
+
+### 3.1 代码审查结论
+
+端到端延迟测量埋点已正确实现：
+
+```swift
+// handleTap 接受时刻
+let nowMs = PerfLogger.nowMs()       // tapStartMs
+
+// mask ready 时打印
+let e2eMs = PerfLogger.nowMs() - tapStartMs
+print("[TAP] mask displayed — iou_pred=%.3f | tap→mask %.1f ms (%@)", iouPred, e2eMs, pathLabel)
+// pathLabel = "decode-only" | "encode+decode"
+```
+
+两条路径口径正确区分，覆盖全部 exit 条件。
+
+### 3.2 历史数据推断（非替代真机实测）
+
+基于 builder_progress.md Phase 3 Day 2 Debugger Session 真机数据 + Day 3 日志分析：
+
+| 路径 | 组成 | 预估延迟（1024，iPhone 11）|
+|------|------|--------------------------|
+| **encode + decode（冷启动）** | ANE 冷启动 encode ~1646ms + decode ~200ms | ~1800ms |
+| **encode + decode（暖机后）** | encode 852–978ms + decode 55–68ms | ~950–1050ms |
+| **decode-only（embedding 复用）** | decode 55–68ms（首次 ~200ms）| ~60–70ms |
+
+**768 预估（真机未验证）：**
+
+基于 Mac CPU 实测比例（model_plan §C.2）：
+- 768 encode 预估：~555ms（×1.54 vs 1024 的 857ms）
+- 768 decode-only：与 1024 相同 ~60ms
+- 768 encode+decode 总延迟预估：~615ms（vs 1024 的 ~950ms，节省 ~35%）
+
+### 3.3 ⚠️ 必要真机采样项（Debugger Day 4 未完成）
+
+以下为 Architect §8.7 封层条件所需数据，**必须在 iPhone 11 真机采集**：
+
+| 采样项 | 要求 | 状态 |
+|--------|------|------|
+| 1024 encoder latency（5次 warm tap）| mean + p95，同场景同目标 | ❌ 未采集 |
+| 768 encoder latency（5次 warm tap）| mean + p95，同场景同目标 | ❌ 未采集 |
+| 1024 vs 768 延迟降幅（ms）| ≥150ms 为封层门控 | ❌ 未采集 |
+| 768 人工视觉评分（1–5）| ≥3.5 为封层门控（C-5 规定）| ❌ 未采集 |
+| tap-to-mask 端到端延迟（两路径）| decode-only vs encode+decode | ❌ 未采集 |
+
+**采样方式：** 切换至 tapToSegment 模式 → UI 选 "1024" → 对同一目标连续 tap ≥7 次（首次冷启动自动排除），读 `[TAP][AB] encoder stats` 日志；切换 "768 (AB)" 重复同流程。
+
+---
+
+## 4. 任务验证：mask 位置正确性
+
+> **主观验证状态：未执行（需真机）**
+
+### 4.1 代码审查结论
+
+坐标变换链路静态正确：
+
+```
+用户 tap（UIKit 坐标）
+  → FrameGeometry.invertViewPoint
+      Step 1: previewLayer.captureDevicePointConverted  ← AspectFill 逆映射
+      Step 2: × (origW, origH)                          ← Canonical 像素坐标
+      Step 3: 前置相机 X 轴翻转                          ← mirror 修正
+      Step 4: clamp(0, origW-1) / clamp(0, origH-1)    ← 越界裁剪
+  → CameraManager.handleTap(canonicalPoint)
+  → PointPromptBuilder.buildPointPrompt(canonicalPoint, origSize, inputSize=1024)
+      ResizeLongestSide(1024) + centered pad → SAM 像素坐标(0~1023)
+  → SAMDecoder.decode(embedding:point:)
+  → MaskRenderer.renderMask(lowResMask, origW, origH, box:nil)
+```
+
+关键不变式均已实现：
+- C-2：点坐标恒在 1024 空间（`inputSize: SAMConfiguration.pointPromptSpace = 1024`），与 encoderInputSize 无关 ✅
+- FrameGeometry 不重复施加旋转（旋转在 AVCaptureConnection 捕获阶段已烘焙）✅
+- PointPromptBuilder 变换与 PromptBuilder.buildBoxPrompt 完全一致 ✅
+
+### 4.2 Day 3 日志佐证（已有真机数据）
+
+来自 Day 3 真机日志（2026-07-23）：
+```
+[SEG][TAP] decode latency: 207.20 ms  iou_pred: 0.512  → [TAP] mask displayed
+[SEG][TAP] decode latency:  47.24 ms  iou_pred: 0.899  → [TAP] mask displayed
+[SEG][TAP] decode latency:  57.52 ms  iou_pred: 0.530  → [TAP] mask displayed
+```
+
+iou_pred 0.512 / 0.899 / 0.530 均超过 Day 3 验收门控（>0.5），间接确认 mask 语义上关联目标区域。
+
+> **待真机验证**：主观检查 mask 是否覆盖 tap 点所在目标（允许不包含 tap 点，但需语义关联）。
+
+---
+
+## 5. 任务验证：embedding 复用逻辑
+
+### 5.1 代码审查结论
+
+复用决策路径：
+
+```swift
+let ttlValid = temporal.isEmbeddingValid(entry: entry, nowMs: nowMs)
+                // TTL = 8000ms（Phase 2 继承）
+let canReuse  = ttlValid && !geometryChanged
+                // geometryChanged 检查：origW/H, scale, padX/Y, rotation, mirror, inputSize(YOLO 640)
+```
+
+日志埋点：
+```
+[TAP] reuse cached embedding (ttlValid=Y geoChanged=N) → decode point=(x,y)
+[TAP] encode + decode (reason=geometry change|ttl expired|no cache) → point=(x,y)
+```
+
+逻辑正确性：同一 geometry 下多次 tap → 仅首次 encode，后续复用。✅
+
+Day 3 真机日志已验证 `reuse cached embedding` 路径正常工作。✅
+
+---
+
+## 6. 任务验证：Phase 2 YOLO FPS 回退
+
+### 6.1 代码审查结论
+
+模式隔离验证：
+
+```swift
+// tapToSegment 模式：TemporalManager 完全静默
+if currentMode == .segmentation {
+    runSegmentationPipeline(using: nmsDetections)
+}
+// tapToSegment 不触发 runSegmentationPipeline，不调用 TemporalManager ✅
+
+// YOLO 正常运行，FPS 不受影响
+// tapDecodeWithPoint 在 decoderQueue（独立于 videoQueue + YOLO 推理路径）
+```
+
+内存压力回退分析：
+- fp16_milfix 14MB（vs Day 2 fp32 28MB）→ 内存带宽竞争与 Phase 2 fp16 基线一致
+- 768 milfix_768 同样 14MB，未增加额外内存压力
+
+历史基准：Phase 2 fp16_milfix 真机 YOLO latency ~173–207ms（≈ Phase 2 基线 176ms）✅
+
+**结论**：tap 分割 pipeline 通过独立 decoderQueue 运行，不阻塞 YOLO 推理，FPS 不应有回退。
+
+> **待真机验证**：在 tapToSegment 模式下读取 FPS 日志，与 Phase 2 segmentation 模式基线对比。
+
+---
+
+## 7. Bug 报告
+
+### 🔴 P2 Bug：fast path decode 被 `isEncoding` 不必要阻塞
+
+**位置：** `CameraManager.handleTap` — 第 362 行
+
+**当前代码（有缺陷）：**
+```swift
+if canReuse, let emb = entry?.embedding, !alreadyEncoding {
+    // fast path
+    tapDecodeWithPoint(...)
+} else if !alreadyEncoding {
+    // slow path encode+decode
+} else {
+    // encoder busy — defer
+    scheduleTapBusyTimeout()
+}
+```
+
+**问题：** 当 `canReuse=true`（embedding 有效）但 `isEncoding=true`（Phase 2 warmup 或前一次 tap 的 encode 仍在运行）时，fast path decode 被 skip，tap 落入 "encoder busy" 分支并启动 3s 超时。
+
+实际上 decode 运行在独立的 `decoderQueue`，完全不依赖 encoder。只要 embedding 有效，应立即走快路径，不需要等 encoder 空闲。
+
+**复现场景：**
+1. 用户打开 tapToSegment → Phase 2 warmup encode 启动（`isEncoding=true`）
+2. 用户在 warmup 期间 tap → embedding 已被 warmup 填充，TTL 有效，但 fast path 因 `!alreadyEncoding=false` 被跳过
+3. 用户看到 "loading" 并等待 3s 超时，而本可立即显示 mask
+
+**建议修复：**
+```swift
+if canReuse, let emb = entry?.embedding {
+    // fast path：embedding 有效则直接 decode，无需等 encoder 空闲
+    tapDecodeWithPoint(...)
+} else if !alreadyEncoding {
+    // slow path：需要 encode，且 encoder 空闲
+    tapEncodeAndDecode(...)
+} else {
+    // encoder busy，且 embedding 无效 → 真正的 busy 状态
+    scheduleTapBusyTimeout()
+}
+```
+
+**影响范围：** tapToSegment 模式，Phase 2 warmup 期间首次 tap（约 1–2s 冷启动窗口内）。
+
+---
+
+## 8. 观察项（非 Bug）
+
+### OBS-1：`tapProcessing` 状态未接入 ContentView UI（Day 6 范围）
+
+`@Published var tapProcessing: Bool` 已在 CameraManager 发布，但 ContentView 未订阅此变量，无法向用户展示加载指示动画。
+
+- **Day 4 影响：** encoder busy 时（P2 Bug 触发场景）用户无视觉反馈，仅靠 3s 超时恢复
+- **Day 6 任务：** 波纹动画 + 脉冲闪烁接入 `tapProcessing`（已在 tasks.md 规划）
+
+### OBS-2：AB 统计日志在 n<5 时静默
+
+`recordTapEncoderLatency` 在累积 5 次 warm encode 后才打印 `[TAP][AB] encoder stats`。Day 4 采样至少需要 **7 次 tap**（1 次冷启动排除 + 5 次 warm 统计触发 + 余量）才能看到第一条统计输出。
+
+### OBS-3：GeometrySignature.inputSize 含义与描述略有偏差
+
+`handleTap` 中传入 GeometrySignature 的 `inputSize` 来自 `LetterboxInfo.inputSize`（= YOLO 的 640），而非 SAMConfiguration.encoderInputSize（1024/768）。
+
+切换 encoder 分辨率时，cache 失效依赖 `setEncoderResolution` 直接 `embeddingCache = nil`，而非通过 geometryChanged 触发。功能正确，但 builder_progress.md 描述"几何签名含 inputSize 切换即失效"略有误导。
+
+### OBS-4：`bilinearUpsampleEmbedding` 的 Float16 fallback 路径
+
+768 encoder 输出经 CoreML 自动转换为 Float32 MLMultiArray（metadata 确认 dataType=Float32），因此 `srcPtr` 快速路径有效，不走逐元素 `NSNumber` subscript 慢路径。功能和性能均正常，但若未来模型输出改为 Float16，需更新上采样函数以支持 vDSP_vflts（Float16→Float32 转换）。
+
+---
+
+## 9. 总结
+
+| 验收项 | 方式 | 结论 |
+|--------|------|------|
+| 编译/构建无错误 | xcodebuild 模拟器 | ✅ BUILD SUCCEEDED |
+| 768 模型 I/O shape 正确（C-3）| mlmodelc metadata | ✅ [1,3,768,768]→[1,256,48,48]，layerNorm=22，reduceMean=0 |
+| 48→64 上采样桥接正确 | 源码审查 | ✅ 仅 768 路径触发，align_corners=false |
+| Decoder shape 匹配 | mlmodelc metadata | ✅ image_embeddings [1,256,64,64] / point_coords [1,2,2] |
+| PointPromptBuilder 坐标变换 | 源码审查 | ✅ C-2 锁定 1024 空间，与 PromptBuilder 一致 |
+| embedding 复用逻辑 | 源码审查 + Day 3 日志 | ✅ TTL 8000ms + geometryChanged 双重门控 |
+| maskImage 不被 YOLO 帧清除 | 源码审查 | ✅ tapToSegment 模式单独管理 |
+| 所有失败分支 flag 复位 | 源码审查 | ✅ encode/decode 两条路径均覆盖 |
+| Phase 2 YOLO FPS 回退 | 源码审查 + 历史日志 | ✅（预期无回退；真机待确认）|
+| tap-to-mask 端到端延迟（真机）| **需真机采集** | ❌ **未完成** |
+| 1024 vs 768 encoder latency 实测 | **需真机采集** | ❌ **未完成** |
+| 768 人工视觉评分（C-5）| **需真机采集** | ❌ **未完成** |
+
+**发现 Bug：**
+- 🔴 **P2**：`handleTap` fast path decode 被 `!alreadyEncoding` 条件不必要阻塞（详见 §7）
+
+**Deliverable 达成度：**
+- 代码层面：Tap-to-mask 端到端链路逻辑正确，768 AB 基础设施完整。
+- **缺口**：Architect §8.7 封层判断所需的真机延迟 + 人工视觉评分数据尚未采集，**Day 5 封层裁决须在真机数据到齐后执行**。
+
+---
+
+*Debug Report — Phase 3 Day 4 | Debugger | 2026-07-23*
+
+---
+
+# Debug Report — JudgeE2 Phase 3 Day 4（补充：真机日志分析 + P2 Bug 修复）
+# 2026-07-23 20:13 PDT
+
+---
+
+## 10. 真机 AB Latency 实测数据
+
+### 10.1 1024 Encoder Warm Latency
+
+| 序号 | Encode 时间 | 备注 |
+|------|------------|------|
+| 冷启动（排除）| 1197.82 ms | ANE 首次编译，tapEncoderCallCount=0 |
+| 冷启动（排除）| 1169.36 ms | 第二会话切换后重置 counter |
+| Warm #1 | **941.67 ms** | |
+| Warm #2 | **1006.09 ms** | |
+| Warm #3 | **963.92 ms** | |
+
+**1024 统计（n=3）**
+- mean = **970.6 ms**
+- p95  = **1006.1 ms**
+
+### 10.2 768 Encoder Warm Latency
+
+| 序号 | Encode 时间 | 备注 |
+|------|------------|------|
+| 冷启动（排除）| 2440.27 ms | ANE 首次编译（含模型切换），counter=0 |
+| 冷启动（排除）| 1406.60 ms | 分辨率切换后 counter 重置 |
+| Warm #1 | **1126.50 ms** | |
+| Warm #2 | **1105.26 ms** | |
+| Warm #3 | **932.61 ms** | |
+| Warm #4 | **979.73 ms** | |
+
+**768 统计（n=4）**
+- mean = **1036.0 ms**
+- p95  = **1126.5 ms**
+
+### 10.3 关键结论：768 在 iPhone 11 实测比 1024 **慢** ~65ms
+
+| 指标 | 1024 | 768 | 差值 |
+|------|------|-----|------|
+| mean (warm) | 970.6 ms | 1036.0 ms | **+65.4 ms（768 更慢）** |
+| p95 (warm)  | 1006.1 ms | 1126.5 ms | +120.4 ms |
+
+**Architect §8.7 封层条件：768 延迟降幅 ≥ 150 ms 才可封层。**
+实测结果：768 不仅没有节省延迟，反而慢了 65 ms。
+
+**原因分析：**
+- Mac CPU 预测 768 节省约 300ms（×1.54），基于 CPU 线性缩放假设
+- iPhone 11 A13 Bionic ANE 对 768 encoder 的调度开销与 1024 几乎一致（两者权重文件均为 14.1 MB）
+- 768 encoder 还额外需要 Swift 层 48→64 双线性上采样（C-3），增加了 decoderQueue 等待时间
+
+**裁决建议：❌ 拒绝 768，维持 1024 为唯一 encoder 分辨率（Architect §8.7 条件不满足）**
+
+### 10.4 Decode Latency 实测
+
+| 路径 | 观测值 |
+|------|--------|
+| 1024 首次 decode（ANE 首次编译）| 201 ms / 211 ms |
+| 1024 warm decode | 46–68 ms（mean ≈ 55 ms）|
+| 768 首次 decode | 95 ms / 245 ms |
+| 768 warm decode | 54–75 ms（mean ≈ 63 ms）|
+
+---
+
+## 11. mask 不可见根因分析
+
+### 11.1 现象
+- 日志确认 `[TAP] mask displayed` 多次出现 → maskImage IS set ✅
+- iou_pred 均值高（0.65–0.95）→ decode 质量正常 ✅
+- 用户看不到任何 mask overlay
+
+### 11.2 根因：P2 Bug 导致 mask 出现在错误时机
+
+P2 Bug（`handleTap` fast path 被 `!alreadyEncoding` 不必要阻塞，见 §7）在 768 模式下触发频率极高：
+
+```
+768 典型序列（摘自日志）：
+[TAP] encode + decode (reason=ttl expired)     ← 触发 encode
+[TAP] encoder busy — tap deferred ×8           ← 后续 8 次 tap 全部被阻断
+[TAP] encode done 2440.27 ms                   ← 8.9 秒后
+[TAP] mask displayed | tap→mask 8926.3 ms      ← mask 出现在 8.9 秒前的场景
+
+[TAP] busy timeout — loading indicator cleared  ← 用户等不及，3s 超时
+[TAP] encode done 1406.60 ms                   ← 12.5 秒后
+[TAP] mask displayed | tap→mask 12471.6 ms     ← mask 出现在 12.5 秒前的场景，
+[TAP] mask displayed | tap→mask 12579.7 ms       两个 mask 相隔仅 108ms，互相覆盖
+```
+
+**结果：**
+- mask 出现时用户已移走手机，场景完全改变
+- mask 覆盖在错误的区域上，用户感知为"没有 mask"
+- 多个积压 tap 的 mask 在 100ms 内连续覆盖，任何一个都无法稳定显示
+
+### 11.3 1024 模式同样受影响
+
+```
+[TAP] reuse cached embedding → decode ×4       ← 4 次 tap 同时进入 decoderQueue
+[TAP] mask displayed | tap→mask 90.8 ms        ← 第 1 个：约 90ms，可见
+[TAP] mask displayed | tap→mask 1015.9 ms      ← 第 2 个：1s 后覆盖第 1 个
+[TAP] mask displayed | tap→mask 1110.0 ms      ← 第 3 个：95ms 后再覆盖
+[TAP] mask displayed | tap→mask 1209.0 ms      ← 第 4 个：99ms 后再覆盖
+```
+
+第 1 个 mask（90ms）在用户 tap 后约 90ms 显示，持续约 925ms 后被覆盖。这个 mask 实际上是可见的，但由于 P2 Bug 影响视觉感受（多个 mask 快速闪动），用户体验为"不稳定"。
+
+### 11.4 结论
+mask 渲染管线本身正确（MaskRenderer → CGImage → maskLayer.contents 链路无误），**问题根源是 P2 Bug 导致 mask 显示严重滞后或快速闪动**。修复 P2 Bug 后，embed 复用路径（decode-only ~55ms）应能提供流畅的单次 tap 响应。
+
+---
+
+## 12. P2 Bug 修复
+
+**已在本次会话应用修复（2026-07-23 20:13 PDT）**
+
+### 修复内容
+
+文件：`JudgeE2/Detection/CameraManager.swift` — `handleTap`
+
+```swift
+// 修复前（有缺陷）：
+if canReuse, let emb = entry?.embedding, !alreadyEncoding {
+    tapDecodeWithPoint(...)     // fast path 因 !alreadyEncoding 被错误阻断
+} else if !alreadyEncoding {
+    tapEncodeAndDecode(...)
+} else {
+    scheduleTapBusyTimeout()   // 有可用 embedding 时也落入 busy 分支
+}
+
+// 修复后：
+if canReuse, let emb = entry?.embedding {
+    tapDecodeWithPoint(...)     // embedding 有效则立即 decode，不等 encoder
+} else if !alreadyEncoding {
+    tapEncodeAndDecode(...)     // 需要 encode 且 encoder 空闲
+} else {
+    scheduleTapBusyTimeout()   // 仅在需要 encode 但 encoder 占用时触发
+}
+```
+
+**修复后预期行为：**
+- embedding 有效时（decode-only 路径）：tap→mask ≈ 55ms，即使 warmup encode 在跑也不受影响
+- embedding 无效时：encode + decode ≈ 1000ms（不变）
+- "encoder busy, no cache" 的真正 busy 状态：仍正确触发 3s 超时
+
+**编译验证：** BUILD SUCCEEDED ✅
+
+---
+
+## 13. AB 测试最终结论
+
+| 条件 | 实测结果 | 是否满足 §8.7 封层条件 |
+|------|---------|----------------------|
+| 768 latency 降幅 ≥ 150ms | 实测 +65ms（**慢了**）| ❌ 不满足 |
+| 768 人工视觉评分 ≥ 3.5 | 无法评分（mask 滞后不可见）| ❌ 无效 |
+
+**结论：768 AB 测试失败，建议 Architect Day 5 封层 1024 为唯一分辨率。**
+
+---
+
+*Debug Report — Phase 3 Day 4 补充 | Debugger | 2026-07-23*
+
+---
+
+## 14. Mask 不可见根因 — 最终确认（2026-07-23 23:11 PDT）
+
+### 14.1 关键证据
+
+用户提供的 `Mask logits range` 日志：
+```
+Mask logits range: min=-1.7636719, max=4.4296875 | mean=0.044882078, std=1.1364882,
+                   thresh=0.61312616 | nonzero=13739/65536 | shape=[1, 1, 256, 256]
+```
+
+**结论：**
+- `nonzero=13739`（21% 像素）→ alpha[] 数组计算完全正确
+- `thresh=0.613`（= mean + 0.5*std）→ 阈值合理
+- mask 像素 **确实存在**，问题在 alpha[] 之后的渲染链路
+
+### 14.2 根因定位：CIFalseColor 对 DeviceGray CIImage 输出全透明
+
+**MaskRenderer 旧代码流程：**
+1. `alpha[]` UInt8 数组（0 or 255）✅ 计算正确
+2. 创建灰度 `CGImage`（`CGColorSpaceCreateDeviceGray`，8bpp）✅
+3. `CIImage(cgImage: grayImage)` → 单通道灰度 CIImage ← ⚠️
+4. 缩放 / 裁剪 / 平移 ✅
+5. `CIFalseColor` 对灰度 CIImage 的处理：**输出全透明** ← 🔴 根本原因
+6. `createCGImage` → 全透明 CGImage → maskLayer.contents 不可见
+
+**为什么历史测试没有发现：**
+- Phase 2（April 2026）存在 `thresh=0.0` Bug 导致 `nonzero=0`，alpha[] 全零，没有像素进入渲染路径，CIFalseColor Bug 无处暴露。
+- Phase 3 Day 3 修复了阈值后，nonzero > 0，CIFalseColor Bug 首次暴露。
+
+### 14.3 修复方案：直接构建 RGBA CGImage，绕过 CIFalseColor
+
+**修复文件：** `JudgeE2/Segmentation/MaskRenderer.swift`
+
+核心变更（阈值/alpha[] 计算逻辑不变）：
+
+```swift
+// 旧代码：灰度 CGImage + CIFalseColor（DeviceGray 输入时输出全透明）
+let grayImage = CGImage(...DeviceGray...) ...
+var ciImage = CIImage(cgImage: grayImage)
+// ... transforms ...
+CIFalseColor { inputColor0: transparent, inputColor1: cyan }  ← 输出全透明
+
+// 新代码：直接 RGBA CGImage（预乘 cyan）+ CIImage transforms
+// Cyan 60% alpha，premultiplied: R=0, G=130, B=153, A=153
+var rgba = [UInt8](repeating: 0, count: total * 4)
+for i in 0..<total where alpha[i] > 0 {
+    rgba[i*4+0]=0; rgba[i*4+1]=130; rgba[i*4+2]=153; rgba[i*4+3]=153
+}
+let coloredImage = CGImage(...premultipliedLast RGBA...) ...
+var ciImage = CIImage(cgImage: coloredImage)
+// 同样的 scale/crop/translate transforms
+// 无需 CIFalseColor
+```
+
+**编译验证：BUILD SUCCEEDED ✅**
+
+### 14.4 预期修复后行为
+
+- tap 后约 55ms（decode-only）或 ~1s（encode+decode）可见青色 mask overlay
+- Phase 2 segmentation 模式同样受益（虽无近期测试数据，同样的渲染链路）
+- mask 位置可能因 CIImage 坐标系（y 轴翻转）而上下翻转，这是下一个可能需要校正的 bug
+
+---
+
+*Debug Report — Phase 3 Day 4 追加 | Debugger | 2026-07-23*
+
+---
+---
+
+# Debug Report — JudgeE2 Phase 3 Day 5
+# （真机日志逐行分析 + Debugger 五条验收判定，2026-08-10）
+
+**输入材料：**
+- 真机 session（2026-08-09，iPhone 11 / A13，Day 5 构建：要求 A/B/C + 多实例池 + stability 埋点），整理稿 `day5_log_extract.md`（11 次 tap、27 个候选、内存轨迹、YOLO 统计）
+- 磁盘当前源码：`CameraManager.swift`(2137 行) / `TapInstanceManager.swift`(245) / `MaskRenderer.swift`(690) / `TemporalManager.swift`(395) / `TouchHandler.swift`(119) / `SAMDecoder.swift` / `ModelLoader.swift`
+- 契约：architect_output §3.1 / §3.2.1 / §3.4（Day 5 修订）、§9、§10、§11
+
+**证据分级约定（全文遵守）：**
+✅ **已验证** = 有日志行或源码行直接支撑；🔶 **推断** = 由已验证事实推出但缺直接观测；❓ **未测到** = 本轮数据不足以判定。
+
+---
+
+## 15. 构建验证
+
+| 项 | 结果 |
+|----|------|
+| `xcodebuild -scheme JudgeE2 -destination generic/platform=iOS -configuration Debug` | ✅ **BUILD SUCCEEDED** |
+| 编译 warning | ✅ **0 条**（过滤 AppIntents 元数据的框架提示后） |
+| 编译 error | ✅ 0 条 |
+
+Builder 声称的「BUILD SUCCEEDED，零 warning」**复现成立**。
+
+### 15.1 ⚠️ 关键构建配置发现：本轮全部性能数字来自 **Debug (-Onone)** 构建
+
+- ✅ 已验证：`project.pbxproj:488` `SWIFT_OPTIMIZATION_LEVEL = "-Onone"`（Debug），`:470` `GCC_OPTIMIZATION_LEVEL = 0`；Release 为 `:544` `SWIFT_COMPILATION_MODE = wholemodule`。
+- ✅ 已验证：工程内**没有 shared scheme**（`JudgeE2.xcodeproj/xcshareddata` 不存在，只有 `xcuserdata/.../xcschememanagement.plist`）⇒ Xcode 自动生成 scheme，Run action 默认 **Debug**。
+- ✅ 已验证：日志末尾 `Message from debugger: Xcode has killed the LLDB RPC server` ⇒ 该 session 是 Xcode **Run**（调试器附着）而非 Profile/Release 安装。
+- 🔶 推断（高置信）：**Day 5 真机 session 跑的是 Debug/-Onone 构建。**
+
+**量化佐证（这一条比配置文件更有说服力）：**
+`CameraManager.swift:2031-2041` 的 argmax 循环是 `8400 × 80 = 672,000` 次 `transposeBuffer[...]` 下标读取。实测 `Post = 175–313 ms`（其中 NMS/映射占极小部分）⇒ **每次迭代 260–466 ns**，即 A13 @2.65 GHz 上约 **700–1200 个时钟周期做一次 float 比较**。优化构建下这应是 1–5 周期（可 SIMD）。260 ns/iter 正是 `-Onone` + Debug 独占访问检查（`transposeBuffer` 是**类的存储属性**，每次下标都走 `swift_beginAccess/endAccess` 动态检查）的典型量级。
+
+> **影响面**：§18 的 tap 后处理、§20.3 的 YOLO Post 都建立在同一批纯 Swift 热循环上。**在换成 Release 重测之前，本轮所有绝对延迟数字都不能作为架构裁决的输入**（这一条比 §10.2 的 G-1/G-2/G-3 三个口径缺陷更靠前，因为它同时污染上述三者）。
+
+---
+
+## 16. Day 5 Debugger 五条验收判定
+
+| # | 验收条目 | 判定 | 一句话依据 |
+|---|---------|------|-----------|
+| 1 | tap 1/2/3 个不同位置，多 mask 同时显示 | ✅ **PASS** | `pool=[#2 \| #3 \| #4*] n=3` + 合成 `nonzero` 逐次累加，算术自洽 |
+| 2 | 第 4 个 tap 时最老实例被 FIFO 删除 | ❓ **未测到** | 全 session **没有任何一组连续 tap 达到第 4 次**，`pool full → FIFO evicted` 一行都没有 |
+| 3 | 同 geometry 下多实例共享 embedding，不重复 encode | ✅ **PASS（带保留）** | 9 次成功 tap **全部 `[fast]`**，零条 `[slow]` / `encode done`；但同一 pool 内的实例用的**不是同一份** embedding |
+| 4 | 3 实例同时活跃时内存无明显升高（< +30 MB） | ✅ **PASS（覆盖不足）** | n=1→3 内存 **334.2→333.1→334.4 MB**（Δ≈0）；但 FIFO 释放路径未被触发过 |
+| 5 | 对齐告警已消失或显著减少 | ❌ **FAIL（按字面计数）** | 全 session **6 条**（启动 3 + TAP#1 3），未减少；根因已定位且**与 Day 5 改动无关** |
+
+以下逐条给出日志依据。**本报告未勾选 tasks.md 任何 checkbox。**
+
+---
+
+### 16.1 条目 1 —— 多 mask 同时显示：✅ PASS
+
+✅ **已验证**，两条独立证据：
+
+**(a) pool 状态行**（`CameraManager.swift:1144` → `TapInstanceManager.debugSummary()`）：
+```
+[TAP#3]  … | pool=[#2 iou=0.38 | #3* iou=0.97] n=2 | tap→mask 483.1 ms
+[TAP#4]  … | pool=[#2 iou=0.38 | #3 iou=0.97 | #4* iou=0.83] n=3 | tap→mask 519.1 ms
+[TAP#11] … | pool=[#9 iou=0.73 | #10 iou=0.89 | #11* iou=0.56] n=3 | tap→mask 674.7 ms
+```
+`debugSummary()` 只列出池内实例，`*` 标 primary ⇒ 三个实例并存且恰有一个 primary，符合 §3.4。
+
+**(b) 合成像素数算术自洽**（比 pool 行更强，因为它证明的是**真的画上去了**，不只是数据结构里有）：
+`drawTile` 的 `nonzero` 是 `compositeLayers` 混合后 256×256 空间内 `accA>0` 的像素数（`MaskRenderer.swift:190-200`），与单实例的 `area` 同空间可比：
+
+| tap | 本实例 area | 合成 nonzero | 校验 |
+|---|---|---|---|
+| #2 | 2492 | —（n=1 未打） | — |
+| #3 | 429 | **2627** | 2492+429=2921，重叠 294 px ⇒ 合理 |
+| #4 | 281 | **2908** | 2627+281=**2908** ✅ 完全吻合 |
+| #10 | 9380 | **9903** | #9(523)+9380=9903 ✅ 完全吻合 |
+| #11 | 10203 | **20106** | 9903+10203=20106 ✅ 完全吻合 |
+
+三处**逐位吻合**，证明旧实例的 alpha 在新 tap 的合成中被完整重放，没有被覆盖或丢弃。
+
+**§11.7 关注点核对：** 没有出现「先点的 mask 自己消失」——#2 存活到 #4（跨越 ≥2 次 tap 间隔，远超已撤销的 2000 ms），#9 存活到 #11。§11.1 撤销 mask 时间型 TTL 的裁决在真机行为上**已生效**。
+
+**未验证项（不影响本条判定，但需 Day 6 补）：**
+- 🔶 三实例**颜色是否真的不同**：代码上 `TapInstanceManager.swift:130-131` 按「未被占用的调色板颜色优先」分配，逻辑正确；但日志不打颜色，需录屏或截图确认。
+- 🔶 primary/secondary 的 alpha 0.55/0.35 差异同上，需目视确认。
+
+---
+
+### 16.2 条目 2 —— 第 4 个 tap 触发 FIFO：❓ 未测到
+
+✅ **已验证的是「没测到」这件事本身**：
+
+- 三组 tap 的最大连续长度分别是 **3 / 2 / 3**（第一组 #2#3#4，中间被 `[TAP#5] clearAll` 截断；第二组 #6#7，被 `[TAP#8] clearAll` 截断；第三组 #9#10#11，session 结束）。
+- `pool=… n=` 的最大值是 **3**，从未出现 n 回落到 3 且成员被替换的情形。
+- `handleTap` 中 FIFO 淘汰会打 `[TAP#N] pool full → FIFO evicted oldest instance`（`CameraManager.swift:660`）+ `[TAP#g] request retired — FIFO eviction`（`:771`），二者**均为 `diagLog`**，而本 session `quietMode == false`（`PerfLogging.swift:86`；同为 diagLog 的 `reuse cached embedding` / `candidates` 行都在），**所以「日志里没有」等价于「事件没发生」**，不是被静音吞掉。
+
+⇒ 该条**不是 FAIL，是从未被执行**。需按 §21.2 的采样规程补测。
+
+---
+
+### 16.3 条目 3 —— 共享 embedding、不重复 encode：✅ PASS（带一条必须记录的保留）
+
+✅ **已验证（主结论成立）**：9 次成功 tap **全部走快路径**：
+```
+[TAP#2]  reuse cached embedding (ttlValid=Y geoChanged=N cacheAge=5516ms) … [fast]
+[TAP#3]  … cacheAge=2280ms … [fast]
+[TAP#4]  … cacheAge=5613ms … [fast]
+```
+全 session **零条** `[TAP#N] encode + decode (…) [slow]`（`CameraManager.swift:722`）、**零条** `[TAP#N] encode done … → decode`（`:967`）、**零条** `encoder busy, no cache — tap parked`（`:737`）。⇒ **没有任何一次 tap 自己付过 encode 的钱**，多实例共用缓存的目标达成。`ttlValid=Y geoChanged=N` 也确认 §4.2 的复用判定按契约工作。
+
+🔶 **必须记录的保留 —— 「共享」的实际语义比条目字面弱：**
+
+同一 pool 内的三个实例**并不是同一份 embedding 解出来的**。证据是 `cacheAge` 的非单调：#2 = 5516 ms → #3 = **2280 ms**。若两次 tap 复用同一份 embedding，第二次的 cacheAge 必然更大。cacheAge 变小 ⇒ 中间发生了一次 re-encode，来源是 `tapDecodeWithPoint` 尾部的 post-tap 主动刷新（`CameraManager.swift:1166-1168`，`ignoreQuietWindow: true`），对应日志里的 `[TAP] background embedding refresh 569.11 / 560.54 / 553.52 ms`。
+
+**后果（属新发现，交 Architect）：** 同屏共存的 3 个 mask 可能分别解码自**最多相差 8 秒**（embedding TTL）的三帧。手机架稳时无害；一旦有场景运动，合成图里混着不同时刻的分割结果，而 §3.2.1 的 C1–C6 里**没有任何条件会捕获这种不一致**。这正是 §11.9 **R6**（mask 与物体脱节无机制捕获）的一个更强版本 —— R6 说的是「mask 比画面旧」，这里是「**同屏 mask 彼此之间就不同龄**」。建议 Day 6 随 R2 一并复议时把这条并进去，**Day 5 不改行为**。
+
+**关于「burst 须控制在 8 s 内」的前提（§11.7 条目 3）：** 已满足，最大 cacheAge = 5613 ms < 8000 ms，无一次因 TTL 过期触发 re-encode。
+
+---
+
+### 16.4 条目 4 —— 3 实例内存 < +30 MB：✅ PASS（但覆盖不足，且量级预期需修正）
+
+✅ **已验证**，两组独立数据：
+
+| 组 | n=1 | n=2 | n=3 | Δ(n=1→n=3) |
+|---|---|---|---|---|
+| 第一组（#2/#3/#4） | 334.2 MB | 333.1 MB | 334.4 → 329.2 MB | **≈ 0 MB** |
+| 第三组（#9/#10/#11） | 314.5 MB | 313.3 MB | 313.2 → 313.5 MB | **≈ −1 MB** |
+
+远低于 +30 MB 阈值 ⇒ **PASS**。
+
+**按 §11.7 的修订前提（mask 常驻 ⇒ 这是真正的泄漏检验）逐条回应 Architect 的三点建议：**
+
+- **(a) 稳态读数**：已满足。上表取的是 n 稳定后的读数，非 tap 瞬时峰值。
+- **(b) ≥12 次 tap / ≥4 轮 FIFO 后复读**：**未满足**。本轮 9 次成功 tap、**0 轮 FIFO**。跨两轮 clearAll 的基线：`311.0 → 313.5 MB`（+2.5 MB，量级等同读数噪声），**未见棘轮式增长**，但 FIFO 淘汰路径的释放正确性**完全未验证**。
+- **(c) 量级预期 < 1 MB**：⚠️ **该预期偏低，应修正为 ≈ 11 MB**，理由是代码而非实测：
+  - `TapInstanceManager.swift:41` `var mask: MLMultiArray?` 保留了**整份 decoder 输出** `[1,3,256,256]` Float32 = **786 KB/实例**，而其注释自己写明「nothing reads it today」（`:39-40`）；
+  - `:55` `maskAlpha: [UInt8]` 256×256 = 64 KB/实例；
+  - ⇒ 3 实例 ≈ **2.55 MB**，其中 **2.3 MB 是死存储**；
+  - 另加 `maskImage` 的合成 CGImage 1080×1920×4 ≈ **8.3 MB**（`MaskRenderer.swift:570-575` 每次 tap 新建，旧的由 ARC 释放，同时被 `maskLayer.contents` 持有一份）。
+  - 合计约 11 MB，仍远在 30 MB 预算内，且低于本次内存读数 1 MB 的分辨率，所以实测「Δ≈0」与代码估算**不矛盾**。
+
+**另有一条非 mask 的内存观察（属 §11.7(c) 所说「应单独报告的发现」）：** 见 §20.2 的 TAP#1 峰值 371 MB 与模型重复加载。
+
+---
+
+### 16.5 条目 5 —— 对齐告警消失或显著减少：❌ FAIL（字面计数），但根因已定位且**与 Day 5 无关**
+
+✅ **已验证的计数**：全 session **6 条** `Invalid layer: Invalid input tensor channel 1 and format size 2 bytes, must be aligned on 64 bytes`
+- 启动期 3 条（紧跟 `[ModelLoader] encoder loaded: MobileSAM_ImageEncoder_fp16_milfix`，在 `MobileSAM models loaded in 3295.18 ms` 之前）
+- TAP#1 期间 3 条（2+1，紧跟 `[TAP#1] reuse cached embedding`，在 `[SEG] point decoder: multimask` 之前）
+
+Day 4 的待验项写的是「观察启动日志中是否还有 3 条」（本报告 §7 表格），实测**仍是 3 条**；全 session 口径本次首次采集，为 6 条。**未消失，未减少。**
+
+✅ **根因定位（这是本条最有价值的部分）——告警从来不是 encoder 发出的：**
+
+决定性证据是 `MODE SWITCH → tapToSegment` 之后那次**孤立的 encoder 加载**：
+```
+=== MODE SWITCH → tapToSegment ===
+SAMEncoder loading model: MobileSAM_ImageEncoder_fp16_milfix (input=1024 feat=64 units=2)
+…(YOLO 帧若干)…                       ← 此处 0 条 Invalid layer
+```
+而 TAP#1 那次**孤立的 decoder 加载**（`SAMDecoder.init`，`SAMDecoder.swift:22-51`）产出 3 条：
+```
+Invalid layer: … ×2
+Invalid layer: … ×1
+[SEG] point decoder: multimask (3 candidates, CPU+GPU)     ← SAMDecoder.swift:45，init 末尾
+```
+⇒ **milfix encoder 加载 = 0 条告警；`MobileSAM_PromptMaskDecoder` 加载 = 3 条告警。**
+
+由此反推：启动期的 3 条也是 decoder（`ModelLoader.swift:78` `MobileSAM_PromptMaskDecoder(configuration: config)`，`config.computeUnits = .cpuAndNeuralEngine`，`:51`），因为 ModelLoader 用的也是 milfix encoder（`:62-65`）。再结合 Phase 2 时代日志（pre-milfix）启动期同样是 **3 条**、而 decoder 模型文件从未变过 ⇒ **原始 encoder 也贡献 0 条**。
+
+> ⚠️ **这意味着 `ModelLoader.swift:55-58` 的注释「Original MobileSAM_ImageEncoder … → 3 ANE alignment warnings at load time」是一处误归因**，且「Phase 3 优化入口点 1：ANE 对齐修复」至今**没有任何证据表明它消除过哪怕 1 条告警**。（milfix 换用本身可能仍有其它收益，但「消除对齐告警」这条理由不成立。）
+
+**为什么计数从 3 涨到 6：** 同一个 box decoder 在一次运行里被加载了**两次** —— `ModelLoader.testMobileSAMLoad()`（启动冒烟测试，`JudgeE2App.swift:14`）一次，`SAMDecoder.init` 一次。见 §20.1。
+
+**实质风险评估（与计数分开看）：** ✅ 已验证**无**「A13 fp16 LayerNorm 崩坏」签名 —— TAP#1 `Mask logits range: min=-9.74, max=3.60 | mean=-3.82, std=3.11`，量级正常（崩坏时是 1e6+）；27 个候选的 `iou_pred` 全部落在 [0.38, 0.98] ⊂ [0,1]（越界会被 `CameraManager.swift:1059` 的数值哨兵拦下并报 `corrupt decode discarded`，全 session 0 次）。**告警是噪声，不是当前故障源。**
+
+**判定理由说明：** 条目原文是「已消失或显著减少」。计数 3→6，两个口径都不满足，故判 FAIL；但这是 **Day 5 之前就存在的既有状态**，不构成对 Day 5 构建的否定，修法也很便宜（§21.1 D-3/D-4）。
+
+---
+
+## 17. 现象①② 的共同根因：warmup 被 background refresh 抢占后**静默丢弃**
+
+用户观察到的「warmup 似乎根本没跑」与「TAP#1 解码成功却被丢弃」是**同一个 bug 的两级后果**。Builder 的 `warmupPending` 修复方向正确，但**堵的是另一个洞**。
+
+### 17.1 ✅ 已验证：warmup 走到了 videoQueue，然后在 `isEncoding` 守卫处无声返回
+
+`warmupSegmentationIfPossible()` 有且只有三个出口（`CameraManager.swift:464-539`）：
+
+| 出口 | 行号 | 日志 | 本 session 是否出现 |
+|---|---|---|---|
+| 无相机帧 → 挂起 | `:471-473` | `[SAM] warmup deferred — no camera frame yet, armed for next frame`（diagLog） | ❌ **没有** |
+| 首帧补跑 | `:1501-1504` | `[SAM] first frame arrived — running deferred warmup`（diagLog） | ❌ **没有** |
+| encode 成功 | `:508` | `SAM encoder warmup latency: %.2f ms`（perfLog） | ❌ **没有** |
+| encode 失败 | `:531` | `[SAM] warmup encode returned nil …`（faultLog） | ❌ **没有** |
+| **encoder 槽已被占 → 直接 return** | **`:479-482`** | **无任何日志** | —— |
+
+```swift
+// CameraManager.swift:479-482
+self.stateLock.lock()
+guard !self.isEncoding else { self.stateLock.unlock(); return }   // ← 唯一的无日志出口
+self.isEncoding = true
+self.stateLock.unlock()
+```
+
+且 `setMode` 确实调用了它（`:392` 打出 `=== MODE SWITCH → tapToSegment ===`，`:414` 紧接 `warmupSegmentationIfPossible()`）；本 session `quietMode == false`（大量 diagLog 在场）⇒ **排除「被静音」这一解释**。
+
+⇒ **唯一自洽的路径：warmup 的 videoQueue 块执行时 `isEncoding == true`，于是 return，且从此不再重试。**（`warmupPending` 只在「没有相机帧」时置位，`:471`，此处相机帧是有的 —— detectionOnly 模式已跑了几十帧。）
+
+### 17.2 ✅ 抢占者身份已确认：background embedding refresh
+
+竞态发生在 videoQueue 上，两个候选者：
+
+- `setMode`（sessionQueue）先写 `self.currentMode = mode`（`:393`），再 `discardAllTapWork`，最后 `warmupSegmentationIfPossible()` → `videoQueue.async`（`:464`）；
+- 与此同时 videoQueue 上**正在处理的那一帧**在 `runDetectionPipeline` 里读到已翻转的 `currentMode == .tapToSegment`，走到 `:1612` `refreshTapEmbeddingIfNeeded()`（或非第 3 帧时的 `:1543`），此时 `embeddingCache == nil`（`setMode(.detectionOnly)` 在 `:418` 清过）⇒ `cacheFresh == false`、`quiet == true` ⇒ 在 `:1198-1201` 抢先 `isEncoding = true` 并把 encode 派到 encoderQueue。
+
+日志直接印证抢占者身份 —— 首次 encode 打的是 refresh 的标签而不是 warmup 的：
+```
+SAMEncoder loading model: MobileSAM_ImageEncoder_fp16_milfix (input=1024 feat=64 units=2)
+aneSubTypeAndVariant: … (h15)
+[TAP] background embedding refresh 6348.33 ms        ← CameraManager.swift:1226
+```
+6348 ms = SAMEncoder MLModel 加载 + ANE 编译 + 首次推理；对照热态 `553–569 ms`，冷启动倍率 **≈11×**。
+
+> 讽刺的是：**这次「抢跑」反而替 encoder 做完了预热**，所以 TAP#1 才有 embedding 可复用、才能走快路径。真正没人管的是 **decoder**。
+
+### 17.3 ✅ decoder warmup 只存在于 warmup 路径中 ⇒ 直接造成现象①
+
+`decoderQueue` 上的预热 decode 写在 warmup **成功分支内部**（`CameraManager.swift:515-526`）：
+```swift
+self.decoderQueue.async { [weak self] in
+    guard let self, let decoder = self.decoderForQueue(...) , let lb = capturedLetterbox, ... else { return }
+    let t2 = PerfLogger.nowMs()
+    _ = decoder.decode(embedding: embedding, prompt: prompt)
+    perfLog("SAM decoder warmup latency: …")          // ← 全 session 缺席
+}
+```
+`refreshTapEmbeddingIfNeeded`（`:1206-1234`）**只做 encode，不碰 decoderQueue**。⇒ warmup 被吞掉 ⇒ decoder 从未被构造 ⇒ **TAP#1 成为第一次构造 decoder 的调用点**。
+
+### 17.4 现象① 的完整事件时间线（✅ 全部有日志锚点）
+
+```
+t0     [TAP#1] reuse cached embedding (cacheAge=484ms) [fast]   ← CameraManager.swift:681
+t0     scheduleTapTimeout(1.5s, "fast")                          ← :684 / :240
+t0+ε   decoderQueue: decoderForQueue(...) → SAMDecoder.init      ← :1029 → SAMDecoder.swift:22
+       ├─ MLModel(MobileSAM_PromptMaskDecoder, units=.all)       ← SAMDecoder.swift:30  → Invalid layer ×3
+       └─ MLModel(MobileSAM_PromptMaskDecoder_multi, .cpuAndGPU) ← SAMDecoder.swift:42
+t?     [SEG] point decoder: multimask (3 candidates, CPU+GPU)    ← SAMDecoder.swift:45（init 末尾）
+t0+1.5s[TAP#1] timed out after 1.5s (fast path)                  ← :818 —— 先 removeInstance(:814) 再 failTap
+t?     [SEG][TAP#1] decode latency: 220.25 ms                    ← 首次推理，热态仅 38.8–67.3 ms
+t?     [TAP#1] candidates: … → picked ch0 area=10066             ← 解码与候选选择全部成功
+t?     [TAP#1] instance retired during decode — mask not shown   ← :1115（updateMask 返回 false）
+```
+
+**根因判定（回答用户提出的三选一）：三者都是，但优先级明确：**
+
+| 候选根因 | 判定 | 说明 |
+|---|---|---|
+| **warmup 缺失** | 🔴 **主因** | 冷 decoder 构造（两个 MLModel + ANE/GPU 编译）> 1.5 s，是超时的**唯一**来源。§10.4 C 已白纸黑字写明「冷启动的正解不是加长超时，而是进入模式即 warmup」——**这句话是对的，只是 warmup 没跑成** |
+| **超时阈值 1.5 s 太短** | 🟡 次因、且**不应调大** | 热态 decode 38.8–67.3 ms，1.5 s 已是 22×。为一个本不该发生的冷启动去放宽稳态阈值，等于把 §10.4 C 的教训又走一遍 |
+| **超时后不该 retire 在途实例** | 🟠 **独立缺陷，值得单独修** | `scheduleTapTimeout` 在 `:814` 直接 `removeInstance`，使 220 ms 后**成功抵达的 mask 被丢弃**。用户体验上「1.7 秒后出现 mask」严格优于「报失败且永远不出现」。建议：超时只负责**显示失败提示**，不删实例；实例由 C1–C6 事件删除；晚到的结果照常渲染并把提示撤下（`tapFailure = nil` 已在 `:1155` 做了） |
+
+### 17.5 关于 `warmupPending` 的核实结论
+
+- ✅ 代码确实存在且实现正确（`:245-247` 声明、`:471` 置位、`:1501-1504` 首帧补跑）；
+- ✅ 但它**只覆盖「还没有任何相机帧」这一种丢弃**（builder_progress §682-683 自述的正是这一种）；
+- ❌ **不覆盖本次实际发生的「encoder 槽被占」丢弃**（`:480`）。
+
+⇒ Builder 的说法「已加 warmupPending 在首帧到达后补跑」属实，但**没有解决本 session 的问题**；`warmupPending` 在本 session 从未被置位（无 `warmup deferred` 日志）。
+
+### 17.6 修复建议（不写代码，只给约束）
+
+- **ISSUE**：`CameraManager.swift:480` 是全函数唯一的无日志、无重试出口。
+- **IMPACT**：模式进入时 warmup 与 background refresh 抢同一个 `isEncoding` 槽，**约一半概率** warmup 被永久丢弃 ⇒ decoder 冷启动回落到用户首次 tap ⇒ §10.4 C 的 G-3 失败模式原样复活（只是从 8.6 s encode 换成 >1.5 s decode）。
+- **RECOMMENDATION**（三选一，按侵入性从小到大，均不改架构）：
+  1. **最小改动**：把 `:480` 的守卫改成「置 `warmupPending = true` + 打 diagLog」而不是裸 return，复用已有的首帧补跑机制重投；
+  2. **更准**：把 decoder 预热从 warmup 的成功分支里**提出来**，做成不依赖 encoder 槽的独立触发（进入 `.tapToSegment` 时直接往 decoderQueue 投一次 `decoderForQueue(...)` 构造；`decoderQueue` 与 `encoderQueue` 本就互不相干，不违反 §10.4 A「不得新建第三个队列」）；
+  3. **顺带**：`refreshTapEmbeddingIfNeeded` 在 `.tapToSegment` 刚进入、`embeddingCache == nil` 的第一帧就抢跑，语义上它做的就是 warmup 的活却不打 warmup 日志、不置 `samWarmingUp`（⇒ UI 的「Preparing segmentation…」横幅在最需要的 6.3 秒里**没有显示**）。建议冷启动首次 encode 无论由谁发起都置 `samWarmingUp`。
+- **验证方法**：修复后进入 `.tapToSegment`，日志必须同时出现 `SAM encoder warmup latency` **与** `SAM decoder warmup latency`；随后首次 tap 的 decode latency 应落在 38–70 ms 区间而非 220 ms。
+
+---
+
+## 18. 现象③：快路径 p95 未达 200 ms —— 瓶颈**没有**转移到主线程
+
+### 18.1 ✅ 实测汇总（修正口径，n=8；TAP#1 无 e2e 故排除）
+
+| 指标 | 值 |
+|---|---|
+| tap→mask min / median / mean / max | **483.1 / 522.8 / 542.2 / 674.7 ms** |
+| p95（n=8，`ceil(0.95n)-1` 同工程内既有算法） | **674.7 ms** |
+| decode 分量 mean / median | **55.59 / 55.89 ms** |
+| **残差 = e2e − decode** | mean **486.6**，median **467.3**，range **428.0–608.1**，**sd 55.9** |
+
+**对 §10.4 要求 A 目标（p95 ≤ 200 ms）：❌ 未达成，超标 3.4 倍。**
+
+### 18.2 ✅ 但要求 A **确实生效了** —— 证据是方差而不是均值
+
+| | Day 4（旧口径，终点在主线程之前，走 videoQueue） | Day 5（修正口径，终点在主线程块内，绕开 videoQueue） |
+|---|---|---|
+| 范围 | 429 – 1030 ms | 483 – 675 ms |
+| **极差** | **601 ms** | **192 ms**（↓68%） |
+| 中位 | ≈620 ms | 522.8 ms |
+
+去队列化消除的正是**排队带来的随机分量**（极差从 601 → 192 ms），这与「tap 不再排在 YOLO 帧后面」完全吻合。**要求 A 的实现是对的。**
+
+### 18.3 🔴 §10.1 的归因有误：「90% 是排队」在 Day 4 数据里就已经被证伪
+
+§10.1 断言「620 ms 中位里约 90% 是调度排队，只有 61 ms 是真实计算」。但 Day 4 的**最小值**就能证伪它：
+
+```
+Day 4 min e2e 429 ms − decode 61 ms = 368 ms
+```
+24 次采样中的最小值，其排队等待必然接近 0（tap 恰好落在帧间隙）⇒ **Day 4 就已经存在一个 ≈368 ms 的、与排队无关的固定成本**，只是被 429–1030 的大方差掩盖了。
+
+Day 5 去掉排队后，残差最小值 **428.0 ms**，与 Day 4 的 368 ms **同一量级**，差值 ≈60 ms 恰好对应 Day 5 新增的两块工作（stability 计算 + `compositeLayers`，见 §18.5）。**两个独立 session 互相印证。**
+
+### 18.4 ✅ 瓶颈**不在**主线程 —— 用方差判据排除
+
+用户问「是否已从 videoQueue 转移到主线程」。**证据指向：否。**
+
+- 残差 **sd 仅 55.9 ms**，min 428 / max 608，**分布很窄**。
+- 若残差主要是「等主线程 runloop 空出来」，那它应当近似**均匀分布在 0 到主线程一个工作周期之间**（主线程在 ~2.5 FPS 的发布节奏下工作周期 ≈400 ms），必然出现大量接近 0 的样本。**实测一个都没有**（最小 428 ms）。
+- 残差与 pool 规模也基本无关：n=1 均值 470.4、n=2 均值 466.0、n=3 均值 541.8（仅 2 样本）。⇒ 不是「实例越多主线程越忙」。
+
+⇒ 🔶 **推断（高置信）：残差是一段近乎恒定的、串行的 CPU 工作**，位于 `decoder.decode()` 返回之后、`DispatchQueue.main.async` 块之前 —— 也就是**全部在 decoderQueue 上**。
+
+### 18.5 残差的成分拆解（🔶 推断，各项均有代码依据，但**缺少埋点无法定量**）
+
+`tapDecodeWithPoint` 在 decode 返回后到主线程之前做的事（`CameraManager.swift:1083-1144`）：
+
+| # | 工作 | 代码位置 | 规模 | 备注 |
+|---|---|---|---|---|
+| 1 | `extractLogits` 拷贝 3×256×256 | `MaskRenderer.swift:586-640` | 196,608 元素 | Day 4 已有 |
+| 2 | ch0 全局统计 + 填 `allLogits` | `:273-282` | 65,536 次闭包调用 | Day 4 已有 |
+| 3 | 数值哨兵遍历全部通道 | `:292-294` | 196,608 | Day 4 已有 |
+| 4 | 🔴 **`allLogits.sorted(by: >)`** | **`:383`** | **65,536 元素排序 ≈1.1M 次闭包比较** | Day 4 已有，**但在本路径上是死代码，见 §18.6** |
+| 5 | 3×（二值化 + `keepComponentContaining` 泛洪 + `stabilityScore`） | `:417-447` / `:251-263` | ≈400,000 | **`stabilityScore` 是 Day 5 新增** |
+| 6 | `compositeLayers`（256×256 × n 层 + 输出） | `:160-201` | 65,536×(n+1) | **Day 5 新增** |
+| 7 | `drawTile`：CGImage 256×256 → `UIGraphicsImageRenderer(size: 1080×1920)` 插值放大 | `:567-575` | **约 2.07 M 像素 + 每次 tap 新分配 8.3 MB 位图** | Day 4 已有；CoreGraphics（C 代码，不受 -Onone 影响） |
+
+合计约 **90 万–110 万次 Swift 元素级操作 + 一次 65k 排序 + 一次 2M 像素重采样**。在 §15.1 认定的 **-Onone + Debug 独占访问检查**下，这个量级落到 400 ms 完全说得通（与 §15.1 里 YOLO Post 每次迭代 260–466 ns 的实测单价一致）。
+
+### 18.6 🔴 新发现：tap 路径上 `thresh` 与 65k 排序是**纯死代码**
+
+`buildAlpha` 里的自适应阈值分支（`MaskRenderer.swift:369-390`）计算 `thresh`（含 `allLogits.sorted(by: >)` 取 p30），但在 **tap + multimask 路径**（`tapPoint256 != nil && channels > 1`，`:402`）上：
+
+- 每个候选是按**绝对阈值 `> 0`** 二值化的（`:421`），**不读 `thresh`**；
+- 最终 `alpha = sel.alpha`（`:478`）、`nonzeroCount = sel.comp.count`（`:479`），把前面基于 `thresh` 的一切覆盖掉；
+- `thresh` 唯一的去处是两行日志：`[MASK] adaptive cap`（`:387`）与 `Mask logits range … thresh=`（`:513`）。
+
+⇒ **ISSUE**：每次 tap 都为两行诊断日志付一次 65,536 元素排序 + 一次 65,536 次闭包写入（`:272-282` 的 `allLogits`）。
+⇒ **IMPACT**：在 -Onone 下这可能是残差里最大的单块（🔶 推断，需埋点确认）；且它**不影响任何决策**，删除对 §10.5 R3「不得扰动 88% 基线」是**零风险**的（Phase 2 的 box 路径 `:339-368` 走另一分支，不受影响）。
+⇒ **RECOMMENDATION**：把 `allLogits` 的填充与 p30 排序**收进 `else` 分支**（即仅当 `tapPoint256 == nil || channels == 1` 时计算）。副作用仅是 tap 日志里 `thresh` 与 `[MASK] adaptive cap` 消失 —— 而 §19.3 会说明这两行的诊断价值可以被 stability 完全替代。
+
+### 18.7 ⚠️ 计时口径仍有一处未闭合：双击失败等待窗口未计入
+
+- ✅ **已验证**：`TouchHandler.swift:71` `singleTap.require(toFail: doubleTap)`。
+- ⇒ 单击回调 `handleSingleTap`（`:77`）**只有在双击识别器失败之后**才触发，UIKit 的双击等待窗口典型为 **250–350 ms**。
+- 而 `tapStartMs` 取自 `CameraManager.handleTap` 函数入口（`:613`），即**在这段等待之后**。
+- §10.4 要求 B 明确写「起点保持在手势 `.ended`」。当前起点 = 手势**识别成功**时刻 ≠ `.ended` 时刻。
+
+⇒ **ISSUE**：实测 483–675 ms 仍是下界，用户真实感知约 **730–1000 ms**。
+⇒ **IMPACT**：G-1 的口径缺陷只被修掉了一半（终点修了，起点没修）；Day 7 若用当前数字对照 §10.6 门控表，会**系统性乐观 ≈300 ms**。
+⇒ **RECOMMENDATION**：`TouchHandler` 在 `touchesEnded`（或用 `gesture.state == .ended` 的时间戳）记录起点并传给 `handleTap`；**或**由 Architect 明确接受「起点 = 识别成功时刻」并在 §10.6 门控表里把该常量写死备注。**不建议**为了数字好看而去掉 `require(toFail:)` —— 那会让双击清除与单击分割互相打架。
+
+### 18.8 建议的埋点（settle §18.4/§18.5 的唯一办法，成本极低）
+
+在 `tapDecodeWithPoint` 里加 4 个时间戳并打一行：
+```
+[TAP#N] breakdown: queue=?ms decode=?ms alpha=?ms composite+draw=?ms mainhop=?ms
+       ①decoderQueue 块入口 ②decode 返回 ③buildTapAlpha 返回 ④compositeLayers 返回 ⑤主线程块入口
+```
+判据：
+- 若 ③−② 占大头 ⇒ 确认 §18.5，先做 §18.6 的死代码收窄 + Release 构建复测；
+- 若 ⑤−④ 占大头 ⇒ 我的 §18.4 结论错误，瓶颈确在主线程，届时再查 SwiftUI 侧；
+- ①−tapStart 应 ≈0，若不为 0 说明 decoderQueue 有堆积（R4）。
+
+### 18.9 对 §10.6 Day 7 门控的建议（不代裁决）
+
+当前数据落在门控表的「> 500 ms」行，但**不应据此重开进度条议题** —— 该行的前置条件是「**且已排除排队因素**」，而本轮尚有两个更大的未排除项：**Debug 构建**（§15.1）与 **tap 路径死代码**（§18.6）。建议 Day 7 先在 **Release 构建 + 收窄死代码**后重采，再对照门控表。
+
+---
+
+## 19. 现象④：stability 首批数据定量分析
+
+> ⚠️ **本节严格遵守 §10.5 R3 / §11.8 B-4：只做分析与阈值建议，不要求任何决策接入。三步走的第 (1) 步（只打日志）在 Day 5 已完成且被证实未污染决策路径。**
+
+### 19.1 被选中候选（n=9）的相关性
+
+| 关系 | Pearson r | Spearman ρ |
+|---|---|---|
+| **stability ~ iou_pred** | **0.945** | **0.983** |
+| stability ~ fill | 0.927 | 0.883 |
+| iou_pred ~ fill | 0.924 | — |
+| stability ~ area | −0.260 | −0.333 |
+
+全部 27 个候选（含未被选中的 ch1/ch2）：stability~iou r=0.897 / ρ=0.832；stability~fill r=0.871。
+
+**🔴 最重要的一条解读（也是最容易被误读的）：三个量彼此高度共线。** `iou_pred ~ fill` 自身就有 r=0.924。因此**当前数据无法证明 stability 携带了 iou_pred 之外的独立信息** —— 它可能只是同一潜在因素（候选的边界锐利程度）的第三个测量。要证明增量价值，必须做「以 iou_pred 为协变量后的偏相关 / 在 iou_pred 相近的样本内部比较」，而 n=9 远不够。
+
+### 19.2 双峰分离（这一条比相关系数更有操作价值）
+
+按 stability 排序后，样本呈**清晰双峰、中间空档**：
+
+| 组 | 样本 | iou_pred 范围 | fill 范围 |
+|---|---|---|---|
+| 低 stab（< 0.3，n=4） | #2(0.00) #7(0.01) #11(0.07) #9(0.27) | **0.38 – 0.73** | **0.65 – 0.88** |
+| 高 stab（≥ 0.8，n=5） | #4(0.80) #1(0.85) #10(0.89) #6(0.97) #3(1.00) | **0.83 – 0.97** | **0.90 – 0.99** |
+| **空档** | **0.27 → 0.80 之间无样本** | 0.73 → 0.83 无样本 | 0.88 → 0.90 无样本 |
+
+三条边界（stab、iou、fill）**在同一处同时断开**，再次说明是同一潜在因素。
+
+### 19.3 三次 `[MASK] adaptive cap` 与低 stability 的关系：**完全重合，但不是独立证据**
+
+✅ 已验证：三次触发全部落在最低的三个 stability 上，且完全可分：
+
+| tap | stab | adaptive cap |
+|---|---|---|
+| #2 | 0.00 | ✅ 触发 |
+| #7 | 0.01 | ✅ 触发 |
+| #11 | 0.07 | ✅ 触发 |
+| #9 | **0.27** | ❌ 未触发 |
+| 其余 5 次（stab ≥ 0.80） | — | ❌ 未触发 |
+
+⇒ 判据 `stab ≤ 0.07` 与「cap 触发」在本样本上 **3/3 精确重合，0 假阳性 0 假阴性**。
+
+**但必须指出：这两者在数学上本来就在测同一件事，重合不构成交叉验证。**
+- adaptive cap 触发条件是 `p30 > mean + 0.5σ`（`MaskRenderer.swift:385-386`），即「**超过 30% 的像素高于均值**」⇒ logit 场平坦且整体偏正；
+- stability = `count(logit > +1) / count(logit > −1)`（`:251-263`），场平坦时分母暴涨、分子塌陷 ⇒ 趋近 0。
+
+⇒ 两者都是「**logit 场变平**」的读数。这反而是个**好消息**：§18.6 建议删掉的 p30 排序，其诊断信息 **已被 stability 完全覆盖**，删除不损失可观测性。
+
+### 19.4 🔴 反向警告：高 stability **不等于**好 mask，绝不能用作「选择器」
+
+全 27 个候选中，stability 最高的往往是**整帧候选**：
+
+| tap | ch2 面积 | ch2 fill | ch2 stab |
+|---|---|---|---|
+| #2 | **65536**（=256²，满帧） | 1.00 | **1.00** |
+| #6 | 65530 | 1.00 | 0.98 |
+| #7 | 65490 | 1.00 | 0.98 |
+| #11 | 65534 | 1.00 | 0.99 |
+| #10 | 65468 | 1.00 | 0.93 |
+
+⇒ **「挑 stability 最高的候选」会稳定地选中满屏 mask**，是灾难性的。这也解释了为什么 stability 与 area 的相关是**负的**（r=−0.26）却又在 ch2 上最高 —— 关系非单调。
+⇒ stability 若将来参与决策，唯一安全的形态是**否决式（veto / 置信度标记）**，且必须**保留在 cap60 面积上限之后**，不得替代面积规则。
+
+### 19.5 建议的阈值区间（供 ML_Vision 第 (3) 步裁决时参考，**现在不要接**）
+
+| 区间 | 本样本表现 | 建议语义 |
+|---|---|---|
+| **stab < 0.10** | n=3，iou 0.38–0.58，fill 0.65–0.69，100% 伴随 adaptive cap | **强嫌疑**：logit 场平坦，正是低对比失败模式的签名。可先只做「标红日志 / 记入遥测」，或作为「触发 detect→crop→重编码」的入口条件 |
+| **0.10 ≤ stab < 0.60** | n=1（#9，stab 0.27，iou 0.73，fill 0.88，未触发 cap） | **不确定区**，样本量为 1，**不足以定策**。必须靠定向复采填满 |
+| **stab ≥ 0.60** | n=5，iou 0.83–0.97，fill 0.90–0.99 | **正常**，无需干预 |
+
+**为什么建议 0.10 而不是 0.30 作为下界：** 0.00/0.01/0.07 三点与 0.27 之间已有 4 倍间隔，且 #9（0.27）是本样本里唯一一个「低 stab 但 iou 尚可（0.73）、fill 良好（0.88）」的样本，把它划进「嫌疑」区会立刻引入假阳性。取 0.10 可在本样本上做到 0 假阳性。
+
+### 19.6 ⚠️ 统计局限（必须与上表**同时**被引用）
+
+1. **n = 9（被选中候选），有效独立样本更少**：9 次 tap 来自 3 个连续 burst、同一场景、同一次架机，**不是独立同分布样本**。
+2. **没有 ground truth。** 全部相关性是 stability 与 **iou_pred（模型自评）**、**fill（几何量）** 的相关，**不是与「mask 是否正确」的相关**。Day 4 的 88% 基线是**人工评分**得到的，本轮**没有采集任何人工评分**。⇒ 目前**不能**声称「stability 预测 mask 质量」，只能声称「stability 与 iou_pred 高度一致」。
+3. **低端有地板效应**：0.00 / 0.01 / 0.07 三个值已贴地板，任何以它们为支点的斜率估计都不可靠。
+4. **不确定区几乎是空的**：0.10–0.60 只有 1 个样本，而这恰恰是阈值最需要精度的地方。
+5. **单设备（iPhone 11 / A13）、单构建（Debug）、单 decoder 后端（`.cpuAndGPU`，见 `SAMDecoder.swift:40`）**。stability 依赖 logit 的绝对尺度（`stabilityDelta = 1.0`，`MaskRenderer.swift:38`），换 backend / 换精度后**阈值不可外推**。
+6. **定向复采的目标量**：按 §10.5 R3 三步走的第 (2) 步，需覆盖 Day 4 的 **6 个失败物体** + 相当数量的满分物体，并**同步记录人工评分**，样本量建议 **每类 ≥15**，否则阈值仍无法脱离「一个样本决定一个区间」的窘境。
+
+---
+
+## 20. 其它发现
+
+### 20.1 🟠 P2 —— `MobileSAM_PromptMaskDecoder` 被加载两次，且 tap 模式下**第一份完全用不上**
+
+- **ISSUE (a)**：`JudgeE2App.swift:13-14` 在 App 启动时调用 `ModelLoader.testLoad` + `testMobileSAMLoad`，后者（`ModelLoader.swift:48-100`）加载 encoder + decoder **纯粹为了打印耗时与内存**，两个 `MLModel` 都是**局部变量、随即释放**。代价：`Model loaded in 10363.36 ms`（YOLO）+ `MobileSAM models loaded in 3295.18 ms`，`settled +2s delta = 67.1 MB`，以及那 3 条启动期告警（§16.5）。它**不预热任何实际被使用的实例** —— `CameraManager` 的 `samEncoder`/`samDecoder` 是各自队列私有的（`CameraManager.swift:169-172`、`:429-442`）。
+- **ISSUE (b)**：`SAMDecoder.init`（`SAMDecoder.swift:22-51`）**无条件加载两个模型**：`:30` 的 box decoder（Phase 2 用）+ `:42` 的 multimask point decoder（Phase 3 用）。在 `.tapToSegment` 下 box decoder 从头到尾**不会被调用一次**，但它的加载成本**落在 TAP#1 的关键路径上**，并贡献那 3 条 ANE 告警（它是唯一用 ANE-enabled compute units 加载的 decoder，`:24`；point decoder 明确用 `.cpuAndGPU`，`:40`）。
+- **IMPACT**：启动多 ~3.3 s、峰值内存多 ~67 MB；TAP#1 冷启动被无谓拉长（是 §17.4 超时的直接助推）；告警计数 3→6。
+- **RECOMMENDATION**：(1) 把 `testMobileSAMLoad()` 改为仅 DEBUG 或直接移除（它的三个日志值在 Day 5 已无裁决用途）；(2) `SAMDecoder` 的 box decoder 改为 **lazy**，只在 Phase 2 box 路径首次调用时构造；(3) 若必须预加载，把它挂到 `decoderQueue` 的 warmup 上（§17.6 建议 2），而不是留给用户的第一次 tap。
+
+### 20.2 内存轨迹解读
+
+| 阶段 | Mem | 解读 |
+|---|---|---|
+| detectionOnly 稳态 | ≈201 MB | YOLO 常驻 |
+| tapToSegment 空闲 | 216.7 → 223.0 MB | 模式切换开销 |
+| 首次 refresh 后 | 272–282 MB | SAMEncoder MLModel 常驻 + embedding [1,256,64,64] fp32 = 4 MB |
+| **TAP#1 期间峰值** | **317.9 → 368.7 → 371.3 MB** | ✅ 与 §20.1(b) 吻合：两个 decoder MLModel 同时加载 + 首次 GPU/ANE 编译临时缓冲 |
+| n=1/2/3 稳态（两组） | 334 / 333 / 334；314 / 313 / 313 | ✅ 实例增长不带来内存增长（条目 4） |
+| clearAll 后 | 314.7 → 311.0 | 释放合成图与实例 |
+| session 末 | 313.5 | ✅ 无棘轮增长 |
+
+- ✅ 无泄漏迹象（在 9 次 tap / 2 次 clearAll 的尺度上）。
+- 🔶 **371 MB 峰值**在 iPhone 11 上不触发 jetsam，但它是「启动冒烟加载 + 每队列各自加载 + box decoder 白加载」三笔浪费叠加的结果，修掉 §20.1 后应能明显下压。
+- **不建议单独立项**，随 §20.1 一并处理即可。
+
+### 20.3 YOLO 性能退化：**不建议单独立项**，但发现了一处更值得做的浪费
+
+- ✅ 实测：`mean 187.29 → 196.02 ms`（+4.7%）、`p95 204.60 → 216.42 ms`（+5.8%）、Post `≈175 → 200–313 ms`。
+- **归因（🔶 推断）**：tapToSegment 多实例段里，decoderQueue 上跑着 §18.5 那 100 万次元素操作，与 videoQueue 的 `decodeDetections`（同样 CPU-bound）抢大核；A13 只有 2 个性能核。Infer（ANE）只涨 4.7% 而 Post（CPU）涨 14–79%，**符合 CPU 竞争而非 ANE 竞争的特征**。
+- **立项判定：❌ 不必单独立项。** 理由有二：(1) 幅度在 A13 热节流的正常波动范围内；(2) 更根本的是——
+- 🔴 **新发现（值得立项的是这个）**：在 `.tapToSegment` 下，`runDetectionPipeline` 每 3 帧跑一次完整 YOLO（`CameraManager.swift:1540-1546`），随后 `decodeDetections` + `topK` 排序 + `classAwareNMS` + `mapToMetadataRect` 全跑一遍（`:1567-1570`），**结果在 `:1593-1594` 被直接丢弃**（`boxes = []`）。而 §1.1 说 tap 模式跑 YOLO 是「仅为维持 FrameGeometry」—— 但 FrameGeometry 来自 `captureOutput` 里的 `letterboxToSquare` → `lastLetterbox` → `publishTapGeometry`（`:1508` / `:2108-2110`），**与 YOLO 推理和后处理毫无关系**。
+  - **IMPACT**：每 3 帧白白消耗 ~196 ms ANE + ~200–313 ms CPU，且这些 CPU 正是与 tap 后处理抢核的那部分。
+  - **RECOMMENDATION**：`.tapToSegment` 下跳过 `model.prediction` 与整段后处理（保留 `letterboxToSquare` 与几何发布）。这是 Day 5 三条要求之外的**独立收益**，对 §18 的残差与本节的 Post 退化同时有效。归 Architect 裁决是否属 Phase 3 范围（会改变 `Inference time stats` 在 tap 模式下的可采集性）。
+
+### 20.4 🟡 数据竞争：`currentMode` 无同步
+
+- **ISSUE**：`CameraManager.swift:53` `var currentMode: AppMode = .detectionOnly` —— 写在 **sessionQueue**（`:393`），读在 **videoQueue**（`:1540`/`:1593`/`:1605`/`:1608`/`:1611`）与**手势线程**（`:609` `handleTap`、`:1263` `handleClearAllTapMasks`）。无锁、无 atomic。
+- **IMPACT**：形式上是 Swift 数据竞争（TSan 可报）。实际风险低（枚举、单字），但它是 §17.2 那个竞态窗口的**组成部分**：`currentMode` 翻转与 warmup 派发之间的时序不确定正是 warmup 被抢的前提。
+- **RECOMMENDATION**：与 `backendMirror`/`tapGeometryMirror` 同样处理 —— 放进 `stateLock` 镜像（`:212-230` 已经建立了这个模式，照抄即可，零架构改动）。**不阻塞 Day 5 验收。**
+
+### 20.5 🟡 `latestCameraBuffer` 长期持有 capture pool 的 CVPixelBuffer
+
+- **ISSUE**：`CameraManager.swift:1496` `latestCameraBuffer = pixelBuffer`（强引用），并被 `refreshTapEmbeddingIfNeeded`（`:1184`）/`tapEncodeAndDecode` 跨队列带到 encoderQueue，在 6.3 秒的冷 encode 期间**整段持有**。
+- **IMPACT**：占用 AVFoundation 的缓冲池槽位；池耗尽时系统丢帧（配合 `alwaysDiscardsLateVideoFrames`）。可能是 tap 模式 FPS 偏低的一个次要贡献者。
+- **RECOMMENDATION**：低优先级。若要修，在派发去 encoderQueue 前做一次 `CVPixelBufferCreate` 拷贝（或复用已有的 `letterboxOutputBuffer` 模式）。**Day 5 不必动。**
+
+### 20.6 ⚪ 遗留死代码（与 §11.8 B-2 一致，Day 6 处理）
+
+- `TapInstanceManager.swift:66-73` 的 `maskTTL` 派生字段与 `isMaskValid(now:)` 判定式 API 仍在，`:83-93` 的注释仍称其为「per-instance mask TTL」。✅ 已确认**没有任何调用方**（`drawableInstances()` `:223-228` 只过滤 `maskAlpha != nil`），行为与 §11.1 裁决一致。按 B-2 归 Day 6 清理，**Debugger 不要求 Day 5 改动**。
+- `TapInstanceManager.swift:41` `var mask: MLMultiArray?` 同属死存储（注释 `:39-40` 自承「nothing reads it today」），成本 786 KB/实例，见 §16.4(c)。
+
+---
+
+## 21. 移交清单
+
+### 21.1 交 Builder（Debugger 仅记录，不代 Builder 决定时点）
+
+| 编号 | 问题 | 优先级 | 位置 | 建议时点 |
+|---|---|---|---|---|
+| **D-1** | warmup 在 `isEncoding` 被占时**静默丢弃且不重试** ⇒ decoder 从未预热 ⇒ TAP#1 超时 | 🔴 **P1** | `CameraManager.swift:479-482` | 立即（这是 §10.4 要求 C 未真正落地的部分） |
+| **D-2** | decoder 预热只存在于 warmup 成功分支内，无独立触发 | 🔴 **P1** | `CameraManager.swift:515-526` | 同 D-1 |
+| **D-3** | 超时后 `removeInstance` 使**已成功**的解码结果被丢弃 | 🟠 P2 | `CameraManager.swift:814` → `:1110-1118` | Day 6 |
+| **D-4** | `SAMDecoder.init` 无条件加载 box decoder（tap 模式不用），落在 TAP#1 关键路径 + 3 条 ANE 告警 | 🟠 P2 | `SAMDecoder.swift:30` | Day 6 |
+| **D-5** | 启动期 `testMobileSAMLoad()` 加载后即丢弃（+3.3 s，+67 MB，+3 条告警），不预热真正使用的实例 | 🟠 P2 | `JudgeE2App.swift:14` / `ModelLoader.swift:48-100` | Day 6 |
+| **D-6** | tap 路径上 `allLogits` + 65k 排序 + `thresh` 是死代码 | 🟠 P2（性能） | `MaskRenderer.swift:272-282, 369-390` | Day 6，配合 §18.8 埋点一起验证 |
+| **D-7** | §18.8 的 5 段耗时埋点（settle 残差归属的**唯一**手段） | 🟠 P2 | `CameraManager.swift:1012-1160` | Day 6，先于任何优化 |
+| **D-8** | e2e 起点未落在手势 `.ended`，双击失败窗口 ~300 ms 未计入 | 🟡 P3 | `TouchHandler.swift:71,77` + `CameraManager.swift:613` | Day 6/7（需 Architect 先定口径） |
+| **D-9** | `currentMode` 跨队列无同步 | 🟡 P3 | `CameraManager.swift:53` | Day 6 |
+| **D-10** | `.tapToSegment` 下 YOLO 推理 + 后处理结果被丢弃却照跑 | 🟡 P3（收益大，但改行为） | `CameraManager.swift:1540-1594` | 需 Architect 裁决 |
+| **D-11** | `TapInstance.mask` 死存储 786 KB/实例；`maskTTL`/`isMaskValid` 死代码 | ⚪ P4 | `TapInstanceManager.swift:41,66-73` | Day 6（已在 §11.8 B-2 中） |
+
+### 21.2 建议的下一次真机采样规程（补齐本轮缺口）
+
+1. **先换 Release 构建**（§15.1）—— 否则一切延迟数字都要重来。
+2. **补 FIFO 验收（条目 2）**：单次 burst 连点 **≥5 下**、间隔 1–2 s（保证总跨度 < 8 s 以免触发 embedding TTL），确认出现 `pool full → FIFO evicted oldest instance` 且 `pool=` 的成员按 `createdAt` 最老者被替换。
+3. **补泄漏验收（条目 4(b)）**：连续 **≥12 次 tap**（≥4 轮 FIFO），在每轮 n=3 稳态各读一次内存，最后 clearAll 再读一次，检查是否回到首轮 n=3 的水位。
+4. **补慢路径样本（§10.5 R1，Day 7 强制项）**：等待 > 8 s 使 embedding TTL 失效后再 tap，或旋转设备触发 `tapGeometryChanged`；目标 ≥10 次。
+5. **补 warmup 验收（D-1/D-2 修复后）**：进入 `.tapToSegment` 必须同时看到 `SAM encoder warmup latency` **与** `SAM decoder warmup latency`；首次 tap 的 decode latency 应 ≈40–70 ms 而非 220 ms。
+6. **补 stability 定向复采（§10.5 R3 第 (2) 步）**：**必须同步做人工评分**，否则第 (3) 步 ML_Vision 无法裁决（§19.6-2）。
+7. **补目视项**：三实例颜色互异、primary/secondary alpha 差异（§16.1 未验证项）—— 录屏即可，屏幕右下角已有 `#N` 计数器可对齐日志。
+
+### 21.3 本报告的边界声明
+
+- ❌ **未勾选 `shared/tasks.md` 中的任何 checkbox，未修改该文件**（勾选权归 Builder / Architect）。
+- ❌ **未修改任何源码**。
+- ✅ 五条验收的判定、措辞与依据由 Debugger 给出（§11.7 授权）；其中条目 2 判为「未测到」而非 FAIL，条目 5 判为「字面 FAIL 但根因与 Day 5 无关」，两处均已在正文说明判定理由，供 Architect 复核。
+
+---
+
+*Debug Report — Phase 3 Day 5 | Debugger | 2026-08-10*

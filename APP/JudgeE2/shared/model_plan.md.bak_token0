@@ -1,0 +1,311 @@
+# Model Plan — Phase 3, Day 1 (ML_Vision)
+
+> 承接 `shared_v2/model_plan.md`（Phase 1–2 基线）。Phase 3 Day 1 新增内容见下。
+> 上游引用：`models/MobileSAM_PromptMaskDecoder.mlpackage`、`models/MobileSAM_ImageEncoder.mlpackage`（Phase 2 已验证）
+
+---
+
+## Phase 3 Day 1 — 任务 A：SAM 点提示格式（Point Prompt I/O 规范）
+
+### A.1 Decoder 完整 I/O（实测确认）
+
+| Tensor | Shape | dtype |
+|--------|-------|-------|
+| `image_embeddings` | `[1, 256, 64, 64]` | Float16 |
+| `point_coords` | **`[1, 2, 2]`** | Float16 |
+| `point_labels` | **`[1, 2]`** | Float16 |
+| `mask_input` | `[1, 1, 256, 256]` | Float16 |
+| `has_mask_input` | `[1]` | Float16 |
+| ← `low_res_masks` | `[1, 1, 256, 256]` | Float16 |
+| ← `iou_predictions` | `[1, 1]` | Float16 |
+
+> **关键修正**：Architect spec §5.3 预测 `point_coords` 可能为 `[1,1,2]`，实测为 **`[1,2,2]`**（固定 2 点）。Builder 在实现 `PointPromptBuilder` 时必须构造 2 点张量，不得使用 `[1,1,2]`。
+
+---
+
+### A.2 Phase 3 单次前景点 Tap 的 Prompt 构造
+
+模型 `point_coords` 形状固定为 **[1, 2, 2]**，Phase 3 单点 Tap 需要 **2 点输入**（前景点 + padding）：
+
+```
+point_coords[0] = [[tap_x_in_SAM_space, tap_y_in_SAM_space],
+                   [0.0,                0.0               ]]   ← padding
+point_labels[0] = [1.0,   ← foreground
+                   -1.0]  ← padding（SAM 约定）
+```
+
+**SAM 空间坐标定义**：
+- 输入坐标来自 `PointPromptBuilder.buildPointPrompt(canonicalPoint:origSize:inputSize:)`
+- 变换：ResizeLongestSide(inputSize=1024) + centered pad → SAM pixel space (0 ~ 1023)
+- `point_coords` tensor 填入 **SAM 像素坐标（0~1023）**，**不得预先 ÷ 1024**
+- 模型内部 `_embed_points` 执行归一化：`(point_coords + 0.5) / 1024.0`
+
+---
+
+### A.3 点标签语义（模型支持的全部 label 值）
+
+| label 值 | 语义 |
+|---------|------|
+| `0.0` | 背景点（background） |
+| `1.0` | **前景点（foreground）— Phase 3 使用** |
+| `2.0` | 框左上角（SAM box convention，Phase 2 使用） |
+| `3.0` | 框右下角（SAM box convention，Phase 2 使用） |
+| `-1.0` | **Padding / 忽略点 — Phase 3 第 2 点使用** |
+
+**Trace 兼容性确认**：模型使用张量比较操作（`point_labels == i`，`point_labels != -1`）而非 Python if/else 分支。因此 trace 时使用 `[2.0, 3.0]` 的版本，对 Phase 3 的 `[1.0, -1.0]` 输入完全有效，无需重新 trace/re-export Decoder。
+
+---
+
+### A.4 Multi-mask Output 确认
+
+- Decoder 输出：单一最优 mask（`low_res_masks: [1, 1, 256, 256]`），非多候选
+- 导出时 `_select_mask()` 固定选择内部 3 个候选 mask 的 index 0
+- `iou_predictions: [1, 1]` 为该 mask 的 IoU 质量分
+- Phase 3 直接使用此单 mask 输出即可，无需多候选选择逻辑
+
+**Phase 3 输出质量判断**：
+- `iou_pred > 0.5`：合理的前景分割
+- `iou_pred < 0.1`：质量极差，显示 fallback 状态（不添加无效 mask）
+- 阈值可根据实测结果调整
+
+---
+
+### A.5 Phase 2 Box Prompt 与 Phase 3 Point Prompt 对比
+
+| 项目 | Phase 2（Box） | Phase 3（Point） |
+|------|---------------|-----------------|
+| `point_coords` | `[[x1,y1],[x2,y2]]`，框两对角坐标 | `[[x,y],[0,0]]`，前景点 + padding |
+| `point_labels` | `[2.0, 3.0]` | `[1.0, -1.0]` |
+| `mask_input` | 全零 `[1,1,256,256]` | 全零 `[1,1,256,256]`（相同） |
+| `has_mask_input` | `[0.0]` | `[0.0]`（相同） |
+| Decoder 方法 | `decode(embedding:prompt:)` | `decode(embedding:pointPrompt:)`（新增重载） |
+
+---
+
+### A.6 Builder PointPromptBuilder Swift 参考实现
+
+```swift
+// Interaction/PointPromptBuilder.swift
+// point_coords shape: [1, 2, 2]（固定，不可为 [1,1,2]）
+
+struct PointPromptBuilder {
+    struct PointPrompt {
+        let pointCoords: MLMultiArray    // [1, 2, 2] Float32
+        let pointLabels: MLMultiArray    // [1, 2]   Float32
+        let maskInput: MLMultiArray      // [1, 1, 256, 256] Float32（全零）
+        let hasMaskInput: MLMultiArray   // [1] Float32（值 0.0）
+    }
+
+    static func buildPointPrompt(
+        canonicalPoint: CGPoint,
+        origSize: CGSize,
+        inputSize: Int = 1024
+    ) -> PointPrompt? {
+        // 1. ResizeLongestSide(inputSize) 变换
+        let scale = Float(inputSize) / Float(max(origSize.width, origSize.height))
+        var samX = Float(canonicalPoint.x) * scale
+        var samY = Float(canonicalPoint.y) * scale
+        // 2. clamp 到 [0, inputSize-1]
+        samX = max(0, min(samX, Float(inputSize - 1)))
+        samY = max(0, min(samY, Float(inputSize - 1)))
+
+        // 3. 构造 point_coords [1, 2, 2]
+        guard let coords = try? MLMultiArray(shape: [1, 2, 2], dataType: .float32),
+              let labels = try? MLMultiArray(shape: [1, 2], dataType: .float32),
+              let maskIn = try? MLMultiArray(shape: [1, 1, 256, 256], dataType: .float32),
+              let hasMask = try? MLMultiArray(shape: [1], dataType: .float32)
+        else { return nil }
+
+        // 前景点
+        coords[[0, 0, 0] as [NSNumber]] = NSNumber(value: samX)
+        coords[[0, 0, 1] as [NSNumber]] = NSNumber(value: samY)
+        // Padding 点
+        coords[[0, 1, 0] as [NSNumber]] = 0.0
+        coords[[0, 1, 1] as [NSNumber]] = 0.0
+
+        labels[[0, 0] as [NSNumber]] = 1.0   // foreground
+        labels[[0, 1] as [NSNumber]] = -1.0  // padding
+
+        // mask_input / has_mask_input 均为零
+        for i in 0..<maskIn.count { maskIn[i] = 0.0 }
+        hasMask[0] = 0.0
+
+        return PointPrompt(pointCoords: coords, pointLabels: labels,
+                           maskInput: maskIn, hasMaskInput: hasMask)
+    }
+}
+```
+
+> ⚠️ **注意**：`samX/samY` 的单位是 SAM 像素坐标（0~1023），模型内部再 ÷ 1024。上面的实现仅做 ResizeLongestSide，未包含 centered padding。若图像非正方形，还需加上 padding offset。详见 Phase 2 `PromptBuilder.buildBoxPrompt` 中的 padding 计算逻辑，`PointPromptBuilder` 必须使用相同变换。
+
+---
+
+## Phase 3 Day 1 — 任务 B：ANE 对齐告警修复方案
+
+### B.1 告警根因（精确定位）
+
+**告警信息**：`Invalid input tensor channel 1 ... must be aligned on 64 bytes`
+
+**根因**：MobileSAM Encoder neck 中的 `LayerNorm2d` 实现（SAM 原生）对 channel 维度求均值：
+
+```python
+# mobile_sam/modeling/image_encoder.py — LayerNorm2d.forward
+u = x.mean(1, keepdim=True)          # [1, 256, 64, 64] → [1, 1, 64, 64]
+s = (x - u).pow(2).mean(1, keepdim=True)  # [1, 1, 64, 64]
+```
+
+产生 4 个 `[1, 1, 64, 64]` Float16 中间张量：
+- `u_1_cast_fp16` / `s_1_cast_fp16`（第一个 LayerNorm2d 的均值/方差）
+- `u_cast_fp16` / `s_cast_fp16`（第二个 LayerNorm2d 的均值/方差）
+
+**ANE Float16 对齐要求**：iPhone 11 A13 ANE 要求 `channel × sizeof(Float16) = C × 2` 字节必须是 64 字节的倍数，即 C 必须是 32 的倍数。C=1 仅 2 bytes，不满足 → ANE 拒绝调度 → 回退 CPU。
+
+**影响范围**：这 4 个 reduce_mean 操作（以及其下游 sub/div/mul 操作）均回退 CPU，是 encoder 延迟偏高（857ms 均值）的重要原因之一。
+
+**明确排除**：3-channel RGB 输入（`[1, 3, 1024, 1024]`）并非告警根因。第一个 conv 将 3 通道立即扩展为 32 通道（`[1, 32, 512, 512]`），满足对齐要求。
+
+---
+
+### B.2 修复方案（已执行）
+
+**方案选择：Float32 重导出（Option A，立即有效）**
+
+已生成修复模型：
+```
+models/MobileSAM_ImageEncoder_fp32.mlpackage   (28.0 MB，Float32 全精度)
+models/MobileSAM_ImageEncoder.mlpackage        (14.1 MB，原始 Float16，保留不删)
+```
+
+导出脚本：`shared/export_encoder_fp32_ane_fix.py`
+
+**修复效果验证（Python 端静态分析）**：
+- 原始（Float16）：658 个 `_fp16` 命名 op，含 4 个 `[1,1,64,64]` Float16 reduce_mean 张量
+- 修复后（Float32）：0 个 `_fp16` 命名 op，`reduce_mean` 输出仍为 `[1,1,64,64]` 但现在是 **Float32**，不触发 ANE Float16 对齐检查
+
+**I/O 接口不变**：
+- Input: `image: [1, 3, 1024, 1024]`（Float32 输入，与 Swift 代码兼容）
+- Output: `image_embeddings: [1, 256, 64, 64]`
+- 权重来自同一 `mobile_sam.pt` checkpoint，功能等价，无精度损失
+
+---
+
+### B.3 Builder 集成指令（Day 2 执行）
+
+1. 在 Xcode 项目中，删除 `MobileSAM_ImageEncoder.mlpackage` 的引用
+2. 拖入 `MobileSAM_ImageEncoder_fp32.mlpackage`（勾选 target membership）
+3. 更新 Swift 中模型加载代码（文件名变更）：
+   ```swift
+   // 旧
+   let config = MLModelConfiguration()
+   let encoder = try MobileSAM_ImageEncoder(configuration: config)
+   // 新
+   let encoder = try MobileSAM_ImageEncoder_fp32(configuration: config)
+   ```
+4. Clean Build（⌘⇧K）→ 重新 Build
+5. 真机运行，观察 console：
+   - ✅ 预期：`Invalid input tensor channel 1 ... aligned on 64 bytes` 警告**消失**
+   - ✅ 预期：encoder 延迟较 Phase 2 的 857ms 有所下降（需 Debugger Day 7 实测）
+
+---
+
+### B.4 Option B（备选优化路径，Phase 3 Day 3 后评估）
+
+若 Float32 encoder 延迟改善不足（如仍 > 600ms），可考虑：
+
+**MIL PassPipeline 融合 LayerNorm**：使用 coremltools MIL 将 4 个 reduce_mean + 下游 sub/div/mul 融合为单一 `layer_norm` MIL op。融合后的 `layer_norm` op 不暴露 C=1 中间张量给 ANE 调度器，可保留 Float16 精度同时消除告警。
+
+脚本占位符：`shared/export_encoder_fp16_milfix.py`（未来编写，需 coremltools MIL pass 经验）
+
+---
+
+## Deliverable 确认（Phase 3 Day 1 ML_Vision）
+
+- [x] **SAM 点提示 I/O 规范**：`point_coords [1,2,2]` / `point_labels [1,2]` 已确认
+- [x] **单点前景 Tap Prompt 构造**：`[1.0, -1.0]` 标签 + padding 点 `[0,0]`，SAM 空间坐标（0~1023）
+- [x] **Multi-mask 确认**：单一 mask 输出（`iou_predictions [1,1]`），Phase 3 直接使用
+- [x] **ANE 告警根因**：LayerNorm2d neck 的 C=1 Float16 reduce_mean 中间张量
+- [x] **修复模型已生成**：`MobileSAM_ImageEncoder_fp32.mlpackage`（同 I/O 接口，功能等价）
+- [x] **Builder 集成指令**：见 §B.3，Day 2 替换模型后验证告警消除
+
+---
+
+*Phase 3 Day 1 ML_Vision 完成。可进入 Day 2（Builder：TouchHandler + ANE 修复模型集成）。*
+
+---
+
+## Phase 3 Day 3 — 任务：降编码分辨率评估（优化入口点 2）
+
+> 完整报告：`shared/resolution_eval_report.md`  
+> 原始数据：`shared/resolution_eval_results.json`  
+> 评估脚本：`shared/eval_resolution.py`
+
+### C.1 架构可行性确认
+
+**TinyViT-5M 支持降分辨率运行，方案可行，但需 runtime 补丁。**
+
+原始代码 `tiny_vit_sam.py` line 611 硬编码 `x.view(B, 64, 64, C)`，对非 1024 输入直接崩溃。  
+修复方式：将 `64` 改为动态值 `self.img_size // 16`：
+
+```python
+feat_size = self.img_size // 16   # 1024→64, 768→48, 512→32
+x = x.view(B, feat_size, feat_size, C)
+```
+
+**权重兼容性**：所有 attention_biases 依赖 `window_size`（固定），不依赖 `input_resolution`。  
+全量权重可无损迁移至 768/512 架构（0 missing keys / 0 unexpected keys）。
+
+### C.2 延迟预测（iPhone 11 CoreML ANE）
+
+| 分辨率 | Mac CPU mean | 相对比例 | iPhone 11 预测均值 | 加速倍数 |
+|--------|-------------|---------|------------------|--------|
+| 1024×1024 | 867 ms | 1.000 | 857 ms（实测基准） | ×1.00 |
+| 768×768 | 562 ms | 0.648 | **~555 ms** | **×1.54** |
+| 512×512 | 265 ms | 0.305 | **~261 ms** | **×3.28** |
+
+预测方法：Mac 相对比例法（保守），锚定 Phase 2 Debugger milfix fp16 实测 857ms。  
+理论面积法预测 768→482ms、512→214ms，实际值预计在两者之间。
+
+### C.3 Mask 精度评估（zero-shot，4 图×5 点=20 样本）
+
+| 分辨率 | IoU vs 1024 (mean) | IoU vs 1024 (median) | iou_pred mean |
+|--------|--------------------|---------------------|---------------|
+| 1024×1024 | 1.000 | 1.000 | 0.848 |
+| 768×768 | **0.581** | 0.613 | 0.781 |
+| 512×512 | **0.592** | 0.632 | 0.774 |
+
+> ⚠️ **重要**：当前精度为 zero-shot（纯权重迁移，无 fine-tuning）。  
+> 若对目标分辨率做 1–2 epoch fine-tuning，IoU 预计从 0.58 提升至 0.80+。
+
+### C.4 关键 Bug：点坐标归一化
+
+SAM Decoder 固定以 `(1024, 1024)` 归一化点坐标。使用非 1024 Encoder 时，  
+点坐标**必须在传入 Decoder 前换算至 1024 空间**：
+
+```swift
+// 不论 encoderInputSize=768 还是 512，坐标始终以 1024 归一化
+let scale = 1024.0 / Float(max(origW, origH))
+let samX = canonicalPoint.x * scale
+let samY = canonicalPoint.y * scale
+```
+
+若直接传入 768 空间坐标（未换算），将导致 mask 完全错位（IoU≈0），此 Bug 已在评估阶段发现并修复。
+
+### C.5 CoreML 导出规格（若 Architect 批准）
+
+**768 导出方案**：
+1. 修改 `export_encoder_fp16_milfix.py`：`dummy_trace = torch.randn(1, 3, 768, 768)` + monkeypatch `forward_features`
+2. 输出：`models/MobileSAM_ImageEncoder_fp16_milfix_768.mlpackage`（~14 MB，权重相同）
+3. Swift 适配：Encoder 输出 `[1, 256, 48, 48]` → 双线性上采样 → `[1, 256, 64, 64]` → Decoder
+4. `PointPromptBuilder` 保持 1024 归一化（见 C.4），无需修改 Decoder
+
+预计导出时间：< 10 分钟。
+
+### C.6 ML_Vision 推荐
+
+- **768×768**：⚠️ 条件接受 — 加速 ×1.54，zero-shot IoU=0.581（待 Architect 裁决精度阈值）
+- **512×512**：❌ 暂不推荐 — zero-shot 精度不足，需 fine-tuning 后再考虑
+- **保守选项**：1024 保持不变，Phase 3 专注 Tap UX；降分辨率列入 Phase 4
+
+---
+
+*Phase 3 Day 3 ML_Vision 完成（2026-07-22）。等待 Architect Day 4 裁决降分辨率方案。*

@@ -1,0 +1,95 @@
+{
+  "mac_times": {
+    "1024": {
+      "mean": 866.9550835620612,
+      "p95": 965.6552918255328,
+      "min": 809.5683748833835,
+      "max": 1010.1604168303311
+    },
+    "768": {
+      "mean": 561.4588020835072,
+      "p95": 735.6884498847647,
+      "min": 505.79125015065074,
+      "max": 840.7539580948651
+    },
+    "512": {
+      "mean": 264.45095316739753,
+      "p95": 294.63311878498644,
+      "min": 249.86749980598688,
+      "max": 307.8781249932945
+    }
+  },
+  "iphone11_proj": {
+    "1024": {
+      "mac_ratio": 1.0,
+      "quad_ratio": 1.0,
+      "proj_mean_ms": 857.0,
+      "proj_p95_ms": 933.0,
+      "quad_mean_ms": 857.0
+    },
+    "768": {
+      "mac_ratio": 0.648,
+      "quad_ratio": 0.562,
+      "proj_mean_ms": 555.0,
+      "proj_p95_ms": 604.2,
+      "quad_mean_ms": 482.1
+    },
+    "512": {
+      "mac_ratio": 0.305,
+      "quad_ratio": 0.25,
+      "proj_mean_ms": 261.4,
+      "proj_p95_ms": 284.6,
+      "quad_mean_ms": 214.2
+    }
+  },
+  "quality_results": {
+    "good1.PNG": {
+      "768": {
+        "iou_vs_1024": 0.0,
+        "iou_pred_1024": 0.824,
+        "iou_pred_res": 0.664,
+        "mask_pixels_1024": 8319,
+        "mask_pixels_res": 1186
+      },
+      "512": {
+        "iou_vs_1024": 0.0,
+        "iou_pred_1024": 0.824,
+        "iou_pred_res": 0.716,
+        "mask_pixels_1024": 8319,
+        "mask_pixels_res": 1050
+      }
+    },
+    "good2.PNG": {
+      "768": {
+        "iou_vs_1024": 0.0,
+        "iou_pred_1024": 0.948,
+        "iou_pred_res": 0.697,
+        "mask_pixels_1024": 1947,
+        "mask_pixels_res": 1397
+      },
+      "512": {
+        "iou_vs_1024": 0.0,
+        "iou_pred_1024": 0.948,
+        "iou_pred_res": 0.85,
+        "mask_pixels_1024": 1947,
+        "mask_pixels_res": 1413
+      }
+    }
+  },
+  "quality_summary": {
+    "768": {
+      "mean_iou": 0.0,
+      "min_iou": 0.0,
+      "n_images": 2
+    },
+    "512": {
+      "mean_iou": 0.0,
+      "min_iou": 0.0,
+      "n_images": 2
+    }
+  },
+  "baseline": {
+    "mean": 857.0,
+    "p95": 933.0
+  }
+}

@@ -1,0 +1,777 @@
+CoreML computeUnits = MLComputeUnits(rawValue: 2)
+Model input: image image 640x640
+Model loaded in 12957.67 ms
+[ModelLoader] encoder loaded: MobileSAM_ImageEncoder_fp16_milfix
+Invalid layer: Invalid input tensor channel 1 and format size 2 bytes, must be aligned on 64 bytes
+Invalid layer: Invalid input tensor channel 1 and format size 2 bytes, must be aligned on 64 bytes
+Invalid layer: Invalid input tensor channel 1 and format size 2 bytes, must be aligned on 64 bytes
+CoreML computeUnits = MLComputeUnits(rawValue: 3)
+MobileSAM models loaded in 3245.88 ms
+MobileSAM load memory: before=52.1 MB | afterEncoder=650.2 MB | afterDecoder=568.0 MB
+MobileSAM load delta: encoder=598.0 MB | decoder=-82.1 MB | total=515.9 MB
+Model input: image shape=[1, 3, 1024, 1024] dtype=MLMultiArrayDataType(rawValue: 65568)
+Model input: has_mask_input shape=[1] dtype=MLMultiArrayDataType(rawValue: 65568)
+Model input: image_embeddings shape=[1, 256, 64, 64] dtype=MLMultiArrayDataType(rawValue: 65568)
+Model input: mask_input shape=[1, 1, 256, 256] dtype=MLMultiArrayDataType(rawValue: 65568)
+Model input: point_coords shape=[1, 2, 2] dtype=MLMultiArrayDataType(rawValue: 65568)
+Model input: point_labels shape=[1, 2] dtype=MLMultiArrayDataType(rawValue: 65568)
+Reading from public effective user settings.
+<<<< FigXPCUtilities >>>> signalled err=-17281 at <>:308
+<<<< FigCaptureSourceRemote >>>> Fig assert: "err == 0 " at bail (FigCaptureSourceRemote.m:569) - (err=-17281)
+[DBG] preview bounds=(414.0, 896.0), gravity=AVLayerVideoGravity(_rawValue: AVLayerVideoGravityResizeAspectFill)
+CoreML computeUnits = MLComputeUnits(rawValue: 2)
+Model input: image image 640x640
+MobileSAM load memory (settled +2s): 172.3 MB | delta=120.2 MB
+Output var_3019 shape=[1, 84, 8400]
+Output var_3022 shape=[1, 84, 8400]
+CoreML computeUnits = MLComputeUnits(rawValue: 2)
+Model input: image image 640x640
+=== MODE SWITCH → detectionOnly ===
+Frame inference time: 230.65 ms | raw_in_boxes: 8400 | topK: 10 | final_detections: 1
+det[0]: class=68 score=0.621 box=[307.6, 370.5, 480.6, 445.4]
+Pre=38.59ms | Infer=230.65ms | Post=399.67ms | Total=668.91ms | FPS=1.49 | Mem=257.7 MB
+[DBG] device rotation updated: 90
+[DBG] device rotation updated: 90
+Frame inference time: 260.39 ms | raw_in_boxes: 8400 | topK: 10 | final_detections: 2
+det[0]: class=72 score=0.707 box=[194.8, 335.4, 263.5, 473.8]
+det[1]: class=68 score=0.708 box=[361.7, 329.2, 408.9, 357.1]
+Pre=3.21ms | Infer=260.39ms | Post=249.18ms | Total=512.77ms | FPS=1.95 | Mem=200.1 MB
+FPS: 2.06 | Memory: 200.1 MB
+=== MODE SWITCH → segmentation ===
+Frame inference time: 215.13 ms | raw_in_boxes: 8400 | topK: 10 | final_detections: 3
+det[0]: class=68 score=0.707 box=[361.1, 329.5, 409.8, 357.2]
+det[1]: class=68 score=0.705 box=[197.2, 299.9, 265.7, 337.6]
+det[2]: class=72 score=0.708 box=[194.6, 334.1, 264.1, 474.1]
+[SEG] invalidate embedding+mask: primary changed
+[DET] primary box orig=163.9,1002.4,372.3,1422.2 score=0.708 class=72
+[DET] letterbox scale=0.3333 padX=140.00 padY=0.00
+Pre=2.29ms | Infer=215.13ms | Post=230.93ms | Total=448.35ms | FPS=2.23 | Mem=201.2 MB
+SAMEncoder loading model: MobileSAM_ImageEncoder_fp16_milfix (input=1024 feat=64 units=2)
+Frame inference time: 261.85 ms | raw_in_boxes: 8400 | topK: 10 | final_detections: 2
+det[0]: class=72 score=0.706 box=[194.8, 335.1, 262.4, 473.7]
+det[1]: class=68 score=0.708 box=[361.0, 328.9, 409.4, 356.8]
+[DET] primary box orig=164.4,1005.4,367.3,1421.0 score=0.706 class=72
+[DET] letterbox scale=0.3333 padX=140.00 padY=0.00
+[SEG] fallback: bbox-only (encoding in progress, no valid embedding)
+Pre=2.32ms | Infer=261.85ms | Post=337.58ms | Total=601.75ms | FPS=1.66 | Mem=217.5 MB
+FPS: 1.90 | Memory: 217.5 MB
+[TAP][not-accepted] view=(363.5,316.5) normalized=(0.8105,0.3532) canonical=(875.4,678.2) orientation=90 mirrored=false
+Pre=2.40ms | Infer=265.74ms | Post=297.36ms | Total=565.49ms | FPS=1.77 | Mem=224.0 MB
+Pre=3.24ms | Infer=315.44ms | Post=301.23ms | Total=619.91ms | FPS=1.61 | Mem=220.3 MB
+FPS: 1.68 | Memory: 220.3 MB
+Pre=3.13ms | Infer=280.06ms | Post=295.62ms | Total=578.81ms | FPS=1.73 | Mem=206.9 MB
+Pre=3.68ms | Infer=263.13ms | Post=300.05ms | Total=566.85ms | FPS=1.76 | Mem=206.9 MB
+FPS: 1.74 | Memory: 206.9 MB
+Pre=2.95ms | Infer=259.58ms | Post=269.69ms | Total=532.21ms | FPS=1.88 | Mem=206.9 MB
+Pre=2.27ms | Infer=259.26ms | Post=264.39ms | Total=525.92ms | FPS=1.90 | Mem=206.9 MB
+FPS: 1.89 | Memory: 206.9 MB
+Pre=2.08ms | Infer=251.46ms | Post=277.52ms | Total=531.05ms | FPS=1.88 | Mem=205.8 MB
+Pre=2.17ms | Infer=251.32ms | Post=262.90ms | Total=516.39ms | FPS=1.94 | Mem=205.8 MB
+FPS: 1.91 | Memory: 205.8 MB
+Pre=2.17ms | Infer=257.47ms | Post=272.44ms | Total=532.08ms | FPS=1.88 | Mem=205.8 MB
+Pre=2.11ms | Infer=261.12ms | Post=260.45ms | Total=523.67ms | FPS=1.91 | Mem=205.9 MB
+FPS: 1.89 | Memory: 205.9 MB
+Pre=2.99ms | Infer=236.37ms | Post=267.25ms | Total=506.61ms | FPS=1.97 | Mem=205.9 MB
+Pre=2.27ms | Infer=227.98ms | Post=263.28ms | Total=493.52ms | FPS=2.03 | Mem=205.9 MB
+FPS: 2.00 | Memory: 205.9 MB
+Pre=2.27ms | Infer=229.60ms | Post=219.18ms | Total=451.05ms | FPS=2.22 | Mem=205.9 MB
+Pre=2.38ms | Infer=215.10ms | Post=227.85ms | Total=445.33ms | FPS=2.25 | Mem=206.0 MB
+Pre=2.18ms | Infer=207.39ms | Post=251.06ms | Total=460.62ms | FPS=2.17 | Mem=211.8 MB
+FPS: 2.21 | Memory: 211.8 MB
+aneSubTypeAndVariant: Unknown kMGQAppleNeuralEngineSubtype=0x8030 using (h15)
+Pre=3.73ms | Infer=267.31ms | Post=244.85ms | Total=515.89ms | FPS=1.94 | Mem=263.5 MB
+Pre=6.88ms | Infer=213.34ms | Post=210.19ms | Total=430.41ms | FPS=2.32 | Mem=266.0 MB
+SAM encoder latency: 9715.08 ms (cold start — excluded from stats)
+Pre=2.79ms | Infer=230.98ms | Post=209.97ms | Total=443.74ms | FPS=2.25 | Mem=264.8 MB
+FPS: 2.16 | Memory: 264.8 MB
+Invalid layer: Invalid input tensor channel 1 and format size 2 bytes, must be aligned on 64 bytes
+Invalid layer: Invalid input tensor channel 1 and format size 2 bytes, must be aligned on 64 bytes
+Invalid layer: Invalid input tensor channel 1 and format size 2 bytes, must be aligned on 64 bytes
+Pre=2.58ms | Infer=242.71ms | Post=229.84ms | Total=475.13ms | FPS=2.10 | Mem=275.2 MB
+Pre=2.62ms | Infer=267.26ms | Post=228.61ms | Total=498.49ms | FPS=2.01 | Mem=299.5 MB
+Pre=2.46ms | Infer=247.22ms | Post=236.21ms | Total=485.89ms | FPS=2.06 | Mem=298.3 MB
+FPS: 2.05 | Memory: 298.3 MB
+Pre=2.24ms | Infer=264.04ms | Post=263.84ms | Total=530.11ms | FPS=1.89 | Mem=322.1 MB
+[SEG] point decoder: multimask (3 candidates, CPU+GPU)
+Pre=2.31ms | Infer=253.47ms | Post=237.67ms | Total=493.45ms | FPS=2.03 | Mem=371.8 MB
+FPS: 1.95 | Memory: 371.8 MB
+SAM decoder latency: 277.84 ms (cold start — excluded from stats)
+Pre=2.81ms | Infer=245.08ms | Post=206.88ms | Total=454.77ms | FPS=2.20 | Mem=370.2 MB
+Pre=2.59ms | Infer=220.20ms | Post=209.40ms | Total=432.19ms | FPS=2.31 | Mem=365.8 MB
+Pre=2.30ms | Infer=225.25ms | Post=205.73ms | Total=433.29ms | FPS=2.31 | Mem=365.8 MB
+FPS: 2.27 | Memory: 365.8 MB
+Pre=2.42ms | Infer=222.72ms | Post=204.29ms | Total=429.43ms | FPS=2.33 | Mem=349.5 MB
+Pre=2.62ms | Infer=267.76ms | Post=236.03ms | Total=506.42ms | FPS=1.97 | Mem=308.9 MB
+Pre=29.52ms | Infer=252.76ms | Post=208.13ms | Total=490.41ms | FPS=2.04 | Mem=304.2 MB
+FPS: 2.10 | Memory: 304.2 MB
+Pre=2.34ms | Infer=213.02ms | Post=199.07ms | Total=414.42ms | FPS=2.41 | Mem=304.2 MB
+Pre=3.37ms | Infer=221.29ms | Post=208.91ms | Total=433.57ms | FPS=2.31 | Mem=304.5 MB
+Pre=3.25ms | Infer=218.14ms | Post=211.28ms | Total=432.68ms | FPS=2.31 | Mem=304.3 MB
+FPS: 2.34 | Memory: 304.3 MB
+Pre=3.47ms | Infer=219.26ms | Post=209.13ms | Total=431.85ms | FPS=2.32 | Mem=304.2 MB
+Pre=2.34ms | Infer=212.62ms | Post=197.53ms | Total=412.49ms | FPS=2.42 | Mem=304.2 MB
+Pre=2.75ms | Infer=218.71ms | Post=216.12ms | Total=437.57ms | FPS=2.29 | Mem=304.0 MB
+FPS: 2.34 | Memory: 304.0 MB
+Pre=1.85ms | Infer=216.84ms | Post=198.02ms | Total=416.71ms | FPS=2.40 | Mem=304.0 MB
+Pre=3.16ms | Infer=217.33ms | Post=210.27ms | Total=430.76ms | FPS=2.32 | Mem=302.5 MB
+Pre=7.69ms | Infer=214.18ms | Post=194.69ms | Total=416.56ms | FPS=2.40 | Mem=303.5 MB
+FPS: 2.37 | Memory: 300.8 MB
+Pre=2.08ms | Infer=244.06ms | Post=220.22ms | Total=466.36ms | FPS=2.14 | Mem=331.4 MB
+Pre=5.45ms | Infer=239.45ms | Post=213.98ms | Total=458.88ms | FPS=2.18 | Mem=319.9 MB
+Pre=3.37ms | Infer=218.35ms | Post=207.43ms | Total=429.15ms | FPS=2.33 | Mem=320.3 MB
+FPS: 2.21 | Memory: 320.3 MB
+Pre=2.34ms | Infer=216.68ms | Post=213.09ms | Total=432.10ms | FPS=2.31 | Mem=320.3 MB
+Pre=3.65ms | Infer=211.63ms | Post=205.44ms | Total=420.72ms | FPS=2.38 | Mem=320.3 MB
+Pre=2.38ms | Infer=211.93ms | Post=219.15ms | Total=433.46ms | FPS=2.31 | Mem=320.3 MB
+FPS: 2.33 | Memory: 320.3 MB
+Pre=3.01ms | Infer=241.69ms | Post=222.64ms | Total=467.34ms | FPS=2.14 | Mem=320.3 MB
+Pre=2.65ms | Infer=209.11ms | Post=211.84ms | Total=423.60ms | FPS=2.36 | Mem=320.3 MB
+Pre=3.39ms | Infer=256.46ms | Post=231.68ms | Total=491.52ms | FPS=2.03 | Mem=320.3 MB
+FPS: 2.17 | Memory: 320.3 MB
+Pre=2.35ms | Infer=211.24ms | Post=206.36ms | Total=419.94ms | FPS=2.38 | Mem=320.3 MB
+Pre=3.79ms | Infer=254.23ms | Post=229.26ms | Total=487.28ms | FPS=2.05 | Mem=306.9 MB
+Pre=2.93ms | Infer=263.19ms | Post=218.84ms | Total=484.95ms | FPS=2.06 | Mem=310.3 MB
+FPS: 2.15 | Memory: 310.3 MB
+Pre=8.84ms | Infer=245.67ms | Post=234.89ms | Total=489.39ms | FPS=2.04 | Mem=299.4 MB
+Pre=2.37ms | Infer=219.76ms | Post=242.83ms | Total=464.96ms | FPS=2.15 | Mem=297.8 MB
+Pre=3.01ms | Infer=237.80ms | Post=208.95ms | Total=449.76ms | FPS=2.22 | Mem=279.9 MB
+FPS: 2.13 | Memory: 279.9 MB
+Pre=2.24ms | Infer=215.29ms | Post=214.80ms | Total=432.33ms | FPS=2.31 | Mem=270.0 MB
+Pre=1.97ms | Infer=263.30ms | Post=253.12ms | Total=518.39ms | FPS=1.93 | Mem=257.4 MB
+Pre=2.21ms | Infer=209.60ms | Post=248.07ms | Total=459.88ms | FPS=2.17 | Mem=257.4 MB
+FPS: 2.12 | Memory: 257.4 MB
+Pre=2.52ms | Infer=217.53ms | Post=207.88ms | Total=427.94ms | FPS=2.34 | Mem=257.7 MB
+Pre=2.21ms | Infer=217.64ms | Post=211.45ms | Total=431.30ms | FPS=2.32 | Mem=257.7 MB
+Pre=3.02ms | Infer=211.96ms | Post=210.13ms | Total=425.11ms | FPS=2.35 | Mem=257.8 MB
+FPS: 2.33 | Memory: 257.8 MB
+Pre=2.34ms | Infer=247.58ms | Post=224.23ms | Total=474.15ms | FPS=2.11 | Mem=257.8 MB
+Pre=4.85ms | Infer=278.38ms | Post=271.61ms | Total=554.84ms | FPS=1.80 | Mem=271.4 MB
+FPS: 1.94 | Memory: 271.4 MB
+Pre=2.65ms | Infer=253.55ms | Post=275.94ms | Total=532.14ms | FPS=1.88 | Mem=259.6 MB
+Pre=2.08ms | Infer=214.26ms | Post=195.47ms | Total=411.81ms | FPS=2.43 | Mem=259.8 MB
+Pre=2.32ms | Infer=213.29ms | Post=205.17ms | Total=420.78ms | FPS=2.38 | Mem=259.8 MB
+FPS: 2.19 | Memory: 254.4 MB
+Pre=1.85ms | Infer=224.28ms | Post=214.46ms | Total=440.59ms | FPS=2.27 | Mem=259.8 MB
+Pre=2.36ms | Infer=213.26ms | Post=247.23ms | Total=462.85ms | FPS=2.16 | Mem=259.8 MB
+Pre=4.11ms | Infer=249.12ms | Post=215.93ms | Total=469.17ms | FPS=2.13 | Mem=259.9 MB
+FPS: 2.18 | Memory: 259.9 MB
+Pre=2.56ms | Infer=215.11ms | Post=243.52ms | Total=461.19ms | FPS=2.17 | Mem=259.9 MB
+Pre=3.12ms | Infer=246.44ms | Post=213.80ms | Total=463.35ms | FPS=2.16 | Mem=259.9 MB
+Pre=2.25ms | Infer=211.71ms | Post=226.52ms | Total=440.48ms | FPS=2.27 | Mem=259.9 MB
+FPS: 2.19 | Memory: 254.5 MB
+Pre=2.38ms | Infer=248.43ms | Post=211.67ms | Total=462.48ms | FPS=2.16 | Mem=260.0 MB
+Pre=3.30ms | Infer=240.85ms | Post=236.95ms | Total=481.10ms | FPS=2.08 | Mem=272.1 MB
+Pre=9.75ms | Infer=244.68ms | Post=227.18ms | Total=481.61ms | FPS=2.08 | Mem=260.7 MB
+FPS: 2.10 | Memory: 260.7 MB
+Pre=2.36ms | Infer=220.01ms | Post=251.97ms | Total=474.34ms | FPS=2.11 | Mem=260.8 MB
+Pre=3.49ms | Infer=219.81ms | Post=205.53ms | Total=428.83ms | FPS=2.33 | Mem=260.8 MB
+Pre=2.33ms | Infer=209.44ms | Post=209.97ms | Total=421.74ms | FPS=2.37 | Mem=260.8 MB
+FPS: 2.26 | Memory: 260.8 MB
+Pre=2.01ms | Infer=248.66ms | Post=272.15ms | Total=522.83ms | FPS=1.91 | Mem=257.0 MB
+Pre=2.36ms | Infer=244.13ms | Post=277.64ms | Total=524.14ms | FPS=1.91 | Mem=257.0 MB
+FPS: 1.90 | Memory: 251.6 MB
+Pre=2.46ms | Infer=218.91ms | Post=229.56ms | Total=450.93ms | FPS=2.22 | Mem=256.3 MB
+Pre=1.82ms | Infer=230.91ms | Post=245.48ms | Total=478.20ms | FPS=2.09 | Mem=256.3 MB
+Pre=2.90ms | Infer=272.30ms | Post=276.68ms | Total=551.89ms | FPS=1.81 | Mem=256.3 MB
+FPS: 2.02 | Memory: 256.3 MB
+Pre=3.15ms | Infer=263.91ms | Post=270.40ms | Total=537.47ms | FPS=1.86 | Mem=260.3 MB
+Pre=16.36ms | Infer=264.29ms | Post=223.53ms | Total=504.18ms | FPS=1.98 | Mem=249.0 MB
+FPS: 1.92 | Memory: 249.0 MB
+Pre=2.25ms | Infer=208.86ms | Post=277.34ms | Total=488.44ms | FPS=2.05 | Mem=249.0 MB
+Pre=3.12ms | Infer=217.29ms | Post=194.74ms | Total=415.15ms | FPS=2.41 | Mem=249.0 MB
+Pre=2.28ms | Infer=216.19ms | Post=277.12ms | Total=495.59ms | FPS=2.02 | Mem=249.0 MB
+FPS: 2.14 | Memory: 249.0 MB
+Pre=2.80ms | Infer=225.72ms | Post=205.57ms | Total=434.10ms | FPS=2.30 | Mem=249.0 MB
+Pre=2.43ms | Infer=214.61ms | Post=277.09ms | Total=494.12ms | FPS=2.02 | Mem=249.0 MB
+Pre=2.34ms | Infer=217.43ms | Post=208.28ms | Total=428.05ms | FPS=2.34 | Mem=249.0 MB
+FPS: 2.21 | Memory: 249.0 MB
+Pre=2.24ms | Infer=214.71ms | Post=225.73ms | Total=442.68ms | FPS=2.26 | Mem=249.0 MB
+Pre=3.17ms | Infer=234.00ms | Post=242.00ms | Total=479.16ms | FPS=2.09 | Mem=249.1 MB
+Pre=2.97ms | Infer=242.17ms | Post=216.50ms | Total=461.63ms | FPS=2.17 | Mem=261.9 MB
+FPS: 2.16 | Memory: 261.9 MB
+Pre=10.35ms | Infer=250.30ms | Post=250.41ms | Total=511.07ms | FPS=1.96 | Mem=250.1 MB
+Pre=2.30ms | Infer=214.96ms | Post=215.73ms | Total=432.99ms | FPS=2.31 | Mem=250.1 MB
+Pre=2.15ms | Infer=239.65ms | Post=226.93ms | Total=468.73ms | FPS=2.13 | Mem=250.1 MB
+FPS: 2.12 | Memory: 250.1 MB
+Inference time stats (n=100): mean=235.53 ms | p95=267.31 ms
+Detection count stats (n=100): mean=2.01
+Pre=2.63ms | Infer=227.20ms | Post=204.33ms | Total=434.16ms | FPS=2.30 | Mem=250.1 MB
+Pre=2.46ms | Infer=245.13ms | Post=234.80ms | Total=482.40ms | FPS=2.07 | Mem=250.1 MB
+Pre=2.38ms | Infer=240.72ms | Post=206.31ms | Total=449.41ms | FPS=2.23 | Mem=250.1 MB
+FPS: 2.19 | Memory: 250.1 MB
+Pre=2.41ms | Infer=244.37ms | Post=222.39ms | Total=469.17ms | FPS=2.13 | Mem=250.1 MB
+Pre=2.28ms | Infer=229.80ms | Post=215.62ms | Total=447.70ms | FPS=2.23 | Mem=250.1 MB
+Pre=2.33ms | Infer=241.79ms | Post=229.06ms | Total=473.18ms | FPS=2.11 | Mem=250.1 MB
+FPS: 2.16 | Memory: 250.1 MB
+Pre=2.10ms | Infer=263.89ms | Post=242.10ms | Total=508.09ms | FPS=1.97 | Mem=262.6 MB
+Pre=10.70ms | Infer=250.89ms | Post=225.60ms | Total=487.19ms | FPS=2.05 | Mem=250.7 MB
+Pre=1.86ms | Infer=219.34ms | Post=239.95ms | Total=461.15ms | FPS=2.17 | Mem=250.7 MB
+FPS: 2.06 | Memory: 250.7 MB
+Pre=2.75ms | Infer=243.86ms | Post=280.04ms | Total=526.65ms | FPS=1.90 | Mem=250.7 MB
+Pre=2.81ms | Infer=258.14ms | Post=311.14ms | Total=572.09ms | FPS=1.75 | Mem=257.2 MB
+FPS: 1.82 | Memory: 257.2 MB
+Pre=3.40ms | Infer=273.20ms | Post=261.86ms | Total=538.47ms | FPS=1.86 | Mem=256.2 MB
+Pre=1.97ms | Infer=244.96ms | Post=230.95ms | Total=477.88ms | FPS=2.09 | Mem=256.3 MB
+FPS: 1.97 | Memory: 256.3 MB
+Pre=2.65ms | Infer=250.59ms | Post=234.55ms | Total=487.79ms | FPS=2.05 | Mem=256.1 MB
+Pre=1.89ms | Infer=236.57ms | Post=229.40ms | Total=467.86ms | FPS=2.14 | Mem=256.1 MB
+Pre=2.78ms | Infer=253.45ms | Post=231.73ms | Total=487.95ms | FPS=2.05 | Mem=256.1 MB
+FPS: 2.08 | Memory: 256.1 MB
+Pre=3.48ms | Infer=265.02ms | Post=233.37ms | Total=501.87ms | FPS=1.99 | Mem=243.7 MB
+Pre=10.19ms | Infer=255.13ms | Post=247.17ms | Total=512.49ms | FPS=1.95 | Mem=232.6 MB
+FPS: 1.97 | Memory: 232.6 MB
+Pre=2.46ms | Infer=232.38ms | Post=235.09ms | Total=469.92ms | FPS=2.13 | Mem=232.6 MB
+Pre=2.44ms | Infer=250.33ms | Post=233.63ms | Total=486.40ms | FPS=2.06 | Mem=232.6 MB
+Pre=1.81ms | Infer=225.76ms | Post=239.71ms | Total=467.28ms | FPS=2.14 | Mem=232.6 MB
+FPS: 2.10 | Memory: 232.6 MB
+Pre=2.51ms | Infer=249.76ms | Post=247.79ms | Total=500.06ms | FPS=2.00 | Mem=232.6 MB
+Pre=2.38ms | Infer=232.60ms | Post=257.96ms | Total=492.94ms | FPS=2.03 | Mem=232.6 MB
+Pre=2.68ms | Infer=250.85ms | Post=249.26ms | Total=502.79ms | FPS=1.99 | Mem=232.6 MB
+FPS: 2.00 | Memory: 232.6 MB
+Pre=2.24ms | Infer=228.30ms | Post=248.53ms | Total=479.07ms | FPS=2.09 | Mem=232.6 MB
+Pre=2.92ms | Infer=252.84ms | Post=266.80ms | Total=522.56ms | FPS=1.91 | Mem=232.6 MB
+FPS: 1.99 | Memory: 232.6 MB
+Pre=3.34ms | Infer=265.14ms | Post=258.21ms | Total=526.69ms | FPS=1.90 | Mem=244.9 MB
+Pre=11.99ms | Infer=252.31ms | Post=250.73ms | Total=515.02ms | FPS=1.94 | Mem=233.2 MB
+FPS: 1.92 | Memory: 233.2 MB
+Pre=2.41ms | Infer=231.83ms | Post=242.59ms | Total=476.82ms | FPS=2.10 | Mem=233.2 MB
+Pre=5.51ms | Infer=252.77ms | Post=243.93ms | Total=502.21ms | FPS=1.99 | Mem=233.2 MB
+Pre=2.64ms | Infer=234.05ms | Post=244.07ms | Total=480.77ms | FPS=2.08 | Mem=233.2 MB
+FPS: 2.05 | Memory: 233.2 MB
+Pre=2.95ms | Infer=250.21ms | Post=246.54ms | Total=499.70ms | FPS=2.00 | Mem=233.2 MB
+Pre=2.37ms | Infer=232.35ms | Post=236.53ms | Total=471.25ms | FPS=2.12 | Mem=233.2 MB
+Pre=3.29ms | Infer=252.25ms | Post=239.90ms | Total=495.44ms | FPS=2.02 | Mem=233.3 MB
+FPS: 2.04 | Memory: 233.3 MB
+Pre=2.32ms | Infer=225.73ms | Post=253.86ms | Total=481.90ms | FPS=2.08 | Mem=233.3 MB
+Pre=3.32ms | Infer=247.23ms | Post=247.85ms | Total=498.40ms | FPS=2.01 | Mem=233.3 MB
+Pre=3.29ms | Infer=249.92ms | Post=263.89ms | Total=517.11ms | FPS=1.93 | Mem=245.5 MB
+FPS: 2.00 | Memory: 245.5 MB
+Pre=8.32ms | Infer=251.82ms | Post=254.41ms | Total=514.54ms | FPS=1.94 | Mem=233.4 MB
+Pre=2.52ms | Infer=228.16ms | Post=246.80ms | Total=477.48ms | FPS=2.09 | Mem=233.4 MB
+Pre=3.16ms | Infer=247.85ms | Post=245.17ms | Total=496.17ms | FPS=2.02 | Mem=233.4 MB
+FPS: 2.01 | Memory: 233.4 MB
+Pre=1.84ms | Infer=224.66ms | Post=249.52ms | Total=476.01ms | FPS=2.10 | Mem=233.4 MB
+Pre=2.61ms | Infer=251.75ms | Post=261.54ms | Total=515.90ms | FPS=1.94 | Mem=233.4 MB
+Pre=1.90ms | Infer=231.75ms | Post=249.35ms | Total=483.00ms | FPS=2.07 | Mem=233.4 MB
+FPS: 2.03 | Memory: 233.4 MB
+Pre=2.63ms | Infer=253.15ms | Post=258.96ms | Total=514.73ms | FPS=1.94 | Mem=233.4 MB
+Pre=1.88ms | Infer=228.79ms | Post=254.06ms | Total=484.73ms | FPS=2.06 | Mem=233.4 MB
+FPS: 2.00 | Memory: 233.4 MB
+Pre=2.69ms | Infer=249.78ms | Post=256.44ms | Total=508.91ms | FPS=1.96 | Mem=233.4 MB
+Pre=3.36ms | Infer=294.14ms | Post=297.81ms | Total=595.31ms | FPS=1.68 | Mem=245.4 MB
+FPS: 1.81 | Memory: 245.4 MB
+Pre=9.96ms | Infer=259.67ms | Post=270.99ms | Total=540.62ms | FPS=1.85 | Mem=233.4 MB
+Pre=1.82ms | Infer=246.49ms | Post=249.15ms | Total=497.46ms | FPS=2.01 | Mem=233.4 MB
+FPS: 1.92 | Memory: 233.4 MB
+Pre=2.53ms | Infer=256.89ms | Post=255.67ms | Total=515.09ms | FPS=1.94 | Mem=233.4 MB
+Pre=2.28ms | Infer=243.31ms | Post=238.67ms | Total=484.25ms | FPS=2.07 | Mem=233.4 MB
+FPS: 2.00 | Memory: 233.4 MB
+Pre=3.23ms | Infer=273.97ms | Post=280.27ms | Total=557.47ms | FPS=1.79 | Mem=245.2 MB
+SAM encoder warmup latency: 611.05 ms
+SAM decoder warmup latency: 41.23 ms
+Pre=2.57ms | Infer=258.37ms | Post=276.98ms | Total=537.91ms | FPS=1.86 | Mem=233.2 MB
+FPS: 1.82 | Memory: 233.2 MB
+Pre=2.79ms | Infer=251.50ms | Post=267.65ms | Total=521.95ms | FPS=1.92 | Mem=233.2 MB
+Pre=2.37ms | Infer=247.71ms | Post=268.09ms | Total=518.18ms | FPS=1.93 | Mem=233.2 MB
+FPS: 1.92 | Memory: 233.2 MB
+Pre=2.48ms | Infer=254.37ms | Post=265.07ms | Total=521.91ms | FPS=1.92 | Mem=233.2 MB
+Pre=3.47ms | Infer=245.44ms | Post=244.65ms | Total=493.56ms | FPS=2.03 | Mem=233.2 MB
+FPS: 1.97 | Memory: 233.2 MB
+Pre=2.34ms | Infer=255.68ms | Post=272.38ms | Total=530.40ms | FPS=1.89 | Mem=233.3 MB
+Pre=2.30ms | Infer=255.89ms | Post=237.48ms | Total=495.66ms | FPS=2.02 | Mem=233.3 MB
+FPS: 1.94 | Memory: 233.3 MB
+Pre=2.61ms | Infer=259.61ms | Post=268.68ms | Total=530.90ms | FPS=1.88 | Mem=233.3 MB
+Pre=2.84ms | Infer=258.73ms | Post=271.29ms | Total=532.85ms | FPS=1.88 | Mem=244.9 MB
+FPS: 1.88 | Memory: 244.9 MB
+Pre=14.34ms | Infer=262.88ms | Post=286.33ms | Total=563.55ms | FPS=1.77 | Mem=234.1 MB
+Pre=2.62ms | Infer=252.83ms | Post=277.73ms | Total=533.17ms | FPS=1.88 | Mem=234.1 MB
+FPS: 1.82 | Memory: 234.1 MB
+Pre=2.72ms | Infer=262.86ms | Post=278.94ms | Total=544.52ms | FPS=1.84 | Mem=234.1 MB
+Pre=2.69ms | Infer=251.56ms | Post=277.15ms | Total=531.39ms | FPS=1.88 | Mem=234.1 MB
+FPS: 1.85 | Memory: 234.1 MB
+Pre=3.01ms | Infer=262.85ms | Post=277.56ms | Total=543.43ms | FPS=1.84 | Mem=232.4 MB
+Pre=2.51ms | Infer=252.32ms | Post=277.54ms | Total=532.37ms | FPS=1.88 | Mem=232.5 MB
+FPS: 1.86 | Memory: 232.5 MB
+Pre=3.12ms | Infer=264.26ms | Post=277.37ms | Total=544.75ms | FPS=1.84 | Mem=232.8 MB
+Pre=2.59ms | Infer=246.74ms | Post=250.02ms | Total=499.35ms | FPS=2.00 | Mem=232.8 MB
+FPS: 1.91 | Memory: 232.8 MB
+Pre=2.59ms | Infer=277.24ms | Post=280.67ms | Total=560.49ms | FPS=1.78 | Mem=244.2 MB
+Pre=7.43ms | Infer=260.88ms | Post=270.57ms | Total=538.88ms | FPS=1.86 | Mem=232.2 MB
+FPS: 1.82 | Memory: 232.2 MB
+Pre=3.86ms | Infer=266.27ms | Post=277.28ms | Total=547.41ms | FPS=1.83 | Mem=232.4 MB
+Pre=2.46ms | Infer=249.45ms | Post=264.72ms | Total=516.62ms | FPS=1.94 | Mem=232.4 MB
+FPS: 1.88 | Memory: 232.4 MB
+Pre=3.03ms | Infer=259.01ms | Post=277.28ms | Total=539.31ms | FPS=1.85 | Mem=232.4 MB
+Pre=2.50ms | Infer=243.57ms | Post=261.08ms | Total=507.14ms | FPS=1.97 | Mem=232.4 MB
+FPS: 1.91 | Memory: 232.4 MB
+Pre=2.95ms | Infer=257.29ms | Post=277.33ms | Total=537.56ms | FPS=1.86 | Mem=232.5 MB
+Pre=2.31ms | Infer=241.84ms | Post=258.97ms | Total=503.11ms | FPS=1.99 | Mem=232.5 MB
+FPS: 1.92 | Memory: 232.5 MB
+Pre=2.58ms | Infer=258.42ms | Post=277.35ms | Total=538.34ms | FPS=1.86 | Mem=232.5 MB
+Pre=3.93ms | Infer=262.85ms | Post=273.43ms | Total=540.21ms | FPS=1.85 | Mem=245.7 MB
+FPS: 1.85 | Memory: 245.7 MB
+Pre=10.34ms | Infer=256.45ms | Post=277.16ms | Total=543.95ms | FPS=1.84 | Mem=234.0 MB
+Pre=2.50ms | Infer=249.46ms | Post=277.02ms | Total=528.98ms | FPS=1.89 | Mem=234.0 MB
+FPS: 1.86 | Memory: 234.0 MB
+Pre=2.72ms | Infer=260.43ms | Post=277.72ms | Total=540.87ms | FPS=1.85 | Mem=234.0 MB
+Pre=2.49ms | Infer=250.58ms | Post=277.10ms | Total=530.17ms | FPS=1.89 | Mem=234.0 MB
+FPS: 1.86 | Memory: 234.0 MB
+Pre=4.21ms | Infer=260.81ms | Post=279.90ms | Total=544.91ms | FPS=1.84 | Mem=234.0 MB
+Pre=2.43ms | Infer=251.42ms | Post=277.30ms | Total=531.14ms | FPS=1.88 | Mem=234.0 MB
+FPS: 1.86 | Memory: 234.0 MB
+Pre=3.35ms | Infer=257.85ms | Post=277.78ms | Total=538.98ms | FPS=1.86 | Mem=234.0 MB
+Pre=2.95ms | Infer=252.28ms | Post=277.36ms | Total=532.60ms | FPS=1.88 | Mem=234.0 MB
+FPS: 1.86 | Memory: 234.0 MB
+Pre=4.04ms | Infer=280.94ms | Post=287.61ms | Total=572.60ms | FPS=1.75 | Mem=246.1 MB
+Pre=2.46ms | Infer=274.58ms | Post=281.19ms | Total=558.22ms | FPS=1.79 | Mem=234.1 MB
+FPS: 1.77 | Memory: 234.1 MB
+Pre=2.83ms | Infer=264.19ms | Post=277.98ms | Total=545.00ms | FPS=1.83 | Mem=234.1 MB
+Pre=2.43ms | Infer=246.14ms | Post=277.16ms | Total=525.73ms | FPS=1.90 | Mem=234.1 MB
+FPS: 1.86 | Memory: 234.1 MB
+Pre=4.12ms | Infer=262.93ms | Post=290.30ms | Total=557.35ms | FPS=1.79 | Mem=234.1 MB
+Pre=2.50ms | Infer=250.26ms | Post=277.06ms | Total=529.82ms | FPS=1.89 | Mem=234.1 MB
+FPS: 1.84 | Memory: 234.1 MB
+Pre=2.60ms | Infer=267.18ms | Post=277.22ms | Total=547.00ms | FPS=1.83 | Mem=234.1 MB
+Pre=2.52ms | Infer=246.75ms | Post=277.01ms | Total=526.28ms | FPS=1.90 | Mem=234.1 MB
+FPS: 1.86 | Memory: 234.1 MB
+Pre=3.09ms | Infer=259.15ms | Post=280.05ms | Total=542.29ms | FPS=1.84 | Mem=234.1 MB
+Pre=2.64ms | Infer=264.52ms | Post=281.63ms | Total=548.79ms | FPS=1.82 | Mem=246.0 MB
+FPS: 1.83 | Memory: 246.0 MB
+Pre=9.59ms | Infer=290.22ms | Post=298.31ms | Total=598.12ms | FPS=1.67 | Mem=234.1 MB
+Pre=2.72ms | Infer=264.65ms | Post=292.32ms | Total=559.69ms | FPS=1.79 | Mem=234.1 MB
+FPS: 1.72 | Memory: 234.1 MB
+Pre=3.42ms | Infer=278.89ms | Post=296.25ms | Total=578.55ms | FPS=1.73 | Mem=234.1 MB
+Inference time stats (n=100): mean=252.39 ms | p95=274.58 ms
+Detection count stats (n=100): mean=2.01
+Pre=2.71ms | Infer=253.73ms | Post=283.64ms | Total=540.08ms | FPS=1.85 | Mem=234.1 MB
+FPS: 1.78 | Memory: 234.1 MB
+Pre=3.20ms | Infer=256.92ms | Post=277.63ms | Total=537.75ms | FPS=1.86 | Mem=234.1 MB
+Pre=2.60ms | Infer=254.41ms | Post=277.31ms | Total=534.32ms | FPS=1.87 | Mem=234.1 MB
+FPS: 1.86 | Memory: 234.1 MB
+Pre=3.54ms | Infer=259.81ms | Post=280.51ms | Total=543.85ms | FPS=1.84 | Mem=234.1 MB
+Pre=2.46ms | Infer=253.64ms | Post=278.67ms | Total=534.77ms | FPS=1.87 | Mem=234.1 MB
+FPS: 1.85 | Memory: 234.1 MB
+Pre=3.95ms | Infer=285.71ms | Post=294.83ms | Total=584.49ms | FPS=1.71 | Mem=246.0 MB
+Pre=9.56ms | Infer=262.22ms | Post=281.69ms | Total=553.46ms | FPS=1.81 | Mem=234.0 MB
+FPS: 1.75 | Memory: 228.6 MB
+Pre=2.85ms | Infer=269.77ms | Post=289.02ms | Total=561.64ms | FPS=1.78 | Mem=234.0 MB
+Pre=3.06ms | Infer=255.78ms | Post=280.85ms | Total=539.69ms | FPS=1.85 | Mem=234.0 MB
+FPS: 1.81 | Memory: 234.0 MB
+Pre=2.72ms | Infer=271.58ms | Post=304.59ms | Total=578.89ms | FPS=1.73 | Mem=234.0 MB
+Pre=2.59ms | Infer=249.44ms | Post=281.09ms | Total=533.12ms | FPS=1.88 | Mem=234.0 MB
+FPS: 1.79 | Memory: 234.0 MB
+Pre=3.02ms | Infer=282.49ms | Post=293.78ms | Total=579.30ms | FPS=1.73 | Mem=234.0 MB
+Pre=2.98ms | Infer=249.59ms | Post=276.83ms | Total=529.40ms | FPS=1.89 | Mem=234.0 MB
+FPS: 1.80 | Memory: 234.0 MB
+Pre=3.31ms | Infer=278.86ms | Post=292.46ms | Total=574.63ms | FPS=1.74 | Mem=236.3 MB
+Pre=3.51ms | Infer=289.56ms | Post=294.86ms | Total=587.92ms | FPS=1.70 | Mem=248.3 MB
+FPS: 1.72 | Memory: 248.3 MB
+Pre=3.20ms | Infer=289.94ms | Post=292.61ms | Total=585.76ms | FPS=1.71 | Mem=236.3 MB
+Pre=2.54ms | Infer=250.93ms | Post=284.20ms | Total=537.67ms | FPS=1.86 | Mem=236.3 MB
+FPS: 1.78 | Memory: 236.3 MB
+Pre=3.62ms | Infer=272.20ms | Post=278.16ms | Total=553.98ms | FPS=1.81 | Mem=236.4 MB
+Pre=2.56ms | Infer=247.89ms | Post=277.33ms | Total=527.79ms | FPS=1.89 | Mem=236.4 MB
+FPS: 1.85 | Memory: 236.4 MB
+Pre=3.29ms | Infer=257.02ms | Post=277.00ms | Total=537.31ms | FPS=1.86 | Mem=236.4 MB
+Pre=2.56ms | Infer=252.79ms | Post=276.96ms | Total=532.31ms | FPS=1.88 | Mem=236.4 MB
+FPS: 1.87 | Memory: 236.4 MB
+Pre=3.31ms | Infer=261.39ms | Post=277.09ms | Total=541.79ms | FPS=1.85 | Mem=236.4 MB
+Pre=2.51ms | Infer=252.57ms | Post=277.43ms | Total=532.51ms | FPS=1.88 | Mem=236.4 MB
+FPS: 1.86 | Memory: 236.3 MB
+Pre=4.11ms | Infer=274.48ms | Post=282.46ms | Total=561.04ms | FPS=1.78 | Mem=248.3 MB
+Pre=9.58ms | Infer=264.02ms | Post=277.03ms | Total=550.63ms | FPS=1.82 | Mem=236.3 MB
+FPS: 1.80 | Memory: 236.3 MB
+Pre=4.34ms | Infer=262.44ms | Post=283.29ms | Total=550.08ms | FPS=1.82 | Mem=236.3 MB
+Pre=2.50ms | Infer=246.85ms | Post=278.98ms | Total=528.33ms | FPS=1.89 | Mem=236.3 MB
+FPS: 1.85 | Memory: 236.3 MB
+SAM decoder stats (n=100): mean=71.61 ms | p95=91.53 ms
+Pre=2.97ms | Infer=257.71ms | Post=278.03ms | Total=538.70ms | FPS=1.86 | Mem=236.3 MB
+Pre=2.50ms | Infer=250.94ms | Post=277.15ms | Total=530.58ms | FPS=1.88 | Mem=236.3 MB
+FPS: 1.87 | Memory: 236.3 MB
+Pre=2.52ms | Infer=261.84ms | Post=281.31ms | Total=545.67ms | FPS=1.83 | Mem=236.4 MB
+Pre=2.96ms | Infer=248.34ms | Post=276.95ms | Total=528.26ms | FPS=1.89 | Mem=236.4 MB
+FPS: 1.86 | Memory: 236.4 MB
+Pre=2.85ms | Infer=262.62ms | Post=290.28ms | Total=555.75ms | FPS=1.80 | Mem=236.4 MB
+Pre=2.25ms | Infer=264.79ms | Post=279.84ms | Total=546.88ms | FPS=1.83 | Mem=248.3 MB
+FPS: 1.81 | Memory: 248.3 MB
+Pre=13.28ms | Infer=279.82ms | Post=301.99ms | Total=595.10ms | FPS=1.68 | Mem=236.5 MB
+Pre=2.59ms | Infer=249.75ms | Post=277.50ms | Total=529.84ms | FPS=1.89 | Mem=236.5 MB
+FPS: 1.77 | Memory: 236.5 MB
+Pre=4.60ms | Infer=268.68ms | Post=284.10ms | Total=557.39ms | FPS=1.79 | Mem=236.5 MB
+Pre=2.67ms | Infer=244.96ms | Post=279.51ms | Total=527.13ms | FPS=1.90 | Mem=236.5 MB
+FPS: 1.84 | Memory: 236.5 MB
+Pre=3.20ms | Infer=255.43ms | Post=276.98ms | Total=535.61ms | FPS=1.87 | Mem=236.5 MB
+Pre=2.61ms | Infer=247.86ms | Post=281.86ms | Total=532.34ms | FPS=1.88 | Mem=236.5 MB
+FPS: 1.87 | Memory: 236.5 MB
+Pre=2.96ms | Infer=259.95ms | Post=277.42ms | Total=540.33ms | FPS=1.85 | Mem=236.5 MB
+Pre=2.67ms | Infer=247.22ms | Post=280.04ms | Total=529.93ms | FPS=1.89 | Mem=236.5 MB
+FPS: 1.87 | Memory: 236.5 MB
+Pre=3.84ms | Infer=266.78ms | Post=280.77ms | Total=551.39ms | FPS=1.81 | Mem=248.4 MB
+Pre=6.29ms | Infer=260.68ms | Post=281.01ms | Total=547.97ms | FPS=1.82 | Mem=236.4 MB
+FPS: 1.82 | Memory: 236.4 MB
+Pre=3.77ms | Infer=268.74ms | Post=280.45ms | Total=552.97ms | FPS=1.81 | Mem=236.4 MB
+Pre=2.56ms | Infer=250.89ms | Post=277.02ms | Total=530.47ms | FPS=1.89 | Mem=236.4 MB
+FPS: 1.84 | Memory: 236.4 MB
+Pre=2.74ms | Infer=256.60ms | Post=277.06ms | Total=536.39ms | FPS=1.86 | Mem=236.4 MB
+Pre=2.47ms | Infer=250.32ms | Post=277.24ms | Total=530.04ms | FPS=1.89 | Mem=236.4 MB
+FPS: 1.87 | Memory: 236.4 MB
+Pre=3.29ms | Infer=258.39ms | Post=277.67ms | Total=539.35ms | FPS=1.85 | Mem=236.4 MB
+Pre=2.58ms | Infer=249.27ms | Post=277.01ms | Total=528.87ms | FPS=1.89 | Mem=236.4 MB
+FPS: 1.87 | Memory: 236.4 MB
+Pre=3.24ms | Infer=256.03ms | Post=280.86ms | Total=540.13ms | FPS=1.85 | Mem=236.4 MB
+Pre=2.59ms | Infer=270.38ms | Post=283.33ms | Total=556.30ms | FPS=1.80 | Mem=248.4 MB
+FPS: 1.82 | Memory: 248.4 MB
+Pre=12.33ms | Infer=275.20ms | Post=283.49ms | Total=571.02ms | FPS=1.75 | Mem=236.6 MB
+Pre=2.56ms | Infer=246.74ms | Post=277.04ms | Total=526.35ms | FPS=1.90 | Mem=236.6 MB
+FPS: 1.82 | Memory: 236.6 MB
+Pre=2.88ms | Infer=266.16ms | Post=290.86ms | Total=559.90ms | FPS=1.79 | Mem=236.6 MB
+Pre=2.62ms | Infer=249.11ms | Post=276.99ms | Total=528.72ms | FPS=1.89 | Mem=236.6 MB
+FPS: 1.83 | Memory: 236.6 MB
+Pre=2.84ms | Infer=261.14ms | Post=277.69ms | Total=541.68ms | FPS=1.85 | Mem=236.6 MB
+Pre=2.59ms | Infer=241.80ms | Post=276.94ms | Total=521.34ms | FPS=1.92 | Mem=236.6 MB
+FPS: 1.88 | Memory: 236.6 MB
+Pre=2.72ms | Infer=264.38ms | Post=278.91ms | Total=546.01ms | FPS=1.83 | Mem=236.6 MB
+Pre=2.55ms | Infer=249.82ms | Post=278.81ms | Total=531.17ms | FPS=1.88 | Mem=236.6 MB
+FPS: 1.85 | Memory: 236.6 MB
+Pre=7.10ms | Infer=286.81ms | Post=300.81ms | Total=594.72ms | FPS=1.68 | Mem=249.5 MB
+=== MODE SWITCH → tapToSegment ===
+Pre=9.58ms | Infer=294.59ms | Post=329.33ms | Total=633.50ms | FPS=1.58 | Mem=239.2 MB
+FPS: 1.63 | Memory: 239.2 MB
+SAM encoder warmup latency: 591.13 ms
+SAM decoder warmup latency: 30.65 ms
+Pre=2.51ms | Infer=274.79ms | Post=308.10ms | Total=585.39ms | FPS=1.71 | Mem=239.2 MB
+Pre=1.73ms | Infer=251.08ms | Post=276.46ms | Total=529.27ms | FPS=1.89 | Mem=239.2 MB
+FPS: 4.92 | Memory: 239.2 MB
+Pre=2.00ms | Infer=253.41ms | Post=286.06ms | Total=541.47ms | FPS=1.85 | Mem=239.2 MB
+Pre=1.78ms | Infer=247.85ms | Post=235.33ms | Total=484.96ms | FPS=2.06 | Mem=239.2 MB
+FPS: 5.35 | Memory: 239.2 MB
+Pre=1.70ms | Infer=229.58ms | Post=277.93ms | Total=509.21ms | FPS=1.96 | Mem=239.2 MB
+Pre=1.72ms | Infer=235.85ms | Post=241.93ms | Total=479.51ms | FPS=2.09 | Mem=239.2 MB
+FPS: 5.48 | Memory: 239.2 MB
+Pre=1.75ms | Infer=228.57ms | Post=267.48ms | Total=497.79ms | FPS=2.01 | Mem=239.2 MB
+Pre=1.76ms | Infer=244.46ms | Post=255.45ms | Total=501.66ms | FPS=1.99 | Mem=239.2 MB
+FPS: 5.51 | Memory: 239.2 MB
+Pre=1.68ms | Infer=229.94ms | Post=277.25ms | Total=508.87ms | FPS=1.97 | Mem=239.2 MB
+Pre=1.80ms | Infer=226.01ms | Post=264.66ms | Total=492.46ms | FPS=2.03 | Mem=239.1 MB
+FPS: 5.34 | Memory: 239.1 MB
+Pre=2.29ms | Infer=239.08ms | Post=283.52ms | Total=524.88ms | FPS=1.91 | Mem=239.2 MB
+Pre=1.59ms | Infer=245.87ms | Post=278.94ms | Total=526.39ms | FPS=1.90 | Mem=239.2 MB
+FPS: 5.30 | Memory: 239.2 MB
+Pre=1.76ms | Infer=236.91ms | Post=249.32ms | Total=488.00ms | FPS=2.05 | Mem=239.2 MB
+Pre=1.76ms | Infer=235.33ms | Post=272.24ms | Total=509.33ms | FPS=1.96 | Mem=239.2 MB
+FPS: 5.38 | Memory: 239.2 MB
+Pre=1.70ms | Infer=241.51ms | Post=238.92ms | Total=482.13ms | FPS=2.07 | Mem=239.2 MB
+Pre=1.80ms | Infer=230.01ms | Post=267.91ms | Total=499.72ms | FPS=2.00 | Mem=239.2 MB
+FPS: 5.50 | Memory: 239.2 MB
+Pre=1.75ms | Infer=241.15ms | Post=245.21ms | Total=488.10ms | FPS=2.05 | Mem=239.2 MB
+Pre=1.75ms | Infer=236.21ms | Post=276.94ms | Total=514.90ms | FPS=1.94 | Mem=239.2 MB
+FPS: 5.38 | Memory: 239.2 MB
+Pre=1.72ms | Infer=234.52ms | Post=256.41ms | Total=492.65ms | FPS=2.03 | Mem=239.2 MB
+Pre=1.74ms | Infer=242.63ms | Post=275.98ms | Total=520.35ms | FPS=1.92 | Mem=239.2 MB
+FPS: 5.43 | Memory: 239.2 MB
+Pre=2.59ms | Infer=242.02ms | Post=282.51ms | Total=527.12ms | FPS=1.90 | Mem=251.2 MB
+Pre=1.42ms | Infer=250.43ms | Post=231.27ms | Total=483.12ms | FPS=2.07 | Mem=239.2 MB
+FPS: 5.31 | Memory: 239.2 MB
+Pre=1.75ms | Infer=235.24ms | Post=273.81ms | Total=510.80ms | FPS=1.96 | Mem=239.2 MB
+Pre=1.75ms | Infer=241.63ms | Post=241.01ms | Total=484.39ms | FPS=2.06 | Mem=239.2 MB
+FPS: 5.45 | Memory: 239.2 MB
+Pre=1.83ms | Infer=231.56ms | Post=285.95ms | Total=519.35ms | FPS=1.93 | Mem=239.2 MB
+Pre=1.77ms | Infer=232.95ms | Post=244.48ms | Total=479.19ms | FPS=2.09 | Mem=239.2 MB
+FPS: 5.48 | Memory: 239.2 MB
+Pre=1.72ms | Infer=233.60ms | Post=277.39ms | Total=512.71ms | FPS=1.95 | Mem=239.2 MB
+Pre=1.78ms | Infer=228.24ms | Post=233.72ms | Total=463.74ms | FPS=2.16 | Mem=239.2 MB
+FPS: 5.54 | Memory: 239.2 MB
+Pre=1.81ms | Infer=244.15ms | Post=252.21ms | Total=498.18ms | FPS=2.01 | Mem=239.2 MB
+Pre=1.73ms | Infer=230.60ms | Post=243.53ms | Total=475.87ms | FPS=2.10 | Mem=239.2 MB
+FPS: 5.74 | Memory: 239.2 MB
+Pre=1.82ms | Infer=243.67ms | Post=236.03ms | Total=481.52ms | FPS=2.08 | Mem=239.2 MB
+Pre=2.47ms | Infer=235.01ms | Post=258.20ms | Total=495.67ms | FPS=2.02 | Mem=251.2 MB
+FPS: 5.55 | Memory: 251.2 MB
+Pre=1.52ms | Infer=250.68ms | Post=221.83ms | Total=474.03ms | FPS=2.11 | Mem=239.2 MB
+Pre=1.77ms | Infer=224.00ms | Post=257.34ms | Total=483.11ms | FPS=2.07 | Mem=239.2 MB
+FPS: 5.50 | Memory: 239.2 MB
+Pre=2.41ms | Infer=245.99ms | Post=236.16ms | Total=484.56ms | FPS=2.06 | Mem=239.2 MB
+Pre=1.71ms | Infer=235.66ms | Post=271.35ms | Total=508.72ms | FPS=1.97 | Mem=239.2 MB
+FPS: 5.51 | Memory: 239.2 MB
+Pre=1.72ms | Infer=221.54ms | Post=244.88ms | Total=468.13ms | FPS=2.14 | Mem=239.2 MB
+Pre=1.83ms | Infer=228.65ms | Post=286.78ms | Total=517.26ms | FPS=1.93 | Mem=239.2 MB
+FPS: 5.40 | Memory: 239.2 MB
+Pre=1.76ms | Infer=219.46ms | Post=241.94ms | Total=463.15ms | FPS=2.16 | Mem=239.2 MB
+Inference time stats (n=100): mean=251.92 ms | p95=282.49 ms
+Detection count stats (n=100): mean=2.06
+Pre=1.74ms | Infer=235.74ms | Post=263.21ms | Total=500.69ms | FPS=2.00 | Mem=239.2 MB
+FPS: 5.71 | Memory: 239.2 MB
+Pre=1.78ms | Infer=231.54ms | Post=233.42ms | Total=466.74ms | FPS=2.14 | Mem=239.1 MB
+Pre=1.84ms | Infer=240.20ms | Post=241.75ms | Total=483.80ms | FPS=2.07 | Mem=239.1 MB
+FPS: 5.54 | Memory: 239.1 MB
+Pre=3.56ms | Infer=234.54ms | Post=260.36ms | Total=498.47ms | FPS=2.01 | Mem=251.1 MB
+Pre=1.91ms | Infer=252.27ms | Post=226.46ms | Total=480.64ms | FPS=2.08 | Mem=239.1 MB
+FPS: 5.49 | Memory: 239.1 MB
+Pre=1.77ms | Infer=223.64ms | Post=253.63ms | Total=479.04ms | FPS=2.09 | Mem=239.1 MB
+Pre=1.75ms | Infer=239.12ms | Post=238.66ms | Total=479.53ms | FPS=2.09 | Mem=239.1 MB
+FPS: 5.61 | Memory: 239.1 MB
+Pre=1.75ms | Infer=227.42ms | Post=260.38ms | Total=489.55ms | FPS=2.04 | Mem=239.1 MB
+Pre=1.82ms | Infer=235.07ms | Post=239.28ms | Total=476.16ms | FPS=2.10 | Mem=239.1 MB
+FPS: 5.66 | Memory: 239.1 MB
+Pre=1.74ms | Infer=232.97ms | Post=255.82ms | Total=490.53ms | FPS=2.04 | Mem=239.1 MB
+Pre=1.87ms | Infer=231.29ms | Post=241.88ms | Total=475.04ms | FPS=2.11 | Mem=239.1 MB
+FPS: 5.62 | Memory: 239.1 MB
+Pre=1.76ms | Infer=219.71ms | Post=292.35ms | Total=513.83ms | FPS=1.95 | Mem=239.1 MB
+Pre=1.78ms | Infer=216.86ms | Post=252.92ms | Total=471.56ms | FPS=2.12 | Mem=239.1 MB
+FPS: 5.47 | Memory: 239.1 MB
+Pre=1.83ms | Infer=239.33ms | Post=251.10ms | Total=492.26ms | FPS=2.03 | Mem=239.1 MB
+Pre=2.47ms | Infer=240.10ms | Post=253.79ms | Total=496.36ms | FPS=2.01 | Mem=251.1 MB
+FPS: 5.52 | Memory: 251.1 MB
+Pre=1.54ms | Infer=250.97ms | Post=239.65ms | Total=492.16ms | FPS=2.03 | Mem=239.1 MB
+Pre=1.78ms | Infer=225.18ms | Post=244.93ms | Total=471.90ms | FPS=2.12 | Mem=239.1 MB
+FPS: 5.56 | Memory: 239.1 MB
+Pre=3.07ms | Infer=241.91ms | Post=233.25ms | Total=478.24ms | FPS=2.09 | Mem=239.1 MB
+Pre=1.79ms | Infer=224.24ms | Post=240.30ms | Total=466.33ms | FPS=2.14 | Mem=239.1 MB
+FPS: 5.65 | Memory: 233.7 MB
+Pre=1.91ms | Infer=240.66ms | Post=231.30ms | Total=473.87ms | FPS=2.11 | Mem=239.1 MB
+Pre=1.73ms | Infer=228.06ms | Post=258.48ms | Total=488.27ms | FPS=2.05 | Mem=239.1 MB
+FPS: 5.53 | Memory: 239.1 MB
+Pre=1.73ms | Infer=231.31ms | Post=245.10ms | Total=478.13ms | FPS=2.09 | Mem=239.1 MB
+Pre=1.73ms | Infer=220.70ms | Post=267.54ms | Total=489.96ms | FPS=2.04 | Mem=239.1 MB
+FPS: 5.62 | Memory: 239.1 MB
+Pre=1.78ms | Infer=235.89ms | Post=235.83ms | Total=473.50ms | FPS=2.11 | Mem=239.1 MB
+Pre=1.78ms | Infer=225.07ms | Post=278.72ms | Total=505.57ms | FPS=1.98 | Mem=239.1 MB
+FPS: 5.54 | Memory: 239.1 MB
+Pre=11.25ms | Infer=231.62ms | Post=246.22ms | Total=489.08ms | FPS=2.04 | Mem=251.1 MB
+Pre=1.36ms | Infer=240.81ms | Post=239.90ms | Total=482.08ms | FPS=2.07 | Mem=239.1 MB
+FPS: 5.58 | Memory: 239.1 MB
+Pre=1.45ms | Infer=220.03ms | Post=231.18ms | Total=452.66ms | FPS=2.21 | Mem=239.1 MB
+Pre=1.52ms | Infer=236.81ms | Post=241.63ms | Total=479.96ms | FPS=2.08 | Mem=239.1 MB
+FPS: 5.82 | Memory: 239.1 MB
+Pre=1.75ms | Infer=217.28ms | Post=230.43ms | Total=449.46ms | FPS=2.22 | Mem=239.1 MB
+Pre=1.58ms | Infer=239.90ms | Post=227.92ms | Total=469.40ms | FPS=2.13 | Mem=239.1 MB
+FPS: 5.87 | Memory: 239.1 MB
+Pre=1.52ms | Infer=224.50ms | Post=231.48ms | Total=457.50ms | FPS=2.19 | Mem=239.1 MB
+Pre=1.76ms | Infer=223.22ms | Post=242.14ms | Total=467.13ms | FPS=2.14 | Mem=239.1 MB
+FPS: 5.82 | Memory: 239.1 MB
+Pre=1.80ms | Infer=224.83ms | Post=219.31ms | Total=445.94ms | FPS=2.24 | Mem=239.1 MB
+Pre=1.47ms | Infer=235.36ms | Post=232.83ms | Total=469.66ms | FPS=2.13 | Mem=239.1 MB
+FPS: 5.80 | Memory: 239.1 MB
+Pre=1.59ms | Infer=212.99ms | Post=226.02ms | Total=440.61ms | FPS=2.27 | Mem=239.1 MB
+Pre=4.25ms | Infer=239.95ms | Post=259.81ms | Total=504.00ms | FPS=1.98 | Mem=251.1 MB
+FPS: 5.64 | Memory: 251.1 MB
+Pre=1.31ms | Infer=231.59ms | Post=232.51ms | Total=465.42ms | FPS=2.15 | Mem=239.1 MB
+Pre=1.68ms | Infer=231.02ms | Post=226.98ms | Total=459.68ms | FPS=2.18 | Mem=239.1 MB
+FPS: 5.84 | Memory: 239.1 MB
+Pre=1.57ms | Infer=215.61ms | Post=251.52ms | Total=468.70ms | FPS=2.13 | Mem=239.1 MB
+Pre=1.56ms | Infer=219.19ms | Post=224.77ms | Total=445.52ms | FPS=2.24 | Mem=239.1 MB
+FPS: 5.89 | Memory: 239.1 MB
+Pre=1.74ms | Infer=215.23ms | Post=262.26ms | Total=479.23ms | FPS=2.09 | Mem=239.1 MB
+Pre=1.75ms | Infer=214.49ms | Post=233.71ms | Total=449.95ms | FPS=2.22 | Mem=239.1 MB
+FPS: 5.78 | Memory: 239.1 MB
+Pre=1.55ms | Infer=216.67ms | Post=266.76ms | Total=484.98ms | FPS=2.06 | Mem=239.1 MB
+Pre=1.60ms | Infer=213.24ms | Post=221.48ms | Total=436.32ms | FPS=2.29 | Mem=239.1 MB
+FPS: 5.89 | Memory: 239.1 MB
+Pre=1.77ms | Infer=222.49ms | Post=229.98ms | Total=454.24ms | FPS=2.20 | Mem=239.1 MB
+Pre=1.57ms | Infer=223.82ms | Post=216.36ms | Total=441.75ms | FPS=2.26 | Mem=239.1 MB
+FPS: 5.96 | Memory: 239.2 MB
+Pre=9.67ms | Infer=224.66ms | Post=272.21ms | Total=506.54ms | FPS=1.97 | Mem=251.2 MB
+Pre=1.28ms | Infer=229.97ms | Post=277.01ms | Total=508.26ms | FPS=1.97 | Mem=239.2 MB
+FPS: 5.30 | Memory: 239.2 MB
+Pre=1.75ms | Infer=210.68ms | Post=193.09ms | Total=405.52ms | FPS=2.47 | Mem=239.2 MB
+Pre=1.71ms | Infer=216.89ms | Post=277.05ms | Total=495.64ms | FPS=2.02 | Mem=239.2 MB
+FPS: 5.88 | Memory: 239.2 MB
+Pre=1.75ms | Infer=212.98ms | Post=198.00ms | Total=412.73ms | FPS=2.42 | Mem=239.2 MB
+Pre=1.69ms | Infer=223.83ms | Post=205.71ms | Total=431.23ms | FPS=2.32 | Mem=239.2 MB
+FPS: 7.97 | Memory: 233.8 MB
+Pre=1.56ms | Infer=237.60ms | Post=205.72ms | Total=444.88ms | FPS=2.25 | Mem=239.2 MB
+Pre=1.68ms | Infer=213.92ms | Post=245.64ms | Total=461.23ms | FPS=2.17 | Mem=239.2 MB
+FPS: 6.00 | Memory: 233.8 MB
+Pre=1.61ms | Infer=216.62ms | Post=283.73ms | Total=501.96ms | FPS=1.99 | Mem=239.2 MB
+Pre=1.78ms | Infer=223.24ms | Post=262.28ms | Total=487.29ms | FPS=2.05 | Mem=239.2 MB
+FPS: 3.79 | Memory: 239.2 MB
+Pre=1.64ms | Infer=208.03ms | Post=215.95ms | Total=425.61ms | FPS=2.35 | Mem=239.2 MB
+Pre=2.12ms | Infer=206.36ms | Post=258.26ms | Total=466.74ms | FPS=2.14 | Mem=251.2 MB
+FPS: 6.97 | Memory: 245.8 MB
+Pre=1.36ms | Infer=236.01ms | Post=223.12ms | Total=460.48ms | FPS=2.17 | Mem=239.2 MB
+Pre=1.55ms | Infer=214.28ms | Post=223.25ms | Total=439.08ms | FPS=2.28 | Mem=239.2 MB
+FPS: 5.96 | Memory: 233.8 MB
+Pre=1.56ms | Infer=228.14ms | Post=225.37ms | Total=455.06ms | FPS=2.20 | Mem=239.2 MB
+Pre=1.57ms | Infer=217.19ms | Post=222.74ms | Total=441.50ms | FPS=2.26 | Mem=239.2 MB
+FPS: 6.77 | Memory: 233.8 MB
+Pre=1.58ms | Infer=232.89ms | Post=222.88ms | Total=457.34ms | FPS=2.19 | Mem=239.2 MB
+Pre=1.47ms | Infer=210.95ms | Post=228.62ms | Total=441.03ms | FPS=2.27 | Mem=239.2 MB
+Pre=1.56ms | Infer=227.16ms | Post=211.48ms | Total=440.20ms | FPS=2.27 | Mem=239.2 MB
+FPS: 4.86 | Memory: 239.2 MB
+Pre=1.65ms | Infer=215.07ms | Post=210.24ms | Total=426.95ms | FPS=2.34 | Mem=239.2 MB
+Pre=1.60ms | Infer=221.20ms | Post=238.61ms | Total=461.40ms | FPS=2.17 | Mem=239.2 MB
+FPS: 7.80 | Memory: 233.8 MB
+Pre=1.74ms | Infer=215.48ms | Post=216.21ms | Total=433.43ms | FPS=2.31 | Mem=239.2 MB
+Pre=1.54ms | Infer=232.90ms | Post=277.43ms | Total=511.87ms | FPS=1.95 | Mem=239.2 MB
+FPS: 3.95 | Memory: 239.2 MB
+Pre=10.98ms | Infer=201.86ms | Post=200.00ms | Total=412.83ms | FPS=2.42 | Mem=251.2 MB
+Pre=2.28ms | Infer=231.73ms | Post=218.87ms | Total=452.88ms | FPS=2.21 | Mem=239.2 MB
+FPS: 7.84 | Memory: 233.8 MB
+Pre=1.60ms | Infer=211.18ms | Post=227.73ms | Total=440.51ms | FPS=2.27 | Mem=239.2 MB
+Pre=1.57ms | Infer=228.24ms | Post=221.11ms | Total=450.92ms | FPS=2.22 | Mem=239.2 MB
+Pre=1.51ms | Infer=209.64ms | Post=218.71ms | Total=429.86ms | FPS=2.33 | Mem=239.2 MB
+FPS: 4.89 | Memory: 239.2 MB
+Pre=1.55ms | Infer=218.52ms | Post=246.66ms | Total=466.73ms | FPS=2.14 | Mem=239.2 MB
+Pre=1.63ms | Infer=230.55ms | Post=278.35ms | Total=510.52ms | FPS=1.96 | Mem=239.2 MB
+FPS: 5.55 | Memory: 239.2 MB
+Pre=1.73ms | Infer=217.33ms | Post=194.07ms | Total=413.13ms | FPS=2.42 | Mem=239.2 MB
+Pre=1.73ms | Infer=207.83ms | Post=194.25ms | Total=403.81ms | FPS=2.48 | Mem=239.2 MB
+Pre=1.56ms | Infer=224.80ms | Post=194.15ms | Total=420.51ms | FPS=2.38 | Mem=239.2 MB
+FPS: 6.38 | Memory: 239.2 MB
+Pre=1.71ms | Infer=211.01ms | Post=206.12ms | Total=418.85ms | FPS=2.39 | Mem=239.2 MB
+Pre=1.78ms | Infer=217.36ms | Post=230.64ms | Total=449.78ms | FPS=2.22 | Mem=239.2 MB
+FPS: 7.94 | Memory: 245.8 MB
+Pre=4.79ms | Infer=226.87ms | Post=233.20ms | Total=464.87ms | FPS=2.15 | Mem=251.2 MB
+Pre=1.42ms | Infer=240.20ms | Post=208.15ms | Total=449.76ms | FPS=2.22 | Mem=239.2 MB
+FPS: 4.98 | Memory: 233.8 MB
+Pre=1.72ms | Infer=210.57ms | Post=267.28ms | Total=479.56ms | FPS=2.09 | Mem=239.2 MB
+Pre=1.56ms | Infer=221.10ms | Post=277.69ms | Total=500.35ms | FPS=2.00 | Mem=239.2 MB
+FPS: 4.69 | Memory: 239.2 MB
+Pre=1.59ms | Infer=209.86ms | Post=193.51ms | Total=404.95ms | FPS=2.47 | Mem=239.2 MB
+Pre=1.54ms | Infer=220.62ms | Post=193.46ms | Total=415.62ms | FPS=2.41 | Mem=239.2 MB
+Pre=1.44ms | Infer=208.03ms | Post=277.49ms | Total=486.96ms | FPS=2.05 | Mem=239.2 MB
+FPS: 6.05 | Memory: 239.2 MB
+Pre=1.52ms | Infer=207.73ms | Post=193.61ms | Total=402.86ms | FPS=2.48 | Mem=239.2 MB
+Pre=1.57ms | Infer=219.38ms | Post=193.55ms | Total=414.51ms | FPS=2.41 | Mem=239.2 MB
+Pre=1.56ms | Infer=218.20ms | Post=205.00ms | Total=424.76ms | FPS=2.35 | Mem=239.2 MB
+FPS: 6.41 | Memory: 239.2 MB
+Pre=1.52ms | Infer=208.31ms | Post=217.85ms | Total=427.68ms | FPS=2.34 | Mem=239.2 MB
+Pre=1.62ms | Infer=222.72ms | Post=243.57ms | Total=467.92ms | FPS=2.14 | Mem=239.2 MB
+FPS: 6.94 | Memory: 245.9 MB
+Pre=5.82ms | Infer=217.89ms | Post=235.94ms | Total=459.64ms | FPS=2.18 | Mem=250.8 MB
+Pre=1.27ms | Infer=233.48ms | Post=205.77ms | Total=440.52ms | FPS=2.27 | Mem=238.8 MB
+FPS: 4.97 | Memory: 238.8 MB
+Pre=1.72ms | Infer=217.41ms | Post=207.00ms | Total=426.13ms | FPS=2.35 | Mem=238.8 MB
+Pre=1.67ms | Infer=221.94ms | Post=240.06ms | Total=463.67ms | FPS=2.16 | Mem=238.8 MB
+FPS: 7.80 | Memory: 233.4 MB
+Pre=1.59ms | Infer=209.09ms | Post=227.38ms | Total=438.06ms | FPS=2.28 | Mem=238.8 MB
+Pre=1.75ms | Infer=228.16ms | Post=210.00ms | Total=439.92ms | FPS=2.27 | Mem=238.8 MB
+Inference time stats (n=100): mean=223.91 ms | p95=240.20 ms
+Detection count stats (n=100): mean=2.02
+Pre=1.52ms | Infer=224.89ms | Post=277.01ms | Total=503.42ms | FPS=1.99 | Mem=238.8 MB
+FPS: 4.65 | Memory: 238.8 MB
+Pre=1.55ms | Infer=223.00ms | Post=193.17ms | Total=417.72ms | FPS=2.39 | Mem=238.8 MB
+Pre=1.92ms | Infer=208.02ms | Post=192.94ms | Total=402.88ms | FPS=2.48 | Mem=238.8 MB
+Pre=1.74ms | Infer=223.66ms | Post=207.54ms | Total=432.94ms | FPS=2.31 | Mem=238.8 MB
+FPS: 6.30 | Memory: 238.8 MB
+Pre=1.44ms | Infer=219.57ms | Post=196.67ms | Total=417.69ms | FPS=2.39 | Mem=238.8 MB
+Pre=1.50ms | Infer=212.16ms | Post=210.55ms | Total=424.21ms | FPS=2.36 | Mem=238.8 MB
+Pre=2.42ms | Infer=210.35ms | Post=237.67ms | Total=450.44ms | FPS=2.22 | Mem=250.8 MB
+FPS: 6.22 | Memory: 250.8 MB
+Pre=7.48ms | Infer=231.95ms | Post=217.10ms | Total=456.53ms | FPS=2.19 | Mem=238.9 MB
+Pre=1.73ms | Infer=208.38ms | Post=254.45ms | Total=464.56ms | FPS=2.15 | Mem=239.4 MB
+FPS: 5.90 | Memory: 239.4 MB
+Pre=1.86ms | Infer=234.72ms | Post=254.54ms | Total=491.12ms | FPS=2.04 | Mem=239.4 MB
+Pre=1.73ms | Infer=216.39ms | Post=228.51ms | Total=446.63ms | FPS=2.24 | Mem=240.4 MB
+FPS: 5.90 | Memory: 240.4 MB
+=== MODE SWITCH → segmentation ===
+Pre=1.56ms | Infer=220.21ms | Post=245.63ms | Total=467.40ms | FPS=2.14 | Mem=240.6 MB
+Pre=2.43ms | Infer=267.39ms | Post=267.79ms | Total=537.61ms | FPS=1.86 | Mem=240.8 MB
+FPS: 3.78 | Memory: 240.8 MB
+Pre=2.45ms | Infer=243.41ms | Post=240.40ms | Total=486.26ms | FPS=2.06 | Mem=240.8 MB
+Pre=3.52ms | Infer=248.02ms | Post=229.85ms | Total=481.39ms | FPS=2.08 | Mem=240.8 MB
+Pre=2.22ms | Infer=217.48ms | Post=245.69ms | Total=465.38ms | FPS=2.15 | Mem=240.8 MB
+FPS: 2.09 | Memory: 240.8 MB
+Pre=3.65ms | Infer=267.12ms | Post=267.72ms | Total=538.49ms | FPS=1.86 | Mem=252.6 MB
+Pre=9.70ms | Infer=228.81ms | Post=233.84ms | Total=472.36ms | FPS=2.12 | Mem=240.6 MB
+FPS: 1.97 | Memory: 240.6 MB
+Pre=2.99ms | Infer=248.86ms | Post=233.67ms | Total=485.52ms | FPS=2.06 | Mem=240.7 MB
+Pre=1.96ms | Infer=223.05ms | Post=232.55ms | Total=457.56ms | FPS=2.19 | Mem=240.7 MB
+Pre=2.28ms | Infer=249.22ms | Post=228.60ms | Total=480.10ms | FPS=2.08 | Mem=240.7 MB
+FPS: 2.10 | Memory: 240.7 MB
+Pre=2.35ms | Infer=218.73ms | Post=234.27ms | Total=455.35ms | FPS=2.20 | Mem=240.7 MB
+Pre=2.99ms | Infer=252.63ms | Post=227.62ms | Total=483.24ms | FPS=2.07 | Mem=240.7 MB
+Pre=2.33ms | Infer=223.17ms | Post=224.13ms | Total=449.63ms | FPS=2.22 | Mem=240.7 MB
+FPS: 2.16 | Memory: 240.7 MB
+Pre=2.26ms | Infer=253.60ms | Post=232.23ms | Total=488.09ms | FPS=2.05 | Mem=240.7 MB
+Pre=2.83ms | Infer=220.69ms | Post=206.87ms | Total=430.38ms | FPS=2.32 | Mem=240.6 MB
+Pre=5.21ms | Infer=273.44ms | Post=269.13ms | Total=547.78ms | FPS=1.83 | Mem=252.7 MB
+FPS: 2.04 | Memory: 252.7 MB
+Pre=5.81ms | Infer=240.42ms | Post=269.22ms | Total=515.45ms | FPS=1.94 | Mem=240.7 MB
+Pre=2.56ms | Infer=232.01ms | Post=220.78ms | Total=455.35ms | FPS=2.20 | Mem=240.7 MB
+Pre=2.27ms | Infer=221.14ms | Post=217.16ms | Total=440.57ms | FPS=2.27 | Mem=240.7 MB
+FPS: 2.12 | Memory: 240.7 MB
+Pre=2.42ms | Infer=271.96ms | Post=262.24ms | Total=536.62ms | FPS=1.86 | Mem=240.7 MB
+Pre=2.48ms | Infer=238.40ms | Post=207.31ms | Total=448.18ms | FPS=2.23 | Mem=240.7 MB
+Pre=2.32ms | Infer=247.35ms | Post=251.57ms | Total=501.25ms | FPS=2.00 | Mem=240.7 MB
+FPS: 2.02 | Memory: 240.7 MB
+Pre=2.31ms | Infer=223.18ms | Post=207.75ms | Total=433.24ms | FPS=2.31 | Mem=240.7 MB
+Pre=2.37ms | Infer=249.49ms | Post=254.73ms | Total=506.58ms | FPS=1.97 | Mem=240.7 MB
+Pre=2.40ms | Infer=225.89ms | Post=205.73ms | Total=434.02ms | FPS=2.30 | Mem=240.7 MB
+FPS: 2.18 | Memory: 240.7 MB
+Pre=3.47ms | Infer=273.27ms | Post=269.13ms | Total=545.86ms | FPS=1.83 | Mem=252.8 MB
+Pre=7.96ms | Infer=228.43ms | Post=219.55ms | Total=455.94ms | FPS=2.19 | Mem=240.8 MB
+FPS: 1.99 | Memory: 240.8 MB
+Pre=2.54ms | Infer=248.97ms | Post=252.28ms | Total=503.79ms | FPS=1.98 | Mem=240.9 MB
+Pre=2.37ms | Infer=221.51ms | Post=209.63ms | Total=433.51ms | FPS=2.31 | Mem=240.9 MB
+Pre=4.17ms | Infer=250.81ms | Post=252.68ms | Total=507.66ms | FPS=1.97 | Mem=240.9 MB
+FPS: 2.07 | Memory: 240.9 MB
+Pre=2.23ms | Infer=218.17ms | Post=223.04ms | Total=443.44ms | FPS=2.26 | Mem=240.9 MB
+Pre=2.76ms | Infer=250.01ms | Post=253.04ms | Total=505.81ms | FPS=1.98 | Mem=240.9 MB
+Pre=2.35ms | Infer=219.99ms | Post=223.38ms | Total=445.72ms | FPS=2.24 | Mem=240.9 MB
+FPS: 2.15 | Memory: 240.9 MB
+Pre=2.39ms | Infer=244.24ms | Post=260.46ms | Total=507.09ms | FPS=1.97 | Mem=240.9 MB
+Pre=2.28ms | Infer=217.74ms | Post=226.53ms | Total=446.55ms | FPS=2.24 | Mem=240.9 MB
+Pre=4.01ms | Infer=266.50ms | Post=269.29ms | Total=539.81ms | FPS=1.85 | Mem=252.9 MB
+FPS: 2.01 | Memory: 252.9 MB
+Pre=10.96ms | Infer=244.17ms | Post=208.47ms | Total=463.60ms | FPS=2.16 | Mem=240.9 MB
+Pre=4.05ms | Infer=242.15ms | Post=252.35ms | Total=498.54ms | FPS=2.01 | Mem=240.9 MB
+Pre=2.62ms | Infer=225.11ms | Post=208.93ms | Total=436.66ms | FPS=2.29 | Mem=240.9 MB
+FPS: 2.14 | Memory: 240.9 MB
+Pre=3.09ms | Infer=244.00ms | Post=231.52ms | Total=478.60ms | FPS=2.09 | Mem=240.9 MB
+Pre=2.74ms | Infer=229.80ms | Post=207.14ms | Total=439.67ms | FPS=2.27 | Mem=240.9 MB
+Pre=3.03ms | Infer=246.45ms | Post=228.49ms | Total=477.98ms | FPS=2.09 | Mem=240.9 MB
+FPS: 2.14 | Memory: 240.9 MB
+Pre=2.44ms | Infer=238.74ms | Post=225.19ms | Total=466.37ms | FPS=2.14 | Mem=240.9 MB
+Pre=3.15ms | Infer=242.67ms | Post=234.87ms | Total=480.69ms | FPS=2.08 | Mem=240.9 MB
+Pre=3.51ms | Infer=229.60ms | Post=228.11ms | Total=461.22ms | FPS=2.17 | Mem=240.9 MB
+FPS: 2.13 | Memory: 240.9 MB
+Pre=3.74ms | Infer=261.20ms | Post=254.70ms | Total=519.64ms | FPS=1.92 | Mem=252.9 MB
+Pre=6.50ms | Infer=245.72ms | Post=211.94ms | Total=464.16ms | FPS=2.15 | Mem=240.9 MB
+Pre=2.98ms | Infer=246.75ms | Post=227.90ms | Total=477.64ms | FPS=2.09 | Mem=240.9 MB
+FPS: 2.05 | Memory: 240.9 MB
+Pre=2.41ms | Infer=226.78ms | Post=235.15ms | Total=464.34ms | FPS=2.15 | Mem=240.9 MB
+Pre=2.40ms | Infer=250.47ms | Post=229.33ms | Total=482.20ms | FPS=2.07 | Mem=240.9 MB
+Pre=2.22ms | Infer=212.14ms | Post=248.46ms | Total=462.82ms | FPS=2.16 | Mem=240.9 MB
+FPS: 2.12 | Memory: 240.9 MB
+Pre=2.51ms | Infer=246.77ms | Post=231.11ms | Total=480.40ms | FPS=2.08 | Mem=240.9 MB
+Pre=1.84ms | Infer=222.12ms | Post=229.24ms | Total=453.20ms | FPS=2.21 | Mem=240.9 MB
+Pre=2.81ms | Infer=246.69ms | Post=235.45ms | Total=484.94ms | FPS=2.06 | Mem=240.9 MB
+FPS: 2.11 | Memory: 240.9 MB
+Pre=2.32ms | Infer=218.91ms | Post=230.00ms | Total=451.23ms | FPS=2.22 | Mem=240.9 MB
+Pre=3.80ms | Infer=264.55ms | Post=258.70ms | Total=527.05ms | FPS=1.90 | Mem=253.0 MB
+Pre=6.96ms | Infer=232.41ms | Post=243.67ms | Total=483.04ms | FPS=2.07 | Mem=241.0 MB
+FPS: 2.05 | Memory: 241.0 MB
+Pre=2.78ms | Infer=246.88ms | Post=242.90ms | Total=492.55ms | FPS=2.03 | Mem=241.0 MB
+Pre=2.36ms | Infer=233.55ms | Post=234.81ms | Total=470.72ms | FPS=2.12 | Mem=241.0 MB
+Pre=3.10ms | Infer=247.91ms | Post=245.51ms | Total=496.52ms | FPS=2.01 | Mem=241.0 MB
+FPS: 2.05 | Memory: 241.0 MB
+Pre=2.05ms | Infer=225.43ms | Post=232.89ms | Total=460.37ms | FPS=2.17 | Mem=241.0 MB
+Pre=3.28ms | Infer=250.06ms | Post=277.09ms | Total=530.42ms | FPS=1.89 | Mem=241.0 MB
+Pre=2.46ms | Infer=219.01ms | Post=228.13ms | Total=449.60ms | FPS=2.22 | Mem=241.0 MB
+FPS: 2.08 | Memory: 241.0 MB
+Pre=2.88ms | Infer=258.00ms | Post=256.84ms | Total=517.72ms | FPS=1.93 | Mem=241.0 MB
+Pre=2.68ms | Infer=229.58ms | Post=207.16ms | Total=439.42ms | FPS=2.28 | Mem=241.0 MB
+Pre=2.12ms | Infer=274.98ms | Post=267.37ms | Total=544.47ms | FPS=1.84 | Mem=252.9 MB
+FPS: 2.00 | Memory: 252.9 MB
+Pre=12.86ms | Infer=238.96ms | Post=208.86ms | Total=460.67ms | FPS=2.17 | Mem=240.9 MB
+Pre=2.60ms | Infer=261.66ms | Post=252.03ms | Total=516.29ms | FPS=1.94 | Mem=240.9 MB
+Pre=2.29ms | Infer=222.22ms | Post=216.75ms | Total=441.25ms | FPS=2.27 | Mem=240.9 MB
+FPS: 2.11 | Memory: 240.9 MB
+Pre=3.20ms | Infer=253.32ms | Post=268.59ms | Total=525.11ms | FPS=1.90 | Mem=240.9 MB
+Pre=2.65ms | Infer=243.12ms | Post=248.03ms | Total=493.80ms | FPS=2.03 | Mem=240.9 MB
+FPS: 1.96 | Memory: 240.9 MB
+Pre=3.21ms | Infer=260.62ms | Post=277.54ms | Total=541.37ms | FPS=1.85 | Mem=240.9 MB
+Pre=2.18ms | Infer=242.39ms | Post=269.25ms | Total=513.82ms | FPS=1.95 | Mem=240.9 MB
+FPS: 1.89 | Memory: 240.9 MB
+Pre=4.41ms | Infer=254.78ms | Post=255.98ms | Total=515.17ms | FPS=1.94 | Mem=240.9 MB
+Pre=2.38ms | Infer=215.11ms | Post=228.54ms | Total=446.03ms | FPS=2.24 | Mem=240.8 MB
+Pre=8.38ms | Infer=278.01ms | Post=265.18ms | Total=551.57ms | FPS=1.81 | Mem=248.2 MB
+FPS: 1.98 | Memory: 248.2 MB
+Pre=5.82ms | Infer=249.65ms | Post=205.74ms | Total=461.21ms | FPS=2.17 | Mem=236.4 MB
+Pre=3.03ms | Infer=257.98ms | Post=253.57ms | Total=514.58ms | FPS=1.94 | Mem=236.8 MB
+Pre=2.29ms | Infer=223.94ms | Post=213.10ms | Total=439.32ms | FPS=2.28 | Mem=236.8 MB
+FPS: 2.11 | Memory: 236.8 MB
+Pre=3.08ms | Infer=250.74ms | Post=276.85ms | Total=530.67ms | FPS=1.88 | Mem=236.8 MB
+Pre=2.24ms | Infer=217.38ms | Post=215.82ms | Total=435.44ms | FPS=2.30 | Mem=236.8 MB
+Message from debugger: killed
